@@ -15,4 +15,4 @@
 #include "spdlog/fmt/ostr.h"
 #include "spdlog/spdlog.h"
 
-#endif // MGE_MGEPCH_HH
+#endif  // MGE_MGEPCH_HH
