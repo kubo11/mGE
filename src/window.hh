@@ -1,8 +1,10 @@
 #ifndef MGE_WINDOW_HH
 #define MGE_WINDOW_HH
 
-#include "events/event.hh"
 #include "mgepch.hh"
+
+#include "events/event.hh"
+#include "math/vec4.hh"
 
 namespace mge {
 struct WindowData {
@@ -23,6 +25,7 @@ class Window {
 
   void init();
   void update();
+  void clear();
   void make_context_current();
   void set_event_handler(std::function<void(Event &)> event_handler);
 
@@ -47,6 +50,7 @@ class Window {
  private:
   WindowData m_data;
   GLFWwindow *m_window;
+  vec4<float> m_clear_color;
 
   void send_event(Event &);
   void set_default_window_callbacks();

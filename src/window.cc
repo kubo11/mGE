@@ -3,7 +3,8 @@
 #include "events/standard_events.hh"
 
 namespace mge {
-Window::Window(WindowData data) : m_data(std::move(data)) {
+Window::Window(WindowData data)
+    : m_data(std::move(data)), m_clear_color(0.2f, 0.3f, 0.3f, 1.0f) {
   MGE_INFO("Window \"{}\" created", m_data.title);
 }
 
@@ -23,8 +24,6 @@ void Window::init() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif  // __APPLE__
 
-  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
   m_window = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(),
                               nullptr, nullptr);
   if (m_window == NULL) {
@@ -43,6 +42,12 @@ void Window::update() {
   glfwPollEvents();
 
   MGE_TRACE("Window \"{}\" updated", m_data.title);
+}
+
+void Window::clear() {
+  glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b,
+               m_clear_color.a);
+  glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
@@ -86,7 +91,9 @@ void Window::iconify_callback(GLFWwindow *window, int iconified) {}
 void Window::maximize_callback(GLFWwindow *window, int maximized) {}
 
 void Window::framebuffer_resize_callback(GLFWwindow *window, int width,
-                                         int height) {}
+                                         int height) {
+  glViewport(0, 0, width, height);
+}
 
 void Window::content_scale_callback(GLFWwindow *window, float xscale,
                                     float yscale) {}

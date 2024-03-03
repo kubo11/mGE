@@ -26,7 +26,22 @@ class WindowClosedEvent : public WindowEvent {
   }
 };
 
-class WindowResizedEvent : public WindowEvent {};
+class WindowFramebufferResizedEvent : public WindowEvent {
+ public:
+  WindowFramebufferResizedEvent(const Window& window, uint16_t width,
+                                uint16_t height)
+      : WindowEvent(window), m_width(width), m_height(height) {}
+  virtual inline const std::string name() const override {
+    return "WindowFramebufferResizedEvent";
+  }
+
+  inline const uint16_t get_width() const { return m_width; }
+  inline const uint16_t get_height() const { return m_height; }
+
+ private:
+  uint16_t m_width;
+  uint16_t m_height;
+};
 
 }  // namespace mge
 

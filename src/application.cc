@@ -28,6 +28,8 @@ Application::~Application() {
 
 void Application::run() {
   while (m_running) {
+    m_main_window.clear();
+
     for (auto& layer : m_layer_stack) {
       layer->update();
     }
@@ -45,6 +47,10 @@ void Application::send_event(Event& event) {
 
   Event::try_handler<WindowClosedEvent>(
       event, BIND_EVENT_HANDLER(Application::on_window_closed));
+
+  if (event.handled) {
+    return;
+  }
 
   for (auto& layer : m_layer_stack | std::views::reverse) {
     layer->handle_event(event, m_timer.get_dt());
