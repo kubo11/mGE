@@ -15,8 +15,8 @@ struct vec2 {
     };
   };
 
-  vec2<T>(const T& t) : x(t), y(t) {}
-  vec2<T>(const T& x, const T& y) : x(x), y(y) {}
+  vec2(const T& t) : x(t), y(t) {}
+  vec2(const T& x, const T& y) : x(x), y(y) {}
 
   T& operator[](int idx) {
     switch (idx) {

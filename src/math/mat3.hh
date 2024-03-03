@@ -12,13 +12,12 @@ struct mat3 {
   vec3<T> data[3];
 
  public:
-  mat3<T>() : mat3<T>(1) {}
-  mat3<T>(const T& t) : data({t, 0, 0}, {0, t, 0}, {0, 0, t}) {}
-  mat3<T>(const vec3<T>& v) : data({v.x, 0, 0}, {0, v.y, 0}, {0, 0, v.z}) {}
-  mat3<T>(const vec3<T>& v, const vec3<T>& u, const vec3<T>& w)
-      : data(v, u, w) {}
-  mat3<T>(const T& x0, const T& y0, const T& z0, const T& x1, const T& y1,
-          const T& z1, const T& x2, const T& y2, const T& z2)
+  mat3() : mat3<T>(1) {}
+  mat3(const T& t) : data({t, 0, 0}, {0, t, 0}, {0, 0, t}) {}
+  mat3(const vec3<T>& v) : data({v.x, 0, 0}, {0, v.y, 0}, {0, 0, v.z}) {}
+  mat3(const vec3<T>& v, const vec3<T>& u, const vec3<T>& w) : data(v, u, w) {}
+  mat3(const T& x0, const T& y0, const T& z0, const T& x1, const T& y1,
+       const T& z1, const T& x2, const T& y2, const T& z2)
       : data({x0, x1, x2}, {y0, y1, y2}, {z0, z1, z2}) {}
 
   T& operator[](int idx) { return col(idx) }

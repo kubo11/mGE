@@ -15,9 +15,9 @@ struct vec3 {
     };
   };
 
-  vec3<T>(const T& t) : x(t), y(t), z(t) {}
-  vec3<T>(const T& x, const T& y, const T& z) : x(x), y(y), z(z) {}
-  vec3<T>(const vec2<T>& v, const T& z) : x(v.x), y(v.y), z(z) {}
+  vec3(const T& t) : x(t), y(t), z(t) {}
+  vec3(const T& x, const T& y, const T& z) : x(x), y(y), z(z) {}
+  vec3(const vec2<T>& v, const T& z) : x(v.x), y(v.y), z(z) {}
 
   T& operator[](int idx) {
     switch (idx) {
@@ -64,7 +64,7 @@ T dot(const vec3<T>& v, const vec3<T>& u) {
 
 template <typename T>
 vec3<T> cross(const vec3<T>& v, const vec3<T>& u) {
-  return vec3<T>(v.y * u.z - x.z * u.y, v.z * u.x - v.x * u.z,
+  return vec3<T>(v.y * u.z - v.z * u.y, v.z * u.x - v.x * u.z,
                  v.x * u.y - u.y * v.x);
 }
 

@@ -13,18 +13,17 @@ struct mat4 {
   vec4<T> data[4];
 
  public:
-  mat4<T>() : mat4<T>(1) {}
-  mat4<T>(const T& t)
+  mat4() : mat4<T>(1) {}
+  mat4(const T& t)
       : data({t, 0, 0, 0}, {0, t, 0, 0}, {0, 0, t, 0}, {0, 0, 0, t}) {}
-  mat4<T>(const vec4<T>& v)
+  mat4(const vec4<T>& v)
       : data({v.x, 0, 0, 0}, {0, v.y, 0, 0}, {0, 0, v.z, 0}, {0, 0, 0, v.w}) {}
-  mat4<T>(const vec4<T>& v, const vec4<T>& u, const vec4<T>& w,
-          const vec4<T>& t)
+  mat4(const vec4<T>& v, const vec4<T>& u, const vec4<T>& w, const vec4<T>& t)
       : data(v, u, w, t) {}
-  mat4<T>(const T& x0, const T& y0, const T& z0, const T& w0, const T& x1,
-          const T& y1, const T& z1, const T& w1, const T& x2, const T& y2,
-          const T& z2, const T& w2, const T& x3, const T& y3, const T& z3,
-          const T& w3)
+  mat4(const T& x0, const T& y0, const T& z0, const T& w0, const T& x1,
+       const T& y1, const T& z1, const T& w1, const T& x2, const T& y2,
+       const T& z2, const T& w2, const T& x3, const T& y3, const T& z3,
+       const T& w3)
       : data({x0, x1, x2, x3}, {y0, y1, y2, y3}, {z0, z1, z2, z3},
              {w0, w1, w2, w3}) {}
 

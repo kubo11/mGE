@@ -12,11 +12,11 @@ struct mat2 {
   vec2<T> data[2];
 
  public:
-  mat2<T>() : mat2<T>(1) {}
-  mat2<T>(const T& t) : data({t, 0}, {0, t}) {}
-  mat2<T>(const vec2<T>& v) : data({v.x, 0}, {0, v.y}) {}
-  mat2<T>(const vec2<T>& v, const vec2<T>& u) : data(v, u) {}
-  mat2<T>(const T& x0, const T& y0, const T& x1, const T& y1)
+  mat2() : mat2<T>(1) {}
+  mat2(const T& t) : data({t, 0}, {0, t}) {}
+  mat2(const vec2<T>& v) : data({v.x, 0}, {0, v.y}) {}
+  mat2(const vec2<T>& v, const vec2<T>& u) : data(v, u) {}
+  mat2(const T& x0, const T& y0, const T& x1, const T& y1)
       : data({x0, x1}, {y0, y1}) {}
 
   T& operator[](int idx) { return col(idx) }

@@ -3,6 +3,9 @@
 
 #include "../mgepch.hh"
 
+#include "vec2.hh"
+#include "vec3.hh"
+
 namespace mge {
 template <typename T>
 struct vec4 {
@@ -15,14 +18,12 @@ struct vec4 {
     };
   };
 
-  vec4<T>(const T& t) : x(t), y(t), z(t), w(t) {}
-  vec4<T>(const T& x, const T& y, const T& z, const T& w)
+  vec4(const T& t) : x(t), y(t), z(t), w(t) {}
+  vec4(const T& x, const T& y, const T& z, const T& w)
       : x(x), y(y), z(z), w(w) {}
-  vec4<T>(const vec2<T>& v, const T& z, const T& w)
-      : x(v.x), y(v.y), z(z), w(w) {}
-  vec4<T>(const vec2<T>& v, const vec2<T>& u)
-      : x(v.x), y(v.y), z(u.x), w(u.y) {}
-  vec4<T>(const vec3<T>& v, const T& w) : x(v.x), y(v.y), z(v.z), w(w) {}
+  vec4(const vec2<T>& v, const T& z, const T& w) : x(v.x), y(v.y), z(z), w(w) {}
+  vec4(const vec2<T>& v, const vec2<T>& u) : x(v.x), y(v.y), z(u.x), w(u.y) {}
+  vec4(const vec3<T>& v, const T& w) : x(v.x), y(v.y), z(v.z), w(w) {}
 
   T& operator[](int idx) {
     switch (idx) {
