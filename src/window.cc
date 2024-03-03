@@ -1,0 +1,135 @@
+#include "window.hh"
+
+#include "events/standard_events.hh"
+
+namespace mge {
+Window::Window(WindowData data) : m_data(std::move(data)) {
+  MGE_INFO("Window \"{}\" created", m_data.title);
+}
+
+Window::~Window() {
+  glfwDestroyWindow(m_window);
+  m_window = nullptr;
+
+  MGE_INFO("Window \"{}\" terminated", m_data.title);
+}
+
+void Window::init() {
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif  // __APPLE__
+
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+  m_window = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(),
+                              nullptr, nullptr);
+  if (m_window == NULL) {
+    throw std::runtime_error("GLFW cannot create a window instance");
+  }
+
+  glfwSetWindowUserPointer(m_window, this);
+
+  set_default_window_callbacks();
+
+  MGE_INFO("Window \"{}\" initialized", m_data.title);
+}
+
+void Window::update() {
+  glfwSwapBuffers(m_window);
+  glfwPollEvents();
+
+  MGE_TRACE("Window \"{}\" updated", m_data.title);
+}
+
+void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
+
+void Window::set_event_handler(std::function<void(Event &)> event_handler) {
+  m_data.send_event = event_handler;
+}
+
+bool Window::operator==(const Window &w) { return m_window == w.m_window; }
+
+void Window::set_default_window_callbacks() {
+  glfwSetWindowPosCallback(m_window, Window::position_callback);
+  glfwSetWindowSizeCallback(m_window, Window::size_callback);
+  glfwSetWindowCloseCallback(m_window, Window::close_callback);
+  glfwSetWindowRefreshCallback(m_window, Window::refresh_callback);
+  glfwSetWindowFocusCallback(m_window, Window::focus_callback);
+  glfwSetWindowIconifyCallback(m_window, Window::iconify_callback);
+  glfwSetWindowMaximizeCallback(m_window, Window::maximize_callback);
+  glfwSetFramebufferSizeCallback(m_window, Window::framebuffer_resize_callback);
+  glfwSetWindowContentScaleCallback(m_window, Window::content_scale_callback);
+}
+
+void Window::send_event(Event &event) { m_data.send_event(event); }
+
+void Window::position_callback(GLFWwindow *window, int xpos, int ypos) {}
+
+void Window::size_callback(GLFWwindow *window, int width, int height) {}
+
+void Window::close_callback(GLFWwindow *window) {
+  Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  WindowClosedEvent event(*mge_window);
+  mge_window->send_event(event);
+}
+
+void Window::refresh_callback(GLFWwindow *window) {}
+
+void Window::focus_callback(GLFWwindow *window, int focused) {}
+
+void Window::iconify_callback(GLFWwindow *window, int iconified) {}
+
+void Window::maximize_callback(GLFWwindow *window, int maximized) {}
+
+void Window::framebuffer_resize_callback(GLFWwindow *window, int width,
+                                         int height) {}
+
+void Window::content_scale_callback(GLFWwindow *window, float xscale,
+                                    float yscale) {}
+
+GLFWwindowposfun Window::set_position_callback(GLFWwindowposfun callback) {
+  return glfwSetWindowPosCallback(m_window, callback);
+}
+
+GLFWwindowsizefun Window::set_size_callback(GLFWwindowsizefun callback) {
+  return glfwSetWindowSizeCallback(m_window, callback);
+}
+
+GLFWwindowclosefun Window::set_close_callback(GLFWwindowclosefun callback) {
+  return glfwSetWindowCloseCallback(m_window, callback);
+}
+
+GLFWwindowrefreshfun Window::set_refresh_callback(
+    GLFWwindowrefreshfun callback) {
+  return glfwSetWindowRefreshCallback(m_window, callback);
+}
+
+GLFWwindowfocusfun Window::set_focus_callback(GLFWwindowfocusfun callback) {
+  return glfwSetWindowFocusCallback(m_window, callback);
+}
+
+GLFWwindowiconifyfun Window::set_iconify_callback(
+    GLFWwindowiconifyfun callback) {
+  return glfwSetWindowIconifyCallback(m_window, callback);
+}
+
+GLFWwindowmaximizefun Window::set_maximize_callback(
+    GLFWwindowmaximizefun callback) {
+  return glfwSetWindowMaximizeCallback(m_window, callback);
+}
+
+GLFWframebuffersizefun Window::set_framebuffer_resize_callback(
+    GLFWframebuffersizefun callback) {
+  return glfwSetFramebufferSizeCallback(m_window, callback);
+}
+
+GLFWwindowcontentscalefun Window::set_content_scale_callback(
+    GLFWwindowcontentscalefun callback) {
+  return glfwSetWindowContentScaleCallback(m_window, callback);
+}
+
+}  // namespace mge

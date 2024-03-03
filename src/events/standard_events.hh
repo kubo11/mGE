@@ -1,0 +1,6 @@
+#ifndef MGE_EVENT_STANDARD_EVENTS_HH
+#define MGE_EVENT_STANDARD_EVENTS_HH
+
+#include "window_event.hh"
+
+#endif  // MGE_EVENT_STANDARD_EVENTS_HH
