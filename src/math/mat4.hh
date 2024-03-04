@@ -20,44 +20,51 @@ struct mat4 {
       : data({v.x, 0, 0, 0}, {0, v.y, 0, 0}, {0, 0, v.z, 0}, {0, 0, 0, v.w}) {}
   mat4(const vec4<T>& v, const vec4<T>& u, const vec4<T>& w, const vec4<T>& t)
       : data(v, u, w, t) {}
-  mat4(const T& x0, const T& y0, const T& z0, const T& w0, const T& x1,
-       const T& y1, const T& z1, const T& w1, const T& x2, const T& y2,
-       const T& z2, const T& w2, const T& x3, const T& y3, const T& z3,
+  //   mat4(const T& x0, const T& y0, const T& z0, const T& w0, const T& x1,
+  //        const T& y1, const T& z1, const T& w1, const T& x2, const T& y2,
+  //        const T& z2, const T& w2, const T& x3, const T& y3, const T& z3,
+  //        const T& w3)
+  //       : data({x0, x1, x2, x3}, {y0, y1, y2, y3}, {z0, z1, z2, z3},
+  //              {w0, w1, w2, w3}) {}
+
+  mat4(const T& x0, const T& x1, const T& x2, const T& x3, const T& y0,
+       const T& y1, const T& y2, const T& y3, const T& z0, const T& z1,
+       const T& z2, const T& z3, const T& w0, const T& w1, const T& w2,
        const T& w3)
       : data({x0, x1, x2, x3}, {y0, y1, y2, y3}, {z0, z1, z2, z3},
              {w0, w1, w2, w3}) {}
 
-  T& operator[](int idx) { return col(idx) }
+  vec4<T>& operator[](int idx) { return col(idx); }
 
-  const T& operator[](int idx) const { col(idx); }
+  const vec4<T>& operator[](int idx) const { return col(idx); }
 
-  T& col(int idx) {
+  vec4<T>& col(int idx) {
     if (idx < 0 || idx > 4) {
-      throw std::out_of_range();
+      throw std::out_of_range("idx in [0, 3]");
     }
 
     return data[idx];
   }
 
-  const T& col(int idx) const {
+  const vec4<T>& col(int idx) const {
     if (idx < 0 || idx > 4) {
-      throw std::out_of_range();
+      throw std::out_of_range("idx in [0, 3]");
     }
 
     return data[idx];
   }
 
-  T& row(int idx) {
+  vec4<T> row(int idx) {
     if (idx < 0 || idx > 4) {
-      throw std::out_of_range();
+      throw std::out_of_range("idx in [0, 3]");
     }
 
     return vec4<T>(data[0][idx], data[1][idx], data[2][idx], data[3][idx]);
   }
 
-  const T& row(int idx) const {
+  vec4<T> row(int idx) const {
     if (idx < 0 || idx > 4) {
-      throw std::out_of_range();
+      throw std::out_of_range("idx in [0, 3]");
     }
 
     return vec4<T>(data[0][idx], data[1][idx], data[2][idx], data[3][idx]);
@@ -168,8 +175,8 @@ mat4<T> rotation_matrix(double angle, const vec3<T>& v) {
   return mat4<T>(c + v.x * v.x * (1 - c), v.x * v.y * (1 - c) - v.z * s,
                  v.x * v.z * (1 - c) + v.y * s, 0,
                  v.y * v.x * (1 - c) + v.z * s, c + v.y * v.y * (1 - c),
-                 v.y * v.z * (1 - c) - u.x * s, 0,
-                 v.z * v.x * (1 - c) - v.y * s, v, z * v.y * (1 - c) + v.x * s,
+                 v.y * v.z * (1 - c) - v.x * s, 0,
+                 v.z * v.x * (1 - c) - v.y * s, v.z * v.y * (1 - c) + v.x * s,
                  c + v.z * v.z * (1 - c), 0, 0, 0, 0, 1);
 }
 
@@ -226,16 +233,16 @@ mat4<T> operator*(const mat4<T>& m, const T& a) {
 
 template <typename T>
 vec4<T> operator*(const mat4<T>& m, const vec4<T>& v) {
-  return vec2<T>(m.row(0) * v, m.row(1) * v, m.row(2) * v, m.row(3) * v);
+  return vec4<T>(m.row(0) * v, m.row(1) * v, m.row(2) * v, m.row(3) * v);
 }
 
 template <typename T>
 mat4<T> operator*(const mat4<T>& m, const mat4<T>& n) {
-  return mat2<T>(m * n[0], m * n[1], m * n[2], m * n[3]);
+  return mat4<T>(m * n[0], m * n[1], m * n[2], m * n[3]);
 }
 
 template <typename T>
-mat4<T> operator/(const mat4<T>& m, const T& n) {
+mat4<T> operator/(const mat4<T>& m, const T& a) {
   return mat4<T>(m[0] / a, m[1] / a, m[2] / a, m[3] / a);
 }
 
@@ -263,7 +270,7 @@ mat4<T> operator-=(mat4<T>& m, const T& a) {
   m[1] -= a;
   m[2] -= a;
   m[3] -= a;
-  return v;
+  return m;
 }
 
 template <typename T>
@@ -295,7 +302,7 @@ mat4<T> operator/=(mat4<T>& m, const T& a) {
   m[1] /= a;
   m[2] /= a;
   m[3] /= a;
-  return v;
+  return m;
 }
 }  // namespace mge
 

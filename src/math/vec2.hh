@@ -15,6 +15,7 @@ struct vec2 {
     };
   };
 
+  vec2() : x(0), y(0) {}
   vec2(const T& t) : x(t), y(t) {}
   vec2(const T& x, const T& y) : x(x), y(y) {}
 

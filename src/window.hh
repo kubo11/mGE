@@ -32,6 +32,7 @@ class Window {
   inline const uint16_t get_width() const { return m_data.width; }
   inline const uint16_t get_height() const { return m_data.height; }
   inline const std::string &get_title() const { return m_data.title; }
+  inline GLFWwindow *get_instance() { return m_window; }
 
   bool operator==(const Window &w);
 
@@ -46,6 +47,8 @@ class Window {
       GLFWframebuffersizefun callback);
   GLFWwindowcontentscalefun set_content_scale_callback(
       GLFWwindowcontentscalefun callback);
+  GLFWcursorposfun set_cursor_pos_callback(GLFWcursorposfun callback);
+  GLFWscrollfun set_scroll_callback(GLFWscrollfun callback);
 
  private:
   WindowData m_data;
@@ -66,6 +69,8 @@ class Window {
                                           int height);
   static void content_scale_callback(GLFWwindow *window, float xscale,
                                      float yscale);
+  static void cursor_pos_callback(GLFWwindow *window, double x, double y);
+  static void scroll_callback(GLFWwindow *window, double, double yOffset);
 };
 }  // namespace mge
 

@@ -12,9 +12,10 @@ class RenderContext {
   void terminate();
 
  private:
+  static std::unique_ptr<RenderContext> s_instance;
+
   RenderContext();
   void init();
-  static std::unique_ptr<RenderContext> s_instance;
 };
 }  // namespace mge
 

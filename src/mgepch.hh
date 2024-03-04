@@ -5,13 +5,16 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
-#include <exception>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <ranges>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+namespace fs = std::filesystem;
 
 // glad
 #define GLAD_GL_IMPLEMENTATION
@@ -20,6 +23,18 @@
 // glfw
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
+// glm
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtx/matrix_operation.hpp>
+
+// imgui
+#define IMGUI_DEFINE_MATH_OPERATORS
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 // spdlog
 #include <spdlog/fmt/ostr.h>

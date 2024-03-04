@@ -6,15 +6,18 @@
 namespace mge {
 class Layer {
  public:
-  Layer(std::function<void(Event&)> send_event_callback)
-      : m_send_event_callback(send_event_callback){};
-  virtual ~Layer();
-  virtual void attach();
-  virtual void update();
-  virtual void handle_event(Event& event, float dt);
+  Layer() : m_send_event() {}
+  virtual ~Layer() {}
+  virtual void configure() = 0;
+  virtual void update() = 0;
+  virtual void handle_event(Event& event, float dt) = 0;
+  inline virtual void set_event_handler(
+      std::function<void(Event&)> send_event) final {
+    m_send_event = send_event;
+  }
 
  protected:
-  std::function<void(Event&)> m_send_event_callback;
+  std::function<void(Event&)> m_send_event;
 };
 }  // namespace mge
 

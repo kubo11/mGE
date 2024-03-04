@@ -18,6 +18,7 @@ struct vec4 {
     };
   };
 
+  vec4() : x(0), y(0), z(0), w(0) {}
   vec4(const T& t) : x(t), y(t), z(t), w(t) {}
   vec4(const T& x, const T& y, const T& z, const T& w)
       : x(x), y(y), z(z), w(w) {}
@@ -36,7 +37,7 @@ struct vec4 {
       case 3:
         return w;
       default:
-        throw std::out_of_range();
+        throw std::out_of_range("idx in [0, 3]");
     }
   }
 
@@ -51,7 +52,7 @@ struct vec4 {
       case 3:
         return w;
       default:
-        throw std::out_of_range();
+        throw std::out_of_range("idx in [0, 3]");
     }
   }
 };
@@ -98,7 +99,7 @@ vec4<T> operator*(const vec4<T>& v, const T& a) {
 }
 
 template <typename T>
-vec4<T> operator*(const vec4<T>& v, const vec4<T>& u) {
+T operator*(const vec4<T>& v, const vec4<T>& u) {
   return dot(v, u);
 }
 

@@ -3,6 +3,8 @@
 
 #include "../mgepch.hh"
 
+#include "vec2.hh"
+
 namespace mge {
 template <typename T>
 struct vec3 {
@@ -15,6 +17,7 @@ struct vec3 {
     };
   };
 
+  vec3() : x(0), y(0), z(0) {}
   vec3(const T& t) : x(t), y(t), z(t) {}
   vec3(const T& x, const T& y, const T& z) : x(x), y(y), z(z) {}
   vec3(const vec2<T>& v, const T& z) : x(v.x), y(v.y), z(z) {}
@@ -28,7 +31,7 @@ struct vec3 {
       case 2:
         return z;
       default:
-        throw std::out_of_range();
+        throw std::out_of_range("idx in [0, 2]");
     }
   }
 
@@ -41,7 +44,7 @@ struct vec3 {
       case 2:
         return z;
       default:
-        throw std::out_of_range();
+        throw std::out_of_range("idx in [0, 2]");
     }
   }
 };
@@ -53,8 +56,8 @@ T length(const vec3<T>& v) {
 
 template <typename T>
 vec3<T> normalize(const vec3<T>& v) {
-  T length = length(v);
-  return vec3<T>(v.x / length, v.y / length, v.z / length);
+  T len = length(v);
+  return vec3<T>(v.x / len, v.y / len, v.z / len);
 }
 
 template <typename T>
@@ -89,12 +92,17 @@ vec3<T> operator-(const vec3<T>& v, const vec3<T>& u) {
 }
 
 template <typename T>
+vec3<T> operator*(const T& a, const vec3<T>& v) {
+  return vec3<T>(v.x * a, v.y * a, v.z * a);
+}
+
+template <typename T>
 vec3<T> operator*(const vec3<T>& v, const T& a) {
   return vec3<T>(v.x * a, v.y * a, v.z * a);
 }
 
 template <typename T>
-vec3<T> operator*(const vec3<T>& v, const vec3<T>& u) {
+T operator*(const vec3<T>& v, const vec3<T>& u) {
   return dot(v, u);
 }
 

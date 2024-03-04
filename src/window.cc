@@ -4,7 +4,8 @@
 
 namespace mge {
 Window::Window(WindowData data)
-    : m_data(std::move(data)), m_clear_color(0.2f, 0.3f, 0.3f, 1.0f) {
+    : m_data(std::move(data)),
+      m_clear_color(100.f / 256.0f, 100.f / 256.0f, 100.f / 256.0f, 1.0f) {
   MGE_INFO("Window \"{}\" created", m_data.title);
 }
 
@@ -16,7 +17,7 @@ Window::~Window() {
 }
 
 void Window::init() {
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -41,7 +42,7 @@ void Window::update() {
   glfwSwapBuffers(m_window);
   glfwPollEvents();
 
-  MGE_TRACE("Window \"{}\" updated", m_data.title);
+  //   MGE_TRACE("Window \"{}\" updated", m_data.title);
 }
 
 void Window::clear() {
@@ -68,6 +69,8 @@ void Window::set_default_window_callbacks() {
   glfwSetWindowMaximizeCallback(m_window, Window::maximize_callback);
   glfwSetFramebufferSizeCallback(m_window, Window::framebuffer_resize_callback);
   glfwSetWindowContentScaleCallback(m_window, Window::content_scale_callback);
+  glfwSetCursorPosCallback(m_window, Window::cursor_pos_callback);
+  glfwSetScrollCallback(m_window, Window::scroll_callback);
 }
 
 void Window::send_event(Event &event) { m_data.send_event(event); }
@@ -93,6 +96,47 @@ void Window::maximize_callback(GLFWwindow *window, int maximized) {}
 void Window::framebuffer_resize_callback(GLFWwindow *window, int width,
                                          int height) {
   glViewport(0, 0, width, height);
+}
+
+void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
+  static float previous_x = 0.0f;
+  static float previous_y = 0.0f;
+
+  float x_offset = x - previous_x;
+  float y_offset = y - previous_y;
+  previous_x = x;
+  previous_y = y;
+
+  Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
+
+  if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
+       glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)) {
+    float sensitivity = 0.022f;
+    CameraAngleEvent event(-sensitivity * x_offset, sensitivity * y_offset);
+    mge_window->send_event(event);
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
+      glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+    float sensitivity = 0.001f;
+    CameraPositionEvent event(
+        glm::vec2(-sensitivity * x_offset, sensitivity * y_offset));
+    mge_window->send_event(event);
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
+      glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+    float sensitivity = 1.005f;
+    CameraZoomEvent event(std::pow(sensitivity, x_offset));
+    mge_window->send_event(event);
+  }
+}
+
+void Window::scroll_callback(GLFWwindow *window, double, double y_offset) {
+  Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  float sensitivity = 1.1f;
+  CameraZoomEvent event(std::pow(sensitivity, y_offset));
+  mge_window->send_event(event);
 }
 
 void Window::content_scale_callback(GLFWwindow *window, float xscale,
@@ -139,4 +183,11 @@ GLFWwindowcontentscalefun Window::set_content_scale_callback(
   return glfwSetWindowContentScaleCallback(m_window, callback);
 }
 
+GLFWcursorposfun Window::set_cursor_pos_callback(GLFWcursorposfun callback) {
+  return glfwSetCursorPosCallback(m_window, callback);
+}
+
+GLFWscrollfun Window::set_scroll_callback(GLFWscrollfun callback) {
+  return glfwSetScrollCallback(m_window, callback);
+}
 }  // namespace mge

@@ -10,21 +10,16 @@ Application::Application(const ApplicationParams& config)
           WindowData(config.name, config.window_width, config.window_height))),
       m_timer(),
       m_logger(Logger::create()),
-      m_name(config.name) {
+      m_name(config.name),
+      m_ui_manager(UIManager::create(m_main_window)) {
   m_main_window.set_event_handler(BIND_EVENT_HANDLER(Application::send_event));
   glViewport(0, 0, m_main_window.get_width(), m_main_window.get_height());
+  glfwSwapInterval(0);
 
   MGE_INFO("Application \"{}\" created", m_main_window.get_title());
 }
 
-Application::~Application() {
-  m_layer_stack.terminate();
-  WindowManager::destroy_window(m_main_window);
-  m_window_manager.terminate();
-  m_render_context.terminate();
-
-  MGE_INFO("Application \"{}\" terminated", m_name);
-}
+// Application::~Application() { terminate(); }
 
 void Application::run() {
   while (m_running) {
@@ -38,7 +33,19 @@ void Application::run() {
   }
 }
 
+void Application::terminate() {
+  m_layer_stack.terminate();
+  m_ui_manager.terminate();
+  WindowManager::destroy_window(m_main_window);
+  m_window_manager.terminate();
+  m_render_context.terminate();
+
+  MGE_INFO("Application \"{}\" terminated", m_name);
+}
+
 void Application::push_layer(std::unique_ptr<Layer> layer) {
+  layer->set_event_handler(BIND_EVENT_HANDLER(Application::send_event));
+  layer->configure();
   m_layer_stack.push(std::move(layer));
 }
 

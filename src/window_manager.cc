@@ -5,9 +5,9 @@ std::unique_ptr<WindowManager> WindowManager::s_instance = nullptr;
 
 WindowManager& WindowManager::create() {
   s_instance = std::unique_ptr<WindowManager>(new WindowManager());
+  MGE_INFO("Window manager created");
   s_instance->init();
 
-  MGE_INFO("Window manager created");
   return *s_instance;
 }
 

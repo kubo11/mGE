@@ -7,4 +7,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src/mge)
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC mgepch.hh)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC glad glfw spdlog)
+target_link_libraries(${PROJECT_NAME} PUBLIC glad glfw glm imgui spdlog)

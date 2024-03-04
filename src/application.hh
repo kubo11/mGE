@@ -8,6 +8,7 @@
 #include "layers/layer_stack.hh"
 #include "render_context.hh"
 #include "timer.hh"
+#include "ui_manager.hh"
 #include "window_manager.hh"
 
 namespace mge {
@@ -24,6 +25,7 @@ class Application {
   WindowManager& m_window_manager;
   Window& m_main_window;
   RenderContext& m_render_context;
+  UIManager& m_ui_manager;
   LayerStack m_layer_stack;
   std::string m_name;
 
@@ -34,9 +36,10 @@ class Application {
  public:
   Application(const ApplicationParams& config = {});
 
-  virtual ~Application();
+  virtual ~Application() {}
 
   void run();
+  void terminate();
   void push_layer(std::unique_ptr<Layer> layer);
   void send_event(Event& event);
 };
