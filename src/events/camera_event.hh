@@ -14,7 +14,8 @@ class CameraEvent : public Event {
 
 class CameraAngleEvent : public CameraEvent {
  public:
-  CameraAngleEvent(float azimuth, float elevation) {}
+  CameraAngleEvent(float azimuth, float elevation)
+      : m_azimuth(azimuth), m_elevation(elevation) {}
   virtual inline const std::string name() const override {
     return "CameraAngleEvent";
   }

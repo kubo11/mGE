@@ -20,12 +20,12 @@ class RaycasterResetEvent : public RaycasterEvent {
   }
 };
 
-class RaycasterUpdateMaxPixelSizeExponentEvent : public RaycasterEvent {
+class RaycasterAccuracyModifiedEvent : public RaycasterEvent {
  public:
-  RaycasterUpdateMaxPixelSizeExponentEvent(uint8_t max_pixel_size_exponent)
+  RaycasterAccuracyModifiedEvent(uint8_t max_pixel_size_exponent)
       : m_max_pixel_size_exponent(max_pixel_size_exponent) {}
   virtual inline const std::string name() const override {
-    return "RaycasterUpdateMaxPixelSizeExponentEvent";
+    return "RaycasterAccuracyModifiedEvent";
   }
   inline const uint8_t get_max_pixel_size_exponent() const {
     return m_max_pixel_size_exponent;

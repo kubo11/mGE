@@ -26,6 +26,7 @@ namespace fs = std::filesystem;
 
 // glm
 #define GLM_ENABLE_EXPERIMENTAL
+#include <glm/ext/scalar_constants.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/matrix_operation.hpp>
 

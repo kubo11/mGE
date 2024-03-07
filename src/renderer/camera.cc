@@ -14,7 +14,7 @@ Camera::Camera(float view_width, float aspect_ratio, float near_plane,
 void Camera::add_elevation(float elevation) {
   m_elevation += elevation;
 
-  float bound = M_PI * 89 / 90;
+  float bound = glm::radians(89.0f);
   m_elevation = std::clamp(m_elevation, -bound, bound);
 
   update_inverse_view_matrix();
@@ -24,11 +24,12 @@ void Camera::add_elevation(float elevation) {
 void Camera::add_azimuth(float azimuth) {
   m_azimuth += azimuth;
 
-  while (m_azimuth < -M_PI) {
-    m_azimuth += 2 * M_PI;
+  float pi = glm::pi<float>();
+  while (m_azimuth < -pi) {
+    m_azimuth += 2 * pi;
   }
-  while (m_azimuth >= M_PI) {
-    m_azimuth -= 2 * M_PI;
+  while (m_azimuth >= pi) {
+    m_azimuth -= 2 * pi;
   }
 
   update_inverse_view_matrix();

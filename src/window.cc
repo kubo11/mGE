@@ -111,7 +111,7 @@ void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
 
   if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
        glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)) {
-    float sensitivity = 0.022f;
+    float sensitivity = 0.005f;
     CameraAngleEvent event(-sensitivity * x_offset, sensitivity * y_offset);
     mge_window->send_event(event);
   }
@@ -135,7 +135,7 @@ void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
 void Window::scroll_callback(GLFWwindow *window, double, double y_offset) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
   float sensitivity = 1.1f;
-  CameraZoomEvent event(std::pow(sensitivity, y_offset));
+  CameraZoomEvent event(std::pow(sensitivity, -y_offset));
   mge_window->send_event(event);
 }
 
