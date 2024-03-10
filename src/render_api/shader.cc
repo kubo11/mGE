@@ -1,7 +1,8 @@
 #include "shader.hh"
 
 namespace mge {
-Shader::Shader(const fs::path& vertex_path, const fs::path& fragment_path) {
+Shader::Shader(const fs::path& vertex_path, const fs::path& fragment_path)
+    : m_path(fs::path(vertex_path).replace_extension()) {
   // vertex shader
   unsigned int vertex_id = glCreateShader(GL_VERTEX_SHADER);
   std::string vertex_code = Shader::read_shader_code(vertex_path);
@@ -19,28 +20,38 @@ Shader::Shader(const fs::path& vertex_path, const fs::path& fragment_path) {
   Shader::check_shader_compile_erros(fragment_id);
 
   // shader Program
-  id = glCreateProgram();
-  glAttachShader(id, vertex_id);
-  glAttachShader(id, fragment_id);
-  glLinkProgram(id);
-  Shader::check_program_compile_erros(id);
+  m_id = glCreateProgram();
+  glAttachShader(m_id, vertex_id);
+  glAttachShader(m_id, fragment_id);
+  glLinkProgram(m_id);
+  Shader::check_program_compile_erros(m_id);
 
   glDeleteShader(vertex_id);
   glDeleteShader(fragment_id);
 }
 
-void Shader::use() { glUseProgram(id); }
+void Shader::use() { glUseProgram(m_id); }
 
 void Shader::set_uniform(const std::string& name, bool value) {
-  glUniform1i(glGetUniformLocation(id, name.c_str()), static_cast<int>(value));
+  glUniform1i(glGetUniformLocation(m_id, name.c_str()),
+              static_cast<int>(value));
 }
 
 void Shader::set_uniform(const std::string& name, int value) {
-  glUniform1i(glGetUniformLocation(id, name.c_str()), value);
+  glUniform1i(glGetUniformLocation(m_id, name.c_str()), value);
 }
 
 void Shader::set_uniform(const std::string& name, float value) {
-  glUniform1f(glGetUniformLocation(id, name.c_str()), value);
+  glUniform1f(glGetUniformLocation(m_id, name.c_str()), value);
+}
+
+void Shader::set_uniform(const std::string& name, const glm::vec3& value) {
+  glUniform3fv(glGetUniformLocation(m_id, name.c_str()), 1, &value[0]);
+}
+
+void Shader::set_uniform(const std::string& name, const glm::mat4& value) {
+  glUniformMatrix4fv(glGetUniformLocation(m_id, name.c_str()), 1, GL_FALSE,
+                     &value[0][0]);
 }
 
 void Shader::check_shader_compile_erros(unsigned int shader_id) {

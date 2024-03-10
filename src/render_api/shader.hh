@@ -6,18 +6,23 @@
 namespace mge {
 class Shader {
  public:
+  Shader();
   Shader(const fs::path& vertex_path, const fs::path& fragment_path);
 
-  inline const unsigned int get_id() const { return id; }
+  inline const unsigned int get_id() const { return m_id; }
+  inline const fs::path& get_path() const { return m_path; }
 
   void use();
 
   void set_uniform(const std::string& name, bool value);
   void set_uniform(const std::string& name, int value);
   void set_uniform(const std::string& name, float value);
+  void set_uniform(const std::string& name, const glm::vec3& value);
+  void set_uniform(const std::string& name, const glm::mat4& value);
 
  private:
-  unsigned int id;
+  unsigned int m_id = 0;
+  const fs::path m_path;
 
   static void check_shader_compile_erros(unsigned int shader_id);
   static void check_program_compile_erros(unsigned int program_id);

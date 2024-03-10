@@ -11,7 +11,8 @@ Application::Application(const ApplicationParams& config)
       m_timer(),
       m_logger(Logger::create()),
       m_name(config.name),
-      m_ui_manager(UIManager::create(m_main_window)) {
+      m_ui_manager(UIManager::create(m_main_window)),
+      m_shader_system(ShaderSystem::create()) {
   m_main_window.set_event_handler(BIND_EVENT_HANDLER(Application::send_event));
   glViewport(0, 0, m_main_window.get_width(), m_main_window.get_height());
   glfwSwapInterval(0);
@@ -36,6 +37,7 @@ void Application::run() {
 void Application::terminate() {
   m_layer_stack.terminate();
   m_ui_manager.terminate();
+  m_shader_system.terminate();
   WindowManager::destroy_window(m_main_window);
   m_window_manager.terminate();
   m_render_context.terminate();

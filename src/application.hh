@@ -7,6 +7,7 @@
 #include "events/standard_events.hh"
 #include "layers/layer_stack.hh"
 #include "render_context.hh"
+#include "shader_system.hh"
 #include "timer.hh"
 #include "ui_manager.hh"
 #include "window_manager.hh"
@@ -25,6 +26,7 @@ class Application {
   WindowManager& m_window_manager;
   Window& m_main_window;
   RenderContext& m_render_context;
+  ShaderSystem& m_shader_system;
   UIManager& m_ui_manager;
   LayerStack m_layer_stack;
   std::string m_name;

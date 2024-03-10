@@ -101,6 +101,6 @@ void Camera::update_projection_matrix() {
 
 void Camera::update_projection_view_matrix() {
   m_projection_view_matrix =
-      m_inverse_view_matrix * inverse(m_projection_matrix);
+      inverse(m_inverse_view_matrix * inverse(m_projection_matrix));
 }
 }  // namespace mge
