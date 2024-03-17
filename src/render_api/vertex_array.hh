@@ -2,8 +2,7 @@
 #define MGE_RENDER_API_VERTEX_ARRAY_HH
 
 #include "../mgepch.hh"
-
-#include "opengl_utils.hh"
+#include "../render_context.hh"
 
 namespace mge {
 struct VertexAttribute {
@@ -18,27 +17,19 @@ class VertexArray {
                      std::vector<VertexAttribute> vertex_attributes,
                      std::vector<unsigned int> indices = {}) {
     glGenVertexArrays(1, &m_vertex_array_id);
-    glCheckError();
     glBindVertexArray(m_vertex_array_id);
-    glCheckError();
 
     glGenBuffers(1, &m_vertex_buffer_id);
-    glCheckError();
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer_id);
-    glCheckError();
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(),
                  GL_STATIC_DRAW);
-    glCheckError();
 
     if (!indices.empty()) {
       glGenBuffers(1, &m_element_buffer_id);
-      glCheckError();
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_element_buffer_id);
-      glCheckError();
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                    indices.size() * sizeof(unsigned int), indices.data(),
                    GL_STATIC_DRAW);
-      glCheckError();
     }
 
     size_t stride = 0;
@@ -46,12 +37,12 @@ class VertexArray {
       glVertexAttribPointer(i, vertex_attributes[i].size,
                             vertex_attributes[i].type, GL_FALSE, sizeof(T),
                             reinterpret_cast<void*>(stride));
-      glCheckError();
       glEnableVertexAttribArray(i);
-      glCheckError();
-      stride +=
-          vertex_attributes[i].size * gl_sizeof_type(vertex_attributes[i].type);
+      stride += vertex_attributes[i].size *
+                RenderContext::glSizeofType(vertex_attributes[i].type);
     }
+
+    glCheckError();
   }
   inline ~VertexArray() {
     if (m_vertex_array_id) {
@@ -63,10 +54,18 @@ class VertexArray {
     if (m_element_buffer_id) {
       glDeleteBuffers(1, &m_element_buffer_id);
     }
+
+    glCheckError();
   }
 
-  inline void bind() const { glBindVertexArray(m_vertex_array_id); }
-  inline void unbind() const { glBindVertexArray(0); }
+  inline void bind() const {
+    glBindVertexArray(m_vertex_array_id);
+    glCheckError();
+  }
+  inline void unbind() const {
+    glBindVertexArray(0);
+    glCheckError();
+  }
 
   inline void update_vertices(std::vector<T> vertices) {
     GLint size = 0;
@@ -80,6 +79,8 @@ class VertexArray {
       glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(T),
                       vertices.data());
     }
+
+    glCheckError();
   }
   inline void update_indices(std::vector<unsigned int> indices) {
     GLint size = 0;
@@ -94,6 +95,8 @@ class VertexArray {
       glBufferSubData(GL_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int),
                       indices.data());
     }
+
+    glCheckError();
   }
 
  private:

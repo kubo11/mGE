@@ -1,6 +1,8 @@
 #include "shader.hh"
 
 namespace mge {
+GLuint Shader::s_current_shader_id = 0;
+
 Shader::Shader(const fs::path& vertex_path, const fs::path& fragment_path)
     : m_path(fs::path(vertex_path).replace_extension()) {
   // vertex shader
@@ -28,30 +30,73 @@ Shader::Shader(const fs::path& vertex_path, const fs::path& fragment_path)
 
   glDeleteShader(vertex_id);
   glDeleteShader(fragment_id);
+
+  MGE_INFO("Created shader {}", m_path.string());
+
+  glCheckError();
 }
 
-void Shader::use() { glUseProgram(m_id); }
+Shader::~Shader() {
+  if (m_id) {
+    glDeleteProgram(m_id);
+    glCheckError();
+    if (s_current_shader_id == m_id) {
+      s_current_shader_id = 0;
+    }
+    MGE_INFO("Destroyed shader {}", m_path.string());
+  }
+}
+
+void Shader::use() const {
+  if (s_current_shader_id != m_id) {
+    glUseProgram(m_id);
+    s_current_shader_id = m_id;
+    glCheckError();
+  }
+}
+
+bool Shader::is_used() const { return s_current_shader_id == m_id; }
+
+void Shader::unuse() const {
+  if (s_current_shader_id != 0) {
+    glUseProgram(0);
+    s_current_shader_id = 0;
+    glCheckError();
+  }
+}
+
+GLint Shader::get_uniform_id(const std::string& name) {
+  auto id = glGetUniformLocation(m_id, name.c_str());
+  glCheckError();
+  if (id == -1) {
+    MGE_ERROR("No uniform named {} found in {} shader", name, m_path.string());
+  }
+  return id;
+}
 
 void Shader::set_uniform(const std::string& name, bool value) {
-  glUniform1i(glGetUniformLocation(m_id, name.c_str()),
-              static_cast<int>(value));
+  glUniform1i(get_uniform_id(name), static_cast<int>(value));
+  glCheckError();
 }
 
 void Shader::set_uniform(const std::string& name, int value) {
-  glUniform1i(glGetUniformLocation(m_id, name.c_str()), value);
+  glUniform1i(get_uniform_id(name), value);
+  glCheckError();
 }
 
 void Shader::set_uniform(const std::string& name, float value) {
-  glUniform1f(glGetUniformLocation(m_id, name.c_str()), value);
+  glUniform1f(get_uniform_id(name), value);
+  glCheckError();
 }
 
 void Shader::set_uniform(const std::string& name, const glm::vec3& value) {
-  glUniform3fv(glGetUniformLocation(m_id, name.c_str()), 1, &value[0]);
+  glUniform3fv(get_uniform_id(name), 1, &value[0]);
+  glCheckError();
 }
 
 void Shader::set_uniform(const std::string& name, const glm::mat4& value) {
-  glUniformMatrix4fv(glGetUniformLocation(m_id, name.c_str()), 1, GL_FALSE,
-                     &value[0][0]);
+  glUniformMatrix4fv(get_uniform_id(name), 1, GL_FALSE, &value[0][0]);
+  glCheckError();
 }
 
 void Shader::check_shader_compile_erros(unsigned int shader_id) {

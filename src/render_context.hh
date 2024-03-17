@@ -11,12 +11,17 @@ class RenderContext {
   static RenderContext& create();
   void terminate();
 
+  static size_t glSizeofType(GLenum type);
+  static GLenum glCheckError_(const char* file, int line);
+
  private:
   static std::unique_ptr<RenderContext> s_instance;
 
   RenderContext();
   void init();
 };
+
+#define glCheckError() RenderContext::glCheckError_(__FILE__, __LINE__)
 }  // namespace mge
 
 #endif  // MGE_RENDER_CONTEXT_HH
