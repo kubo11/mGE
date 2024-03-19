@@ -1,3 +1,6 @@
+# entt
+add_subdirectory(entt)
+
 # glad
 add_subdirectory(glad/cmake)
 glad_add_library(glad REPRODUCIBLE API gl:core=4.3)
@@ -22,6 +25,8 @@ add_library(
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.h
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
     ${IMGUI_DIR}/backends/imgui_impl_glfw.h
+    ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp
+    ${IMGUI_DIR}/misc/cpp/imgui_stdlib.h
 )
 
 target_link_libraries(imgui PUBLIC glad)

@@ -1,6 +1,6 @@
 #include "window.hh"
 
-#include "events/standard_events.hh"
+#include "events/events.hh"
 
 namespace mge {
 Window::Window(WindowData data)
@@ -48,7 +48,16 @@ void Window::update() {
 void Window::clear() {
   glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b,
                m_clear_color.a);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //   glClear(GL_COLOR_BUFFER_BIT);
+}
+
+bool Window::is_key_pressed(int key) const {
+  return glfwGetKey(m_window, key) == GLFW_PRESS;
+}
+
+bool Window::is_mouse_pressed(int key) const {
+  return glfwGetMouseButton(m_window, key) == GLFW_PRESS;
 }
 
 void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
@@ -71,9 +80,10 @@ void Window::set_default_window_callbacks() {
   glfwSetWindowContentScaleCallback(m_window, Window::content_scale_callback);
   glfwSetCursorPosCallback(m_window, Window::cursor_pos_callback);
   glfwSetScrollCallback(m_window, Window::scroll_callback);
+  glfwSetMouseButtonCallback(m_window, Window::mouse_button_callback);
 }
 
-void Window::send_event(Event &event) { m_data.send_event(event); }
+void Window::send_event(Event &event) const { m_data.send_event(event); }
 
 void Window::position_callback(GLFWwindow *window, int xpos, int ypos) {}
 
@@ -96,51 +106,54 @@ void Window::maximize_callback(GLFWwindow *window, int maximized) {}
 void Window::framebuffer_resize_callback(GLFWwindow *window, int width,
                                          int height) {
   glViewport(0, 0, width, height);
+  Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  mge_window->m_data.width = width;
+  mge_window->m_data.height = height;
 }
 
 void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
   static float previous_x = 0.0f;
   static float previous_y = 0.0f;
 
-  float x_offset = x - previous_x;
-  float y_offset = y - previous_y;
-  previous_x = x;
-  previous_y = y;
-
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
 
-  if ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
-       glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)) {
-    float sensitivity = 0.005f;
-    CameraAngleEvent event(-sensitivity * x_offset, sensitivity * y_offset);
+  float curr_x = -1.0 + x / static_cast<double>(mge_window->m_data.width) * 2.0;
+  float curr_y = 1.0 - y / static_cast<double>(mge_window->m_data.height) * 2.0;
+
+  if (!ImGui::GetIO().WantCaptureMouse) {
+    WindowMouseMovedEvent event(*mge_window, {previous_x, previous_y},
+                                {curr_x, curr_y});
     mge_window->send_event(event);
   }
 
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
-      glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-    float sensitivity = 0.001f;
-    CameraPositionEvent event(
-        glm::vec2(-sensitivity * x_offset, sensitivity * y_offset));
-    mge_window->send_event(event);
-  }
-
-  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
-      glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-    float sensitivity = 1.005f;
-    CameraZoomEvent event(std::pow(sensitivity, x_offset));
-    mge_window->send_event(event);
-  }
+  previous_x = curr_x;
+  previous_y = curr_y;
 }
 
 void Window::scroll_callback(GLFWwindow *window, double, double y_offset) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  float sensitivity = 1.1f;
-  CameraZoomEvent event(std::pow(sensitivity, -y_offset));
-  mge_window->send_event(event);
+  if (!ImGui::GetIO().WantCaptureMouse) {
+    WindowScrollEvent event(*mge_window, y_offset);
+    mge_window->send_event(event);
+  }
 }
 
 void Window::content_scale_callback(GLFWwindow *window, float xscale,
                                     float yscale) {}
+
+void Window::mouse_button_callback(GLFWwindow *window, int button, int action,
+                                   int mods) {
+  Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT &&
+      !ImGui::GetIO().WantCaptureMouse) {
+    double pos_x, pos_y;
+    glfwGetCursorPos(window, &pos_x, &pos_y);
+    pos_x = -1.0 + pos_x / static_cast<double>(mge_window->m_data.width) * 2.0;
+    pos_y = 1.0 - pos_y / static_cast<double>(mge_window->m_data.height) * 2.0;
+    WindowMousePressedEvent event(*mge_window, button, {pos_x, pos_y});
+    mge_window->send_event(event);
+  }
+}
 
 GLFWwindowposfun Window::set_position_callback(GLFWwindowposfun callback) {
   return glfwSetWindowPosCallback(m_window, callback);
@@ -189,5 +202,10 @@ GLFWcursorposfun Window::set_cursor_pos_callback(GLFWcursorposfun callback) {
 
 GLFWscrollfun Window::set_scroll_callback(GLFWscrollfun callback) {
   return glfwSetScrollCallback(m_window, callback);
+}
+
+GLFWmousebuttonfun Window::set_mouse_button_callback(
+    GLFWmousebuttonfun callback) {
+  return glfwSetMouseButtonCallback(m_window, callback);
 }
 }  // namespace mge

@@ -49,13 +49,17 @@ class Window {
       GLFWwindowcontentscalefun callback);
   GLFWcursorposfun set_cursor_pos_callback(GLFWcursorposfun callback);
   GLFWscrollfun set_scroll_callback(GLFWscrollfun callback);
+  GLFWmousebuttonfun set_mouse_button_callback(GLFWmousebuttonfun callback);
+
+  void send_event(Event &) const;
+  bool is_key_pressed(int key) const;
+  bool is_mouse_pressed(int key) const;
 
  private:
   WindowData m_data;
   GLFWwindow *m_window;
   vec4<float> m_clear_color;
 
-  void send_event(Event &);
   void set_default_window_callbacks();
 
   static void position_callback(GLFWwindow *window, int xpos, int ypos);
@@ -71,6 +75,8 @@ class Window {
                                      float yscale);
   static void cursor_pos_callback(GLFWwindow *window, double x, double y);
   static void scroll_callback(GLFWwindow *window, double, double yOffset);
+  static void mouse_button_callback(GLFWwindow *window, int button, int action,
+                                    int mods);
 };
 }  // namespace mge
 

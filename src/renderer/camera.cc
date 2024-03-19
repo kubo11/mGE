@@ -4,6 +4,7 @@ namespace mge {
 Camera::Camera(float view_width, float aspect_ratio, float near_plane,
                float far_plane)
     : m_view_width(view_width),
+      m_unzoomed_view_width(view_width),
       m_aspect_ratio(aspect_ratio),
       m_near_plane(near_plane),
       m_far_plane(far_plane) {
@@ -97,10 +98,19 @@ void Camera::update_projection_matrix() {
       2 / m_view_width, 0, 0, 0, 0, 2 / view_height, 0, 0, 0, 0,
       -2 / (m_far_plane - m_near_plane), 0, 0, 0,
       -(m_far_plane + m_near_plane) / (m_far_plane - m_near_plane), 1);
+
+  float unzoomed_view_height = m_unzoomed_view_width / m_aspect_ratio;
+  m_unzoomed_projection_matrix = glm::mat4(
+      2 / m_unzoomed_view_width, 0, 0, 0, 0, 2 / unzoomed_view_height, 0, 0, 0,
+      0, -2 / (m_far_plane - m_near_plane), 0, 0, 0,
+      -(m_far_plane + m_near_plane) / (m_far_plane - m_near_plane), 1);
 }
 
 void Camera::update_projection_view_matrix() {
   m_projection_view_matrix =
       inverse(m_inverse_view_matrix * inverse(m_projection_matrix));
+
+  m_unzoomed_projection_view_matrix =
+      inverse(m_inverse_view_matrix * inverse(m_unzoomed_projection_matrix));
 }
 }  // namespace mge

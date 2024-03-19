@@ -12,6 +12,9 @@ class Camera {
   inline glm::mat4 get_projection_view_matrix() const {
     return m_projection_view_matrix;
   }
+  inline glm::mat4 get_unzoomed_projection_view_matrix() const {
+    return m_unzoomed_projection_view_matrix;
+  }
   inline glm::vec3 get_position() const {
     return glm::vec3(m_inverse_view_matrix[3][0], m_inverse_view_matrix[3][1],
                      m_inverse_view_matrix[3][2]);
@@ -27,6 +30,7 @@ class Camera {
 
  private:
   float m_view_width;
+  float m_unzoomed_view_width;
   float m_aspect_ratio;
   float m_near_plane;
   float m_far_plane;
@@ -35,8 +39,10 @@ class Camera {
   float m_elevation = 0.0f;
   float m_azimuth = 0.0f;
   glm::mat4 m_inverse_view_matrix{1.0f};
+  glm::mat4 m_unzoomed_projection_matrix{1.0f};
   glm::mat4 m_projection_matrix{1.0f};
   glm::mat4 m_projection_view_matrix{1.0f};
+  glm::mat4 m_unzoomed_projection_view_matrix{1.0f};
 
   void update_inverse_view_matrix();
   void update_projection_matrix();

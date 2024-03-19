@@ -4,9 +4,11 @@
 #include "mgepch.hh"
 
 #include "events/event.hh"
-#include "events/standard_events.hh"
+#include "events/events.hh"
 #include "layers/layer_stack.hh"
 #include "render_context.hh"
+#include "renderer/camera.hh"
+#include "renderer/scene/scene.hh"
 #include "shader_system.hh"
 #include "timer.hh"
 #include "ui_manager.hh"
@@ -29,6 +31,7 @@ class Application {
   ShaderSystem& m_shader_system;
   UIManager& m_ui_manager;
   LayerStack m_layer_stack;
+  Scene m_scene;
   std::string m_name;
 
   bool m_running;
@@ -44,6 +47,8 @@ class Application {
   void terminate();
   void push_layer(std::unique_ptr<Layer> layer);
   void send_event(Event& event);
+
+  inline Scene& get_scene() { return m_scene; }
 };
 }  // namespace mge
 

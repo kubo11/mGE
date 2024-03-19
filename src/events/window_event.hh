@@ -26,6 +26,53 @@ class WindowClosedEvent : public WindowEvent {
   }
 };
 
+class WindowMouseMovedEvent : public WindowEvent {
+ public:
+  WindowMouseMovedEvent(const Window& window, glm::vec2 beg, glm::vec2 end)
+      : WindowEvent(window), m_beg(beg), m_end(end) {}
+  virtual inline const std::string name() const override {
+    return "WindowMouseMovedEvent";
+  }
+
+  inline glm::vec2 get_beg() const { return m_beg; }
+  inline glm::vec2 get_end() const { return m_end; }
+  inline glm::vec2 get_offset() const { return m_end - m_beg; }
+
+ private:
+  glm::vec2 m_beg;
+  glm::vec2 m_end;
+};
+
+class WindowScrollEvent : public WindowEvent {
+ public:
+  WindowScrollEvent(const Window& window, float y_offset)
+      : WindowEvent(window), m_y_offset(y_offset) {}
+  virtual inline const std::string name() const override {
+    return "WindowScrollEvent";
+  }
+
+  inline float get_y_offset() const { return m_y_offset; }
+
+ private:
+  float m_y_offset;
+};
+
+class WindowMousePressedEvent : public WindowEvent {
+ public:
+  WindowMousePressedEvent(const Window& window, int button, glm::vec2 position)
+      : WindowEvent(window), m_button(button), m_position(position) {}
+  virtual inline const std::string name() const override {
+    return "WindowMousePressedEvent";
+  }
+
+  inline int get_button() const { return m_button; }
+  inline glm::vec2 get_position() const { return m_position; }
+
+ private:
+  int m_button;
+  glm::vec2 m_position;
+};
+
 class WindowFramebufferResizedEvent : public WindowEvent {
  public:
   WindowFramebufferResizedEvent(const Window& window, uint16_t width,

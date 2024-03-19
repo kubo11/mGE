@@ -1,40 +1,19 @@
 #ifndef MGE_RENDERER_RENDERER_HH
 #define MGE_RENDERER_RENDERER_HH
 
-#include "mgepch.hh"
+#include "../mgepch.hh"
 
 namespace mge {
 
-enum class RendererType {
-    NONE,
-    LINES,
-    TRIANGLES
-};
+enum class RendererType { LINES, TRIANGLES };
 
+template <RendererType type>
 class Renderer {
-    public:
-        virtual constexpr RenderType type = RendererType::NONE;
-
-        Renderer();
-        virtual ~Renderer();
-
-        virtual void draw() const = 0;
-
-    private:
+ public:
+  static void draw(unsigned int vertices_count);
+  static void draw_indexed(unsigned int indices_count);
 };
 
-class LineRenderer : public Renderer {
-    virtual constexpr RenderType type = RendererType::LINES;
-    public:
-    LineRenderer();
-    virtual ~LineRenderer() override;
+}  // namespace mge
 
-    void set_vertices();
-    virtual void draw() const override;
-
-    private:
-};
-
-} // mge
-
-#endif // MGE_RENDERER_RENDERER_HH
+#endif  // MGE_RENDERER_RENDERER_HH

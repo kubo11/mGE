@@ -24,12 +24,15 @@ class VertexArray {
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(),
                  GL_STATIC_DRAW);
 
+    m_count = vertices.size();
+
     if (!indices.empty()) {
       glGenBuffers(1, &m_element_buffer_id);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_element_buffer_id);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                    indices.size() * sizeof(unsigned int), indices.data(),
                    GL_STATIC_DRAW);
+      m_count = indices.size();
     }
 
     size_t stride = 0;
@@ -44,6 +47,7 @@ class VertexArray {
 
     glCheckError();
   }
+
   inline ~VertexArray() {
     if (m_vertex_array_id) {
       glDeleteVertexArrays(1, &m_vertex_array_id);
@@ -72,6 +76,10 @@ class VertexArray {
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer_id);
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
+    if (!m_element_buffer_id) {
+      m_count = vertices.size();
+    }
+
     if (size < vertices.size() * sizeof(T)) {
       glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T),
                    vertices.data(), GL_STATIC_DRAW);
@@ -84,25 +92,30 @@ class VertexArray {
   }
   inline void update_indices(std::vector<unsigned int> indices) {
     GLint size = 0;
-    glBindBuffer(GL_ARRAY_BUFFER, m_element_buffer_id);
-    glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_element_buffer_id);
+    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+
+    m_count = indices.size();
 
     if (size < indices.size() * sizeof(unsigned int)) {
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                    indices.size() * sizeof(unsigned int), indices.data(),
                    GL_STATIC_DRAW);
     } else {
-      glBufferSubData(GL_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int),
-                      indices.data());
+      glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0,
+                      indices.size() * sizeof(unsigned int), indices.data());
     }
 
     glCheckError();
   }
 
+  inline unsigned int get_count() const { return m_count; }
+
  private:
   unsigned int m_vertex_array_id = 0;
   unsigned int m_vertex_buffer_id = 0;
   unsigned int m_element_buffer_id = 0;
+  unsigned int m_count = 0;
 };
 }  // namespace mge
 

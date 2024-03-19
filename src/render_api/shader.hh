@@ -11,6 +11,8 @@ class Shader {
   Shader(const fs::path& vertex_path, const fs::path& fragment_path);
   ~Shader();
 
+  PREVENT_COPY(Shader);
+
   inline const unsigned int get_id() const { return m_id; }
   inline const fs::path& get_path() const { return m_path; }
   inline bool operator==(const Shader& s) { return m_id == s.m_id; }
@@ -36,6 +38,17 @@ class Shader {
 
   GLint get_uniform_id(const std::string& name);
 };
+
+inline bool operator<(const Shader& lhs, const Shader rhs) {
+  return lhs.get_id() < rhs.get_id();
+}
 }  // namespace mge
+
+template <>
+struct std::hash<mge::Shader> {
+  std::size_t operator()(const mge::Shader& k) const {
+    return std::hash<unsigned int>{}(k.get_id());
+  }
+};
 
 #endif  // MGE_RENDER_API_SHADER

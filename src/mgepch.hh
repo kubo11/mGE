@@ -7,14 +7,19 @@
 #include <cstdio>
 #include <filesystem>
 #include <functional>
+#include <map>
 #include <memory>
 #include <ranges>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 namespace fs = std::filesystem;
+
+// entt
+#include <entt/entt.hpp>
 
 // glad
 #define GLAD_GL_IMPLEMENTATION
@@ -28,6 +33,7 @@ namespace fs = std::filesystem;
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/matrix_operation.hpp>
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -37,6 +43,7 @@ namespace fs = std::filesystem;
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 // spdlog
 #include <spdlog/fmt/ostr.h>
@@ -45,5 +52,9 @@ namespace fs = std::filesystem;
 
 // mGE
 #include "logger.hh"
+
+#define PREVENT_COPY(class_name)          \
+  class_name(const class_name&) = delete; \
+  class_name& operator=(const class_name&) = delete;
 
 #endif  // MGE_MGEPCH_HH
