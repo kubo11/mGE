@@ -39,7 +39,7 @@ class Shader {
   GLint get_uniform_id(const std::string& name);
 };
 
-inline bool operator<(const Shader& lhs, const Shader rhs) {
+inline bool operator<(const Shader& lhs, const Shader& rhs) {
   return lhs.get_id() < rhs.get_id();
 }
 }  // namespace mge

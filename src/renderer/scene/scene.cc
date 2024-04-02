@@ -34,56 +34,15 @@ void Scene::destroy_entity(const std::string& tag) {
   m_entities_by_tag.erase(tag);
 }
 
-std::optional<std::reference_wrapper<Entity>> Scene::get_closest_entity_ws(
-    glm::vec3 position) {
-  auto draw_group =
-      m_registry->group<>(entt::get<TransformComponent, TagComponent>);
-  float min_dist = 10e7;
-  std::string closest_tag = "";
-
-  draw_group.each([this, &position, &min_dist, &closest_tag](
-                      auto entity, auto& transform, auto& tag) {
-    auto dist = glm::distance(position, transform.get_position());
-    if (tag.get_tag() == "cursor") return;
-    if (dist < min_dist && dist < 1.0f) {
-      min_dist = dist;
-      closest_tag = tag.get_tag();
-    }
-  });
-
-  if (closest_tag.size()) {
-    return *m_entities_by_tag.at(closest_tag);
+bool Scene::rename_entity(const std::string& old_tag,
+                          const std::string& new_tag) {
+  if (m_entities_by_tag.contains(new_tag)) {
+    return false;
   }
-
-  return std::nullopt;
-}
-
-std::optional<std::reference_wrapper<Entity>> Scene::get_closest_entity_ss(
-    glm::vec2 position) {
-  auto draw_group =
-      m_registry->group<>(entt::get<TransformComponent, TagComponent>);
-  float min_dist = 10e7;
-  std::string closest_tag = "";
-
-  draw_group.each([this, &position, &min_dist, &closest_tag](
-                      auto entity, auto& transform, auto& tag) {
-    auto tmp = glm::vec2(m_current_camera.get_projection_view_matrix() *
-                         glm::vec4(transform.get_position(), 1.0f));
-    auto dist = glm::distance(
-        position, glm::vec2(m_current_camera.get_projection_view_matrix() *
-                            glm::vec4(transform.get_position(), 1.0f)));
-    if (tag.get_tag() == "cursor") return;
-    if (dist < min_dist && dist < 0.03f) {
-      min_dist = dist;
-      closest_tag = tag.get_tag();
-    }
-  });
-
-  if (closest_tag.size()) {
-    return *m_entities_by_tag.at(closest_tag);
-  }
-
-  return std::nullopt;
+  auto node = m_entities_by_tag.extract(old_tag);
+  node.key() = new_tag;
+  m_entities_by_tag.insert(std::move(node));
+  return true;
 }
 
 }  // namespace mge

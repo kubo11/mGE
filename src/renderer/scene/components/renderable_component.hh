@@ -39,12 +39,16 @@ struct RenderableComponent {
   inline RenderMode get_render_mode() const { return m_render_mode; }
   inline void set_render_mode(RenderMode mode) { m_render_mode = mode; }
   inline void set_color(glm::vec3 color) { m_color = color; }
+  inline void enable() { m_enabled = true; }
+  inline void disable() { m_enabled = false; }
+  inline bool is_enabled() { return m_enabled; }
 
  private:
   Shader& m_shader;
   std::unique_ptr<VertexArray<T>> m_vertex_array;
   glm::vec3 m_color;
   RenderMode m_render_mode;
+  bool m_enabled = true;
 };
 }  // namespace mge
 

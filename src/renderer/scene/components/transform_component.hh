@@ -43,11 +43,11 @@ struct TransformComponent {
     update_model_mat();
   }
 
-  inline glm::vec3 get_position() const { return m_position; }
-  inline quat get_rotation() const { return m_rotation; }
-  inline glm::vec3 get_scale() const { return m_scale; }
+  inline const glm::vec3& get_position() const { return m_position; }
+  inline const quat& get_rotation() const { return m_rotation; }
+  inline const glm::vec3& get_scale() const { return m_scale; }
 
-  inline glm::mat4 get_model_mat() const { return m_model_mat; }
+  inline const glm::mat4& get_model_mat() const { return m_model_mat; }
 
  private:
   glm::vec3 m_position;

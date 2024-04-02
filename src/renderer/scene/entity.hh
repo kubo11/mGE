@@ -11,7 +11,7 @@ class Entity {
   PREVENT_COPY(Entity);
 
   template <class T, class... Args>
-  inline T& add_component(Args&&... args) {
+  inline decltype(auto) add_component(Args&&... args) {
     return m_registry.emplace<T>(m_entity, std::forward<Args>(args)...);
   }
 
@@ -36,6 +36,10 @@ class Entity {
     return m_registry.try_get<T>(m_entity);
   }
 
+  inline bool operator<(const Entity& other) const {
+    return m_entity < other.m_entity;
+  }
+
  private:
   Entity(entt::registry& registry)
       : m_registry(registry), m_entity(m_registry.create()) {}
@@ -45,6 +49,12 @@ class Entity {
 
   friend class Scene;
 };
+
+inline bool operator<(const std::reference_wrapper<Entity>& lhs,
+                      const Entity& rhs) {
+  return lhs.get() < rhs;
+}
+
 }  // namespace mge
 
 #endif  // MGE_RENDERER_SCENE_ENTITY_HH

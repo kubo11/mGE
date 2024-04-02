@@ -14,6 +14,7 @@ class Entity;
 
 class Scene {
  public:
+  using Listener = void(entt::registry&, entt::entity);
   Scene(std::unique_ptr<Camera> camera);
   ~Scene() {}
 
@@ -31,19 +32,17 @@ class Scene {
   inline bool contains(const std::string& tag) {
     return m_entities_by_tag.contains(tag);
   }
-  std::optional<std::reference_wrapper<Entity>> get_closest_entity_ws(
-      glm::vec3 position);
-  std::optional<std::reference_wrapper<Entity>> get_closest_entity_ss(
-      glm::vec2 position);
 
   template <class T>
   inline void draw(
       std::function<void(Shader&, mge::Entity&)> func = nullptr) const {
-    auto draw_group = m_registry->group<>(
-        entt::get<TransformComponent, RenderableComponent<T>, TagComponent>);
+    auto draw_group =
+        m_registry->group<>(entt::get<RenderableComponent<T>, TagComponent>);
 
-    draw_group.each([this, &func](auto entity, auto& transform,
-                                  auto& renderable, auto& tag) {
+    draw_group.each([this, &func](auto entity, auto& renderable, auto& tag) {
+      if (!renderable.is_enabled()) {
+        return;
+      }
       auto& shader = renderable.get_shader();
       auto& vertex_array = renderable.get_vertex_array();
 
@@ -63,8 +62,28 @@ class Scene {
     });
   }
 
+  template <class GetT, class ExcludeT, class FuncT>
+  void foreach (GetT get, ExcludeT exclude, FuncT func) {
+    auto group = m_registry->group<>(get, exclude);
+    group.each(func);
+  }
+
   Entity& create_entity(const std::string& tag);
   void destroy_entity(const std::string& tag);
+  bool rename_entity(const std::string& old_tag, const std::string& new_tag);
+
+  template <class T, class I>
+  inline void on_construct(Listener* listener, I& instance) {
+    m_registry->on_construct<T>().connect<listener>(instance);
+  }
+  template <class T, class I>
+  inline void on_update(Listener* listener, I& instance) {
+    m_registry->on_update<T>().connect<listener>(instance);
+  }
+  template <class T, class I>
+  inline void on_destroy(Listener* listener, I& instance) {
+    m_registry->on_destroy<T>().connect<listener>(instance);
+  }
 
  private:
   std::unique_ptr<entt::registry> m_registry;
