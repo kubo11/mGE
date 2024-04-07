@@ -15,6 +15,18 @@ struct TransformComponent {
         m_model_mat(1.0f) {
     update_model_mat();
   }
+  TransformComponent(TransformComponent&& other)
+      : m_position(std::move(other.m_position)),
+        m_rotation(std::move(other.m_rotation)),
+        m_scale(std::move(other.m_scale)),
+        m_model_mat(std::move(other.m_model_mat)) {}
+  inline TransformComponent& operator=(TransformComponent&& other) {
+    m_position = std::move(other.m_position);
+    m_rotation = std::move(other.m_rotation);
+    m_scale = std::move(other.m_scale);
+    m_model_mat = std::move(other.m_model_mat);
+    return *this;
+  }
 
   inline void translate(const glm::vec3& offset) {
     m_position += offset;

@@ -41,8 +41,12 @@ bool Scene::rename_entity(const std::string& old_tag,
   }
   auto node = m_entities_by_tag.extract(old_tag);
   node.key() = new_tag;
+  node.mapped()->patch<mge::TagComponent>(
+      [&new_tag](auto& tag) { tag.set_tag(new_tag); });
   m_entities_by_tag.insert(std::move(node));
   return true;
 }
+
+void Scene::clear() { m_registry->clear(); }
 
 }  // namespace mge

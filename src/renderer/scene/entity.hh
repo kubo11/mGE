@@ -16,12 +16,17 @@ class Entity {
   }
 
   template <class T>
-  inline T& get_component() {
+  inline const T& get_component() const {
     return m_registry.get<T>(m_entity);
   }
 
+  template <class T, class F>
+  inline void patch(F func) {
+    m_registry.patch<T>(m_entity, func);
+  }
+
   template <typename T>
-  inline std::optional<T&> try_get_component() {
+  inline std::optional<const T&> try_get_component() const {
     auto component = m_registry.try_get<T>(m_entity);
     return component ? *component : std::nullopt;
   }
@@ -32,13 +37,15 @@ class Entity {
   }
 
   template <typename T>
-  bool has_component() {
+  bool has_component() const {
     return m_registry.try_get<T>(m_entity);
   }
 
   inline bool operator<(const Entity& other) const {
     return m_entity < other.m_entity;
   }
+
+  inline entt::entity get_instance() const { return m_entity; }
 
  private:
   Entity(entt::registry& registry)

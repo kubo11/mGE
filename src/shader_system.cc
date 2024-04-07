@@ -13,15 +13,17 @@ ShaderSystem& ShaderSystem::create() {
 
 ShaderSystem& ShaderSystem::get_instance() { return *ShaderSystem::s_instance; }
 
-Shader& ShaderSystem::acquire(const fs::path& shader) {
+const std::shared_ptr<Shader>& ShaderSystem::acquire(const fs::path& shader) {
   if (s_instance->m_shaders.contains(shader)) {
-    return *s_instance->m_shaders.at(shader);
+    return s_instance->m_shaders.at(shader);
   }
 
   return load(shader);
 }
 
-void ShaderSystem::unload(Shader& shader) { unload(shader.get_path()); }
+void ShaderSystem::unload(const std::shared_ptr<Shader>& shader) {
+  unload(shader->get_path());
+}
 
 void ShaderSystem::unload(const fs::path& path) {
   if (s_instance->m_shaders.contains(path)) {
@@ -30,7 +32,7 @@ void ShaderSystem::unload(const fs::path& path) {
 }
 
 void ShaderSystem::terminate() {
-  std::unordered_map<fs::path, std::unique_ptr<Shader>> empty_map;
+  std::unordered_map<fs::path, std::shared_ptr<Shader>> empty_map;
   m_shaders.swap(empty_map);
   s_instance = nullptr;
 
@@ -47,14 +49,14 @@ ShaderSystem::~ShaderSystem() {
 
 void ShaderSystem::init() { MGE_INFO("Shader system initialized"); }
 
-Shader& ShaderSystem::load(const fs::path& shader) {
+const std::shared_ptr<Shader>& ShaderSystem::load(const fs::path& shader) {
   auto vert_path = fs::path(shader).replace_extension(".vert");
   auto frag_path = fs::path(shader).replace_extension(".frag");
 
   s_instance->m_shaders.insert(
-      {shader, std::make_unique<Shader>(vert_path, frag_path)});
+      {shader, std::make_shared<Shader>(vert_path, frag_path)});
 
-  return *s_instance->m_shaders.at(shader);
+  return s_instance->m_shaders.at(shader);
 }
 
 }  // namespace mge

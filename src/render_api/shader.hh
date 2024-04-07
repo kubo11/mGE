@@ -11,7 +11,7 @@ class Shader {
   Shader(const fs::path& vertex_path, const fs::path& fragment_path);
   ~Shader();
 
-  PREVENT_COPY(Shader);
+  //  PREVENT_COPY(Shader);
 
   inline const unsigned int get_id() const { return m_id; }
   inline const fs::path& get_path() const { return m_path; }
