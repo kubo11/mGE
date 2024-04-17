@@ -11,7 +11,7 @@ struct TagComponent {
     m_tag = std::move(other.m_tag);
     return *this;
   }
-  ~TagComponent() { MGE_WARN("Destroyed {}!", m_tag); }
+  ~TagComponent() {}
 
   inline void set_tag(const std::string& tag) { m_tag = tag; }
   const std::string& get_tag() const { return m_tag; }

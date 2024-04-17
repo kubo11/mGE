@@ -54,7 +54,7 @@ void Application::push_layer(std::unique_ptr<Layer> layer) {
 }
 
 void Application::send_event(Event& event) {
-  //   MGE_INFO("{} sent", event.name());
+  MGE_INFO("{} sent", event.name());
 
   Event::try_handler<WindowClosedEvent>(
       event, BIND_EVENT_HANDLER(Application::on_window_closed));

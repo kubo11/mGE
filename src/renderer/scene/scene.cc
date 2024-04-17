@@ -19,9 +19,23 @@ Entity& Scene::create_entity(const std::string& tag) {
   }
 
   auto entity = std::unique_ptr<Entity>(new Entity(*m_registry));
-  entity->add_component<TagComponent>(tag);
   auto& entity_ref = *entity;
   m_entities_by_tag.emplace(tag, std::move(entity));
+  entity_ref.add_component<TagComponent>(tag);
+  return entity_ref;
+}
+
+Entity& Scene::create_entity(const std::string& tag,
+                             const std::function<void(Entity&)> func) {
+  if (m_entities_by_tag.contains(tag)) {
+    throw std::runtime_error("Entity tag duplicated");
+  }
+
+  auto entity = std::unique_ptr<Entity>(new Entity(*m_registry));
+  auto& entity_ref = *entity;
+  m_entities_by_tag.emplace(tag, std::move(entity));
+  func(entity_ref);
+  entity_ref.add_component<TagComponent>(tag);
   return entity_ref;
 }
 

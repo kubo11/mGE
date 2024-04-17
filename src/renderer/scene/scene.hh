@@ -14,9 +14,8 @@ class Entity;
 
 class Scene {
  public:
-  using Listener = void(entt::registry&, entt::entity);
   Scene(std::unique_ptr<Camera> camera);
-  ~Scene() {}
+  ~Scene() = default;
 
   inline Camera& get_current_camera() const { return m_current_camera; }
   inline void set_current_camera(unsigned int idx) {
@@ -90,52 +89,55 @@ class Scene {
   }
 
   Entity& create_entity(const std::string& tag);
+  Entity& create_entity(const std::string& tag,
+                        const std::function<void(Entity&)> func);
   void destroy_entity(const std::string& tag);
   bool rename_entity(const std::string& old_tag, const std::string& new_tag);
-
-  template <class T, auto L, class I>
-  inline void on_construct(I& instance) {
-    m_registry->on_construct<T>().template connect<L>(instance);
-  }
-  template <class T, auto L>
-  inline void on_construct() {
-    m_registry->on_construct<T>().template connect<entt::invoke<L>>();
-  }
-  template <class T, auto L, class I>
-  inline void on_update(I& instance) {
-    m_registry->on_update<T>().template connect<L>(instance);
-  }
-  template <class T, auto L>
-  inline void on_update() {
-    m_registry->on_update<T>().template connect<entt::invoke<L>>();
-  }
-  template <class T, auto L, class I>
-  inline void on_destroy(I& instance) {
-    m_registry->on_destroy<T>().template connect<L>(instance);
-  }
-  template <class T, auto L>
-  inline void on_destroy() {
-    m_registry->on_destroy<T>().template connect<entt::invoke<L>>();
-  }
-
   void clear();
   template <class T>
   inline void clear() {
     m_registry->clear<T>();
   }
 
-  template <class T, class F>
-  inline void patch(const std::string& tag, F func) {
-    m_registry->patch<T>(m_entities_by_tag.at(tag)->get_instance(), func);
-  }
-  template <class T, class F>
-  inline void patch(entt::entity entity, F func) {
-    m_registry->patch<T>(entity, func);
+  template <class T, auto listener>
+  inline void invoke_on_self(entt::registry& registry, entt::entity entity) {
+    auto& my_entity = *m_entities_by_tag.at(registry.get<TagComponent>(entity));
+    auto& component = registry.get<T>(entity);
+    std::invoke(listener, component, my_entity);
   }
 
-  template <class... Args>
-  inline auto view() {
-    return m_registry->view<Args...>();
+  template <class T, auto listener, class I>
+  inline void on_construct(I& instance) {
+    m_registry->on_construct<T>().template connect<listener>(instance);
+  }
+  template <class T, auto listener>
+  inline void on_construct() {
+    m_registry->on_construct<T>()
+        .template connect<&Scene::invoke_on_self<T, listener>>(*this);
+  }
+  template <class T, auto listener, class I>
+  inline void on_update(I& instance) {
+    m_registry->on_update<T>().template connect<listener>(instance);
+  }
+  template <class T, auto listener>
+  inline void on_update() {
+    m_registry->on_update<T>()
+        .template connect<&Scene::invoke_on_self<T, listener>>(*this);
+  }
+  template <class T, auto listener, class I>
+  inline void on_destroy(I& instance) {
+    m_registry->on_destroy<T>().template connect<listener>(instance);
+  }
+  template <class T, auto listener>
+  inline void on_destroy() {
+    m_registry->on_destroy<T>()
+        .template connect<&Scene::invoke_on_self<T, listener>>(*this);
+  }
+  template <class T>
+  inline void disconnect_all() {
+    m_registry->on_construct<T>().disconnect();
+    m_registry->on_update<T>().disconnect();
+    m_registry->on_destroy<T>().disconnect();
   }
 
  private:
