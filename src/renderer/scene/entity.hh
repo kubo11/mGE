@@ -6,7 +6,21 @@
 namespace mge {
 class Entity {
  public:
-  ~Entity() { m_registry.destroy(m_entity); }
+  ~Entity() {
+    m_registry.destroy(m_entity);
+    for (auto& child : m_children) {
+      child.get().m_parents.erase(
+          std::remove(child.get().m_parents.begin(),
+                      child.get().m_parents.end(), *this),
+          child.get().m_parents.end());
+    }
+    for (auto& parent : m_parents) {
+      parent.get().m_children.erase(
+          std::remove(parent.get().m_children.begin(),
+                      parent.get().m_children.end(), *this),
+          parent.get().m_children.end());
+    }
+  }
 
   PREVENT_COPY(Entity);
 
@@ -60,16 +74,28 @@ class Entity {
     m_children.emplace_back(child);
   }
 
+  inline void add_owned_child(Entity& child) {
+    child.m_parents.emplace_back(*this);
+    m_children.emplace_back(child);
+    m_owned_children.emplace_back(child);
+  }
+
   inline void remove_child(Entity& child) {
     child.m_parents.erase(
         std::remove(child.m_parents.begin(), child.m_parents.end(), *this),
         child.m_parents.end());
     m_children.erase(std::remove(m_children.begin(), m_children.end(), child),
                      m_children.end());
+    m_owned_children.erase(
+        std::remove(m_owned_children.begin(), m_owned_children.end(), child),
+        m_owned_children.end());
   }
 
   inline std::vector<std::reference_wrapper<Entity>>& get_children() {
     return m_children;
+  }
+  inline std::vector<std::reference_wrapper<Entity>>& get_owned_children() {
+    return m_owned_children;
   }
   inline std::vector<std::reference_wrapper<Entity>>& get_parents() {
     return m_parents;
@@ -93,6 +119,7 @@ class Entity {
   entt::registry& m_registry;
   entt::entity m_entity;
   std::vector<std::reference_wrapper<Entity>> m_children;
+  std::vector<std::reference_wrapper<Entity>> m_owned_children;
   std::vector<std::reference_wrapper<Entity>> m_parents;
 
   friend class Scene;

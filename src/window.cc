@@ -109,6 +109,8 @@ void Window::framebuffer_resize_callback(GLFWwindow *window, int width,
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
   mge_window->m_data.width = width;
   mge_window->m_data.height = height;
+  WindowFramebufferResizedEvent event(*mge_window, width, height);
+  mge_window->send_event(event);
 }
 
 void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {

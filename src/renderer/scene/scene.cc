@@ -45,7 +45,10 @@ void Scene::destroy_entity(const std::string& tag) {
     return;
   }
 
-  m_entities_by_tag.erase(tag);
+  auto node = m_entities_by_tag.extract(tag);
+  for (auto& child : node.mapped().get()->get_owned_children()) {
+    m_entities_by_tag.erase(child.get().get_component<mge::TagComponent>());
+  }
 }
 
 bool Scene::rename_entity(const std::string& old_tag,

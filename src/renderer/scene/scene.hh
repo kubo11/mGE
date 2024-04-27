@@ -51,10 +51,25 @@ class Scene {
       vertex_array.bind();
 
       if (renderable.get_render_mode() == RenderMode::SURFACE) {
-        Renderer<RendererType::TRIANGLES>::draw_indexed(
-            vertex_array.get_count());
+        if (vertex_array.has_indices()) {
+          Renderer<RendererType::TRIANGLES>::draw_indexed(
+              vertex_array.get_count());
+        } else {
+          Renderer<RendererType::TRIANGLES>::draw(vertex_array.get_count());
+        }
       } else if (renderable.get_render_mode() == RenderMode::WIREFRAME) {
-        Renderer<RendererType::LINES>::draw_indexed(vertex_array.get_count());
+        if (vertex_array.has_indices()) {
+          Renderer<RendererType::LINES>::draw_indexed(vertex_array.get_count());
+        } else {
+          Renderer<RendererType::LINES>::draw(vertex_array.get_count());
+        }
+      } else if (renderable.get_render_mode() == RenderMode::PATCHES) {
+        if (vertex_array.has_indices()) {
+          Renderer<RendererType::PATCHES>::draw_indexed(
+              vertex_array.get_count());
+        } else {
+          Renderer<RendererType::PATCHES>::draw(vertex_array.get_count());
+        }
       }
 
       vertex_array.unbind();

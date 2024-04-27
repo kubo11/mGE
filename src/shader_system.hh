@@ -12,7 +12,7 @@ class ShaderSystem {
 
   static ShaderSystem& create();
   static ShaderSystem& get_instance();
-  static const std::shared_ptr<Shader>& acquire(const fs::path& shader);
+  static std::shared_ptr<Shader> acquire(const fs::path& shader);
   static void unload(const fs::path& path);
   static void unload(const std::shared_ptr<Shader>& shader);
 
@@ -20,12 +20,13 @@ class ShaderSystem {
 
  private:
   static std::unique_ptr<ShaderSystem> s_instance;
+  static const std::unordered_map<GLenum, std::string> s_shader_extensions;
   std::unordered_map<fs::path, std::shared_ptr<Shader>> m_shaders;
 
   ShaderSystem();
 
   void init();
-  static const std::shared_ptr<Shader>& load(const fs::path& shader);
+  static std::shared_ptr<Shader> load(const fs::path& shader);
 };
 }  // namespace mge
 

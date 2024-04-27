@@ -110,6 +110,7 @@ class VertexArray {
   }
 
   inline unsigned int get_count() const { return m_count; }
+  inline bool has_indices() const { return m_element_buffer_id != 0; }
 
  private:
   unsigned int m_vertex_array_id = 0;

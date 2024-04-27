@@ -10,7 +10,11 @@
 #define RENDER_MODE_SIZE 2
 
 namespace mge {
-enum class RenderMode : int { SURFACE = 1 << 0, WIREFRAME = 1 << 1 };
+enum class RenderMode : int {
+  SURFACE = 1 << 0,
+  WIREFRAME = 1 << 1,
+  PATCHES = 1 << 2
+};
 
 inline std::string to_string(RenderMode mode) {
   switch (mode) {
@@ -26,7 +30,7 @@ inline std::string to_string(RenderMode mode) {
 
 template <class T>
 struct RenderableComponent {
-  RenderableComponent(const std::shared_ptr<Shader>& shader,
+  RenderableComponent(std::shared_ptr<Shader> shader,
                       std::unique_ptr<VertexArray<T>> vertex_array = nullptr,
                       glm::vec3 color = {0.0f, 0.0f, 0.0f})
       : m_shader(shader),
@@ -57,7 +61,7 @@ struct RenderableComponent {
   inline void set_color(glm::vec3 color) { m_color = color; }
   inline void enable() { m_enabled = true; }
   inline void disable() { m_enabled = false; }
-  inline bool is_enabled() { return m_enabled; }
+  inline bool is_enabled() const { return m_enabled; }
 
  private:
   std::shared_ptr<Shader> m_shader;

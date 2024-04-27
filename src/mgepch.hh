@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <functional>
+#include <limits>
 #include <map>
 #include <memory>
 #include <ranges>

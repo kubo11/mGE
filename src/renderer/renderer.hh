@@ -5,7 +5,7 @@
 
 namespace mge {
 
-enum class RendererType { LINES, TRIANGLES };
+enum class RendererType { LINES, TRIANGLES, PATCHES };
 
 template <RendererType type>
 class Renderer {

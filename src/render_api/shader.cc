@@ -3,33 +3,31 @@
 namespace mge {
 GLuint Shader::s_current_shader_id = 0;
 
-Shader::Shader(const fs::path& vertex_path, const fs::path& fragment_path)
-    : m_path(fs::path(vertex_path).replace_extension()) {
-  // vertex shader
-  unsigned int vertex_id = glCreateShader(GL_VERTEX_SHADER);
-  std::string vertex_code = Shader::read_shader_code(vertex_path);
-  const char* vertex_code_c = vertex_code.c_str();
-  glShaderSource(vertex_id, 1, &vertex_code_c, NULL);
-  glCompileShader(vertex_id);
-  Shader::check_shader_compile_erros(vertex_id);
-
-  // fragment Shader
-  unsigned int fragment_id = glCreateShader(GL_FRAGMENT_SHADER);
-  std::string fragment_code = Shader::read_shader_code(fragment_path);
-  const char* fragment_code_c = fragment_code.c_str();
-  glShaderSource(fragment_id, 1, &fragment_code_c, NULL);
-  glCompileShader(fragment_id);
-  Shader::check_shader_compile_erros(fragment_id);
+Shader::Shader(const std::unordered_map<GLenum, fs::path>& shader_paths)
+    : m_path(fs::path(shader_paths.begin()->second).replace_extension()) {
+  std::vector<unsigned int> ids;
+  ids.reserve(shader_paths.size());
+  for (auto& [type, path] : shader_paths) {
+    auto id = glCreateShader(type);
+    std::string code = Shader::read_shader_code(path);
+    const char* code_c = code.c_str();
+    glShaderSource(id, 1, &code_c, NULL);
+    glCompileShader(id);
+    Shader::check_shader_compile_erros(id);
+    ids.emplace_back(id);
+  }
 
   // shader Program
   m_id = glCreateProgram();
-  glAttachShader(m_id, vertex_id);
-  glAttachShader(m_id, fragment_id);
+  for (auto& id : ids) {
+    glAttachShader(m_id, id);
+  }
   glLinkProgram(m_id);
   Shader::check_program_compile_erros(m_id);
 
-  glDeleteShader(vertex_id);
-  glDeleteShader(fragment_id);
+  for (auto& id : ids) {
+    glDeleteShader(id);
+  }
 
   MGE_INFO("Created shader {}", m_path.string());
 
@@ -86,6 +84,11 @@ void Shader::set_uniform(const std::string& name, int value) {
 
 void Shader::set_uniform(const std::string& name, float value) {
   glUniform1f(get_uniform_id(name), value);
+  glCheckError();
+}
+
+void Shader::set_uniform(const std::string& name, const glm::vec2& value) {
+  glUniform2fv(get_uniform_id(name), 1, &value[0]);
   glCheckError();
 }
 

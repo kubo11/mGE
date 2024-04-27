@@ -8,10 +8,10 @@ namespace mge {
 class Shader {
  public:
   Shader();
-  Shader(const fs::path& vertex_path, const fs::path& fragment_path);
+  Shader(const std::unordered_map<GLenum, fs::path>& shader_paths);
   ~Shader();
 
-  //  PREVENT_COPY(Shader);
+  PREVENT_COPY(Shader);
 
   inline const unsigned int get_id() const { return m_id; }
   inline const fs::path& get_path() const { return m_path; }
@@ -24,6 +24,7 @@ class Shader {
   void set_uniform(const std::string& name, bool value);
   void set_uniform(const std::string& name, int value);
   void set_uniform(const std::string& name, float value);
+  void set_uniform(const std::string& name, const glm::vec2& value);
   void set_uniform(const std::string& name, const glm::vec3& value);
   void set_uniform(const std::string& name, const glm::mat4& value);
 
