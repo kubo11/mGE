@@ -14,7 +14,7 @@ Application::Application(const ApplicationParams& config)
       m_ui_manager(UIManager::create(m_main_window)),
       m_shader_system(ShaderSystem::create()),
       m_scene(
-          std::make_unique<Camera>(20.0f, 1280.0f / 720.0f, 0.0f, 1000.0f)) {
+          std::make_unique<Camera>(20.0f, 1280.0f / 720.0f, 0.1f, 1000.0f)) {
   m_main_window.set_event_handler(BIND_EVENT_HANDLER(Application::send_event));
   glViewport(0, 0, m_main_window.get_width(), m_main_window.get_height());
   glfwSwapInterval(0);
