@@ -8,9 +8,7 @@
 #include "window_event.hh"
 
 namespace mge {
-#define MGE_EVENTS CameraEvents, RenderModeEvents, WindowEvents
-
-DECLARE_EVENT_MANAGER(MGE_EVENTS);
+DeclareEventManager(CameraEvents, RenderModeEvents, WindowEvents);
 }  // namespace mge
 
 #endif  // MGE_EVENTS_EVENTS_HH

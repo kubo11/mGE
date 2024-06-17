@@ -49,20 +49,19 @@ class _EventManager {
   DispatcherMap<T...> m_event_dispatchers;
 };
 
-#define DECLARE_EVENT_MANAGER(...) \
-  using EventManager = _EventManager<__VA_ARGS__>
+#define DeclareEventManager(...) using EventManager = _EventManager<__VA_ARGS__>
 
-#define ADD_EVENT_LISTENER(event_type, func, arg) \
-  EventManager::get_instance()                    \
-      .get_dispatcher(event_type)                 \
+#define AddEventListener(event_type, func, arg) \
+  EventManager::get_instance()                  \
+      .get_dispatcher(event_type)               \
       .add_listener(event_type, std::bind(&func, arg, std::placeholders::_1))
 
-#define REMOVE_EVENT_LISTENER(event_type, handle) \
-  EventManager::get_instance()                    \
-      .get_dispatcher(event_type)                 \
+#define RemoveEventListener(event_type, handle) \
+  EventManager::get_instance()                  \
+      .get_dispatcher(event_type)               \
       .remove_listener(handle)
 
-#define SEND_EVENT(_event)               \
+#define SendEvent(_event)                \
   EventManager::get_instance()           \
       .get_dispatcher(_event.get_type()) \
       .send_event(_event)

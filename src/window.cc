@@ -86,7 +86,7 @@ void Window::size_callback(GLFWwindow *window, int width, int height) {}
 void Window::close_callback(GLFWwindow *window) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
   WindowClosedEvent event(*mge_window);
-  SEND_EVENT(event);
+  SendEvent(event);
 }
 
 void Window::refresh_callback(GLFWwindow *window) {}
@@ -104,7 +104,7 @@ void Window::framebuffer_resize_callback(GLFWwindow *window, int width,
   mge_window->m_data.width = width;
   mge_window->m_data.height = height;
   WindowFramebufferResizedEvent event(*mge_window, width, height);
-  SEND_EVENT(event);
+  SendEvent(event);
 }
 
 void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
@@ -119,7 +119,7 @@ void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
   if (!ImGui::GetIO().WantCaptureMouse) {
     WindowMouseMovedEvent event(*mge_window, {previous_x, previous_y},
                                 {curr_x, curr_y});
-    SEND_EVENT(event);
+    SendEvent(event);
   }
 
   previous_x = curr_x;
@@ -130,7 +130,7 @@ void Window::scroll_callback(GLFWwindow *window, double, double y_offset) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
   if (!ImGui::GetIO().WantCaptureMouse) {
     WindowScrollEvent event(*mge_window, y_offset);
-    SEND_EVENT(event);
+    SendEvent(event);
   }
 }
 
@@ -147,7 +147,7 @@ void Window::mouse_button_callback(GLFWwindow *window, int button, int action,
     pos_x = -1.0 + pos_x / static_cast<double>(mge_window->m_data.width) * 2.0;
     pos_y = 1.0 - pos_y / static_cast<double>(mge_window->m_data.height) * 2.0;
     WindowMousePressedEvent event(*mge_window, button, {pos_x, pos_y});
-    SEND_EVENT(event);
+    SendEvent(event);
   }
 }
 
