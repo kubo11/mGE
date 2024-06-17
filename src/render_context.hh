@@ -3,6 +3,8 @@
 
 #include "mgepch.hh"
 
+class ShaderProgram;
+
 namespace mge {
 class RenderContext {
  public:
@@ -14,8 +16,13 @@ class RenderContext {
   static size_t glSizeofType(GLenum type);
   static GLenum glCheckError_(const char* file, int line);
 
+  inline static RenderContext& get() { return *s_instance; }
+
+  void bind_shader_program(GLuint program);
+
  private:
   static std::unique_ptr<RenderContext> s_instance;
+  GLuint m_program;
 
   RenderContext();
   void init();

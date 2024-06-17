@@ -7,49 +7,34 @@
 namespace mge {
 class Shader {
  public:
-  Shader();
-  Shader(const std::unordered_map<GLenum, fs::path>& shader_paths);
+  enum class Type {
+    VERTEX,
+    TESSELLATION_CONTROL,
+    TESSELLATION_EVALUATION,
+    GEOMETRY,
+    FRAGMENT,
+    COMPUTE
+  };
+
+  Shader(Type type);
   ~Shader();
 
   PREVENT_COPY(Shader);
 
-  inline const unsigned int get_id() const { return m_id; }
-  inline const fs::path& get_path() const { return m_path; }
-  inline bool operator==(const Shader& s) { return m_id == s.m_id; }
+  bool compile(const char* source);
 
-  void use() const;
-  bool is_used() const;
-  void unuse() const;
+  inline const GLuint get_id() const { return m_id; }
 
-  void set_uniform(const std::string& name, bool value);
-  void set_uniform(const std::string& name, int value);
-  void set_uniform(const std::string& name, float value);
-  void set_uniform(const std::string& name, const glm::vec2& value);
-  void set_uniform(const std::string& name, const glm::vec3& value);
-  void set_uniform(const std::string& name, const glm::mat4& value);
+  inline const Type get_type() const { return m_type; }
+
+  static GLenum to_gl_shader_type(Type type);
 
  private:
-  static GLuint s_current_shader_id;
-  unsigned int m_id = 0;
-  const fs::path m_path;
+  GLuint m_id;
+  Type m_type;
 
-  static void check_shader_compile_erros(unsigned int shader_id);
-  static void check_program_compile_erros(unsigned int program_id);
-  static std::string read_shader_code(const fs::path& path);
-
-  GLint get_uniform_id(const std::string& name);
+  void release();
 };
-
-inline bool operator<(const Shader& lhs, const Shader& rhs) {
-  return lhs.get_id() < rhs.get_id();
-}
 }  // namespace mge
-
-template <>
-struct std::hash<mge::Shader> {
-  std::size_t operator()(const mge::Shader& k) const {
-    return std::hash<unsigned int>{}(k.get_id());
-  }
-};
 
 #endif  // MGE_RENDER_API_SHADER

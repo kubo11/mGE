@@ -35,6 +35,7 @@ namespace fs = std::filesystem;
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/matrix_operation.hpp>
 #include "glm/gtc/matrix_transform.hpp"
 

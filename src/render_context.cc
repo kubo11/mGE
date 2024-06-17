@@ -93,4 +93,9 @@ GLenum RenderContext::glCheckError_(const char* file, int line) {
   return errorCode;
 }
 
+void RenderContext::bind_shader_program(GLuint program) {
+  glUseProgram(program);
+  m_program = program;
+}
+
 }  // namespace mge
