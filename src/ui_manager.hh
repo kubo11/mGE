@@ -10,14 +10,14 @@ class UIManager {
  public:
   ~UIManager();
 
-  static UIManager& create(Window& window);
+  static std::shared_ptr<UIManager> create(Window& window);
   static void start_frame();
   static void end_frame();
   void init(Window& window);
   void terminate();
 
  private:
-  static std::unique_ptr<UIManager> s_instance;
+  static std::shared_ptr<UIManager> s_instance;
 
   UIManager(Window& window);
 };

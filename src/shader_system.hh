@@ -11,7 +11,7 @@ class ShaderSystem {
  public:
   ~ShaderSystem();
 
-  static ShaderSystem& create();
+  static std::shared_ptr<ShaderSystem> create();
   static ShaderSystem& get_instance();
   static std::shared_ptr<ShaderProgram> acquire(const fs::path& shader);
   static void unload(const fs::path& path);
@@ -19,7 +19,7 @@ class ShaderSystem {
   void terminate();
 
  private:
-  static std::unique_ptr<ShaderSystem> s_instance;
+  static std::shared_ptr<ShaderSystem> s_instance;
   static const std::unordered_map<Shader::Type, std::string>
       s_shader_extensions;
   std::unordered_map<fs::path, std::shared_ptr<ShaderProgram>> m_shaders;

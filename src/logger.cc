@@ -1,7 +1,7 @@
 #include "logger.hh"
 
 namespace mge {
-std::unique_ptr<Logger> Logger::s_instance = nullptr;
+std::shared_ptr<Logger> Logger::s_instance = nullptr;
 
 Logger::Logger() {
   spdlog::set_pattern("%^[%T][%n][%l]%$: %v");
@@ -10,17 +10,24 @@ Logger::Logger() {
   m_mge_logger->set_level(spdlog::level::trace);
 }
 
-Logger::~Logger() { Logger::s_instance = nullptr; }
+Logger::~Logger() {
+  if (Logger::s_instance) terminate();
+}
 
-Logger& Logger::create() {
+std::shared_ptr<Logger> Logger::create() {
   if (Logger::s_instance != nullptr) {
     throw std::runtime_error("The logger instance already exists!");
   }
 
-  Logger::s_instance = std::unique_ptr<Logger>(new Logger());
+  Logger::s_instance = std::shared_ptr<Logger>(new Logger());
   MGE_INFO("Logger created");
 
-  return *s_instance;
+  return s_instance;
+}
+
+void Logger::terminate() {
+  s_instance = nullptr;
+  m_mge_logger = nullptr;
 }
 
 void Logger::set_level(LogLevel level) {

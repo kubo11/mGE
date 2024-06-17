@@ -10,7 +10,7 @@ class WindowManager {
  public:
   ~WindowManager();
 
-  static WindowManager& create();
+  static std::shared_ptr<WindowManager> create();
   static WindowManager& get_instance();
   static Window& create_window(WindowData data);
   static void destroy_window(Window& window);
@@ -19,7 +19,7 @@ class WindowManager {
   void terminate();
 
  private:
-  static std::unique_ptr<WindowManager> s_instance;
+  static std::shared_ptr<WindowManager> s_instance;
   std::vector<std::unique_ptr<Window>> m_windows;
 
   WindowManager();

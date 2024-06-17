@@ -5,91 +5,76 @@
 #include "event.hh"
 
 namespace mge {
-
-class WindowEvent : public Event {
- public:
-  WindowEvent(const Window& window) : m_window(window) {}
-  virtual inline const std::string name() const override {
-    return "WindowEvent";
-  }
-  inline const Window& get_window() const { return m_window; }
-
- protected:
-  const Window& m_window;
+enum class WindowEvents {
+  WindowClosed,
+  WindowMouseMoved,
+  WindowScroll,
+  WindowMousePressed,
+  WindowFramebufferResized
 };
 
-class WindowClosedEvent : public WindowEvent {
+class WindowClosedEvent : public Event<WindowEvents> {
  public:
-  WindowClosedEvent(const Window& window) : WindowEvent(window) {}
-  virtual inline const std::string name() const override {
-    return "WindowClosedEvent";
-  }
+  WindowClosedEvent(const Window& window)
+      : Event<WindowEvents>(WindowEvents::WindowClosed, "WindowClosedEvent"),
+        window(window) {}
+  virtual ~WindowClosedEvent() = default;
+  const Window& window;
 };
 
-class WindowMouseMovedEvent : public WindowEvent {
+class WindowMouseMovedEvent : public Event<WindowEvents> {
  public:
   WindowMouseMovedEvent(const Window& window, glm::vec2 beg, glm::vec2 end)
-      : WindowEvent(window), m_beg(beg), m_end(end) {}
-  virtual inline const std::string name() const override {
-    return "WindowMouseMovedEvent";
-  }
-
-  inline glm::vec2 get_beg() const { return m_beg; }
-  inline glm::vec2 get_end() const { return m_end; }
-  inline glm::vec2 get_offset() const { return m_end - m_beg; }
-
- private:
-  glm::vec2 m_beg;
-  glm::vec2 m_end;
+      : Event<WindowEvents>(WindowEvents::WindowMouseMoved,
+                            "WindowMouseMovedEvent"),
+        window(window),
+        beg(beg),
+        end(end) {}
+  virtual ~WindowMouseMovedEvent() = default;
+  const Window& window;
+  glm::vec2 beg;
+  glm::vec2 end;
 };
 
-class WindowScrollEvent : public WindowEvent {
+class WindowScrollEvent : public Event<WindowEvents> {
  public:
   WindowScrollEvent(const Window& window, float y_offset)
-      : WindowEvent(window), m_y_offset(y_offset) {}
-  virtual inline const std::string name() const override {
-    return "WindowScrollEvent";
-  }
-
-  inline float get_y_offset() const { return m_y_offset; }
-
- private:
-  float m_y_offset;
+      : Event<WindowEvents>(WindowEvents::WindowScroll, "WindowScrollEvent"),
+        window(window),
+        y_offset(y_offset) {}
+  virtual ~WindowScrollEvent() = default;
+  const Window& window;
+  float y_offset;
 };
 
-class WindowMousePressedEvent : public WindowEvent {
+class WindowMousePressedEvent : public Event<WindowEvents> {
  public:
   WindowMousePressedEvent(const Window& window, int button, glm::vec2 position)
-      : WindowEvent(window), m_button(button), m_position(position) {}
-  virtual inline const std::string name() const override {
-    return "WindowMousePressedEvent";
-  }
-
-  inline int get_button() const { return m_button; }
-  inline glm::vec2 get_position() const { return m_position; }
-
- private:
-  int m_button;
-  glm::vec2 m_position;
+      : Event<WindowEvents>(WindowEvents::WindowMousePressed,
+                            "WindowMousePressedEvent"),
+        window(window),
+        button(button),
+        position(position) {}
+  virtual ~WindowMousePressedEvent() = default;
+  const Window& window;
+  int button;
+  glm::vec2 position;
 };
 
-class WindowFramebufferResizedEvent : public WindowEvent {
+class WindowFramebufferResizedEvent : public Event<WindowEvents> {
  public:
   WindowFramebufferResizedEvent(const Window& window, uint16_t width,
                                 uint16_t height)
-      : WindowEvent(window), m_width(width), m_height(height) {}
-  virtual inline const std::string name() const override {
-    return "WindowFramebufferResizedEvent";
-  }
-
-  inline const uint16_t get_width() const { return m_width; }
-  inline const uint16_t get_height() const { return m_height; }
-
- private:
-  uint16_t m_width;
-  uint16_t m_height;
+      : Event<WindowEvents>(WindowEvents::WindowFramebufferResized,
+                            "WindowFramebufferResizedEvent"),
+        window(window),
+        width(width),
+        height(height) {}
+  virtual ~WindowFramebufferResizedEvent() = default;
+  const Window& window;
+  uint16_t width;
+  uint16_t height;
 };
-
 }  // namespace mge
 
 #endif  // MGE_EVENTS_WINDOW_EVENT_HH

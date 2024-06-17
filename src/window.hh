@@ -10,11 +10,10 @@ struct WindowData {
   uint16_t width;
   uint16_t height;
   std::string title;
-  std::function<void(Event &)> send_event;
 
   WindowData(const std::string &title = "mGE application",
              uint16_t width = 1280, uint16_t height = 720)
-      : title(title), width(width), height(height), send_event() {}
+      : title(title), width(width), height(height) {}
 };
 
 class Window {
@@ -26,7 +25,6 @@ class Window {
   void update();
   void clear();
   void make_context_current();
-  void set_event_handler(std::function<void(Event &)> event_handler);
 
   inline const uint16_t get_width() const { return m_data.width; }
   inline const uint16_t get_height() const { return m_data.height; }
@@ -50,7 +48,6 @@ class Window {
   GLFWscrollfun set_scroll_callback(GLFWscrollfun callback);
   GLFWmousebuttonfun set_mouse_button_callback(GLFWmousebuttonfun callback);
 
-  void send_event(Event &) const;
   bool is_key_pressed(int key) const;
   bool is_mouse_pressed(int key) const;
 

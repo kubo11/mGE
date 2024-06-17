@@ -10,7 +10,7 @@ class RenderContext {
  public:
   ~RenderContext();
 
-  static RenderContext& create();
+  static std::shared_ptr<RenderContext> create();
   void terminate();
 
   static size_t glSizeofType(GLenum type);
@@ -21,7 +21,7 @@ class RenderContext {
   void bind_shader_program(GLuint program);
 
  private:
-  static std::unique_ptr<RenderContext> s_instance;
+  static std::shared_ptr<RenderContext> s_instance;
   GLuint m_program;
 
   RenderContext();

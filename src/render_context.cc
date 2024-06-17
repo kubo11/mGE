@@ -1,7 +1,7 @@
 #include "render_context.hh"
 
 namespace mge {
-std::unique_ptr<RenderContext> RenderContext::s_instance = nullptr;
+std::shared_ptr<RenderContext> RenderContext::s_instance = nullptr;
 
 RenderContext::RenderContext() {
   MGE_INFO("Render context created");
@@ -14,13 +14,13 @@ RenderContext::~RenderContext() {
   }
 }
 
-RenderContext& RenderContext::create() {
+std::shared_ptr<RenderContext> RenderContext::create() {
   if (s_instance) {
     throw std::runtime_error("Render context already exists!");
   }
 
-  s_instance = std::unique_ptr<RenderContext>(new RenderContext());
-  return *s_instance;
+  s_instance = std::shared_ptr<RenderContext>(new RenderContext());
+  return s_instance;
 }
 
 void RenderContext::init() {

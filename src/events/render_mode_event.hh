@@ -6,19 +6,16 @@
 #include "../renderer/scene/components/renderable_component.hh"
 
 namespace mge {
-class RenderModeUpdatedEvent : public Event {
- public:
-  RenderModeUpdatedEvent(const std::string& tag, RenderMode render_mode)
-      : m_tag(tag), m_render_mode(render_mode) {}
-  virtual inline const std::string name() const override {
-    return "RenderModeUpdatedEvent";
-  }
-  inline const std::string& get_tag() const { return m_tag; }
-  inline RenderMode get_render_mode() const { return m_render_mode; }
+enum class RenderModeEvents { RenderModeUpdated };
 
- private:
-  std::string m_tag;
-  RenderMode m_render_mode;
+class RenderModeUpdatedEvent : public Event<RenderModeEvents> {
+ public:
+  RenderModeUpdatedEvent()
+      : Event<RenderModeEvents>(RenderModeEvents::RenderModeUpdated,
+                                "RenderModeUpdatedEvent") {}
+  virtual ~RenderModeUpdatedEvent() = default;
+  std::string tag;
+  RenderMode render_mode;
 };
 }  // namespace mge
 

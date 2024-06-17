@@ -1,7 +1,7 @@
 #include "shader_system.hh"
 
 namespace mge {
-std::unique_ptr<ShaderSystem> ShaderSystem::s_instance = nullptr;
+std::shared_ptr<ShaderSystem> ShaderSystem::s_instance = nullptr;
 const std::unordered_map<Shader::Type, std::string>
     ShaderSystem::s_shader_extensions = {
         {Shader::Type::VERTEX, ".vert"},
@@ -12,12 +12,12 @@ const std::unordered_map<Shader::Type, std::string>
         {Shader::Type::COMPUTE, ".comp"},
 };
 
-ShaderSystem& ShaderSystem::create() {
-  s_instance = std::unique_ptr<ShaderSystem>(new ShaderSystem());
+std::shared_ptr<ShaderSystem> ShaderSystem::create() {
+  s_instance = std::shared_ptr<ShaderSystem>(new ShaderSystem());
   MGE_INFO("Shader system created");
   s_instance->init();
 
-  return *s_instance;
+  return s_instance;
 }
 
 ShaderSystem& ShaderSystem::get_instance() { return *ShaderSystem::s_instance; }
@@ -38,7 +38,7 @@ void ShaderSystem::unload(const fs::path& path) {
 
 void ShaderSystem::terminate() {
   std::unordered_map<fs::path, std::shared_ptr<ShaderProgram>> empty_map;
-  m_shaders.swap(empty_map);
+  s_instance->m_shaders.swap(empty_map);
   s_instance = nullptr;
 
   MGE_INFO("Shader system terminated");

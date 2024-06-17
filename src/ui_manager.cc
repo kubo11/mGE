@@ -1,7 +1,7 @@
 #include "ui_manager.hh"
 
 namespace mge {
-std::unique_ptr<UIManager> UIManager::s_instance = nullptr;
+std::shared_ptr<UIManager> UIManager::s_instance = nullptr;
 
 UIManager::UIManager(Window& window) {
   MGE_INFO("UI manager created");
@@ -14,13 +14,13 @@ UIManager::~UIManager() {
   }
 }
 
-UIManager& UIManager::create(Window& window) {
+std::shared_ptr<UIManager> UIManager::create(Window& window) {
   if (s_instance) {
     throw std::runtime_error("UI manager already exists!");
   }
 
-  s_instance = std::unique_ptr<UIManager>(new UIManager(window));
-  return *s_instance;
+  s_instance = std::shared_ptr<UIManager>(new UIManager(window));
+  return s_instance;
 }
 
 void UIManager::start_frame() {

@@ -22,33 +22,35 @@ struct ApplicationParams {
 };
 
 class Application {
- protected:
-  Logger m_logger;
-  Timer m_timer;
-  WindowManager& m_window_manager;
-  Window& m_main_window;
-  RenderContext& m_render_context;
-  ShaderSystem& m_shader_system;
-  UIManager& m_ui_manager;
-  LayerStack m_layer_stack;
-  Scene m_scene;
-  std::string m_name;
-
-  bool m_running;
-
-  bool on_window_closed(WindowClosedEvent& event);
-
  public:
-  Application(const ApplicationParams& config = {});
+  virtual ~Application();
 
-  virtual ~Application() {}
-
+  std::unique_ptr<Application> create(const ApplicationParams& config = {});
   void run();
   void terminate();
   void push_layer(std::unique_ptr<Layer> layer);
-  void send_event(Event& event);
 
   inline Scene& get_scene() { return m_scene; }
+
+ protected:
+  Timer m_timer;
+  Window& m_main_window;
+  LayerStack m_layer_stack;
+  Scene m_scene;
+  std::string m_name;
+  bool m_running;
+
+  std::shared_ptr<Logger> m_logger;
+  std::shared_ptr<EventManager> m_event_manager;
+  std::shared_ptr<ShaderSystem> m_shader_system;
+  std::shared_ptr<WindowManager> m_window_manager;
+  std::shared_ptr<UIManager> m_ui_manager;
+  std::shared_ptr<RenderContext> m_render_context;
+
+  bool on_window_closed(WindowClosedEvent& event);
+
+ private:
+  Application(const ApplicationParams& config);
 };
 }  // namespace mge
 
