@@ -10,9 +10,7 @@ enum class RenderModeEvents { RenderModeUpdated };
 
 class RenderModeUpdatedEvent : public Event<RenderModeEvents> {
  public:
-  RenderModeUpdatedEvent()
-      : Event<RenderModeEvents>(RenderModeEvents::RenderModeUpdated,
-                                "RenderModeUpdatedEvent") {}
+  RenderModeUpdatedEvent() : Event<RenderModeEvents>(RenderModeEvents::RenderModeUpdated, "RenderModeUpdatedEvent") {}
   virtual ~RenderModeUpdatedEvent() = default;
   std::string tag;
   RenderMode render_mode;

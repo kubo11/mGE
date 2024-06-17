@@ -14,16 +14,14 @@ bool check_compile_erros(unsigned int program_id) {
   return success;
 }
 
-std::vector<std::string> parse_uniform_names(const char* buffer, GLsizei length,
-                                             GLint size) {
+std::vector<std::string> parse_uniform_names(const char* buffer, GLsizei length, GLint size) {
   MGE_ASSERT(size > 0, "");
 
   if (size == 1) {
     return {buffer};
   }
 
-  MGE_ASSERT(length > 3 && buffer[length - 3] == '[' &&
-             buffer[length - 2] == '0' && buffer[length - 1] == ']');
+  MGE_ASSERT(length > 3 && buffer[length - 3] == '[' && buffer[length - 2] == '0' && buffer[length - 1] == ']');
   std::string base_name(buffer, length - 3);
 
   std::vector<std::string> names(size);
@@ -55,8 +53,7 @@ void ShaderProgram::attach(std::unique_ptr<Shader> shader) {
 }
 
 bool ShaderProgram::link() {
-  MGE_ASSERT(m_shaders.size() >= 2, "Need at least two shaders to link: {}",
-             m_shaders.size());
+  MGE_ASSERT(m_shaders.size() >= 2, "Need at least two shaders to link: {}", m_shaders.size());
 
   m_uniforms.clear();
 
@@ -91,16 +88,14 @@ void ShaderProgram::load_uniforms_at_index(GLuint index) {
   GLsizei length = 0;
   GLint size = 0;
   GLenum type = GL_FLOAT;
-  glGetActiveUniform(m_id, index, static_cast<GLsizei>(buffer.size()), &length,
-                     &size, &type, buffer.data());
+  glGetActiveUniform(m_id, index, static_cast<GLsizei>(buffer.size()), &length, &size, &type, buffer.data());
 
   if (length < 1) {
     MGE_WARN("Unable to get active uniform {} for program {}", index, m_id);
     return;
   }
 
-  std::vector<std::string> names =
-      parse_uniform_names(buffer.data(), length, size);
+  std::vector<std::string> names = parse_uniform_names(buffer.data(), length, size);
   for (const std::string& name : names) {
     GLint location = glGetUniformLocation(m_id, name.c_str());
     MGE_ASSERT(location >= 0);

@@ -13,36 +13,30 @@ struct VertexAttribute {
 template <class T>
 class VertexArray {
  public:
-  inline VertexArray(std::vector<T> vertices,
-                     std::vector<VertexAttribute> vertex_attributes,
+  inline VertexArray(std::vector<T> vertices, std::vector<VertexAttribute> vertex_attributes,
                      std::vector<unsigned int> indices = {}) {
     glGenVertexArrays(1, &m_vertex_array_id);
     glBindVertexArray(m_vertex_array_id);
 
     glGenBuffers(1, &m_vertex_buffer_id);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer_id);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(), GL_STATIC_DRAW);
 
     m_count = vertices.size();
 
     if (!indices.empty()) {
       glGenBuffers(1, &m_element_buffer_id);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_element_buffer_id);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                   indices.size() * sizeof(unsigned int), indices.data(),
-                   GL_STATIC_DRAW);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
       m_count = indices.size();
     }
 
     size_t stride = 0;
     for (int i = 0; i < vertex_attributes.size(); ++i) {
-      glVertexAttribPointer(i, vertex_attributes[i].size,
-                            vertex_attributes[i].type, GL_FALSE, sizeof(T),
+      glVertexAttribPointer(i, vertex_attributes[i].size, vertex_attributes[i].type, GL_FALSE, sizeof(T),
                             reinterpret_cast<void*>(stride));
       glEnableVertexAttribArray(i);
-      stride += vertex_attributes[i].size *
-                RenderContext::glSizeofType(vertex_attributes[i].type);
+      stride += vertex_attributes[i].size * RenderContext::glSizeofType(vertex_attributes[i].type);
     }
 
     glCheckError();
@@ -81,11 +75,9 @@ class VertexArray {
     }
 
     if (size < vertices.size() * sizeof(T)) {
-      glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T),
-                   vertices.data(), GL_STATIC_DRAW);
+      glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(), GL_STATIC_DRAW);
     } else {
-      glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(T),
-                      vertices.data());
+      glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(T), vertices.data());
     }
 
     glCheckError();
@@ -98,12 +90,9 @@ class VertexArray {
     m_count = indices.size();
 
     if (size < indices.size() * sizeof(unsigned int)) {
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                   indices.size() * sizeof(unsigned int), indices.data(),
-                   GL_STATIC_DRAW);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
     } else {
-      glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0,
-                      indices.size() * sizeof(unsigned int), indices.data());
+      glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), indices.data());
     }
 
     glCheckError();

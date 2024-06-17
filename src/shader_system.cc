@@ -2,14 +2,13 @@
 
 namespace mge {
 std::shared_ptr<ShaderSystem> ShaderSystem::s_instance = nullptr;
-const std::unordered_map<Shader::Type, std::string>
-    ShaderSystem::s_shader_extensions = {
-        {Shader::Type::VERTEX, ".vert"},
-        {Shader::Type::TESSELLATION_CONTROL, ".tesc"},
-        {Shader::Type::TESSELLATION_EVALUATION, ".tese"},
-        {Shader::Type::GEOMETRY, ".geom"},
-        {Shader::Type::FRAGMENT, ".frag"},
-        {Shader::Type::COMPUTE, ".comp"},
+const std::unordered_map<Shader::Type, std::string> ShaderSystem::s_shader_extensions = {
+    {Shader::Type::VERTEX, ".vert"},
+    {Shader::Type::TESSELLATION_CONTROL, ".tesc"},
+    {Shader::Type::TESSELLATION_EVALUATION, ".tese"},
+    {Shader::Type::GEOMETRY, ".geom"},
+    {Shader::Type::FRAGMENT, ".frag"},
+    {Shader::Type::COMPUTE, ".comp"},
 };
 
 std::shared_ptr<ShaderSystem> ShaderSystem::create() {

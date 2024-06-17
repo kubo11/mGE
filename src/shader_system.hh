@@ -20,8 +20,7 @@ class ShaderSystem {
 
  private:
   static std::shared_ptr<ShaderSystem> s_instance;
-  static const std::unordered_map<Shader::Type, std::string>
-      s_shader_extensions;
+  static const std::unordered_map<Shader::Type, std::string> s_shader_extensions;
   std::unordered_map<fs::path, std::shared_ptr<ShaderProgram>> m_shaders;
 
   ShaderSystem();

@@ -4,8 +4,7 @@
 
 namespace mge {
 Window::Window(WindowData data)
-    : m_data(std::move(data)),
-      m_clear_color(100.f / 256.0f, 100.f / 256.0f, 100.f / 256.0f, 1.0f) {
+    : m_data(std::move(data)), m_clear_color(100.f / 256.0f, 100.f / 256.0f, 100.f / 256.0f, 1.0f) {
   MGE_INFO("Window \"{}\" created", m_data.title);
 }
 
@@ -25,8 +24,7 @@ void Window::init() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif  // __APPLE__
 
-  m_window = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(),
-                              nullptr, nullptr);
+  m_window = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(), nullptr, nullptr);
   if (m_window == NULL) {
     throw std::runtime_error("GLFW cannot create a window instance");
   }
@@ -46,19 +44,14 @@ void Window::update() {
 }
 
 void Window::clear() {
-  glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b,
-               m_clear_color.a);
+  glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   //   glClear(GL_COLOR_BUFFER_BIT);
 }
 
-bool Window::is_key_pressed(int key) const {
-  return glfwGetKey(m_window, key) == GLFW_PRESS;
-}
+bool Window::is_key_pressed(int key) const { return glfwGetKey(m_window, key) == GLFW_PRESS; }
 
-bool Window::is_mouse_pressed(int key) const {
-  return glfwGetMouseButton(m_window, key) == GLFW_PRESS;
-}
+bool Window::is_mouse_pressed(int key) const { return glfwGetMouseButton(m_window, key) == GLFW_PRESS; }
 
 void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
 
@@ -97,8 +90,7 @@ void Window::iconify_callback(GLFWwindow *window, int iconified) {}
 
 void Window::maximize_callback(GLFWwindow *window, int maximized) {}
 
-void Window::framebuffer_resize_callback(GLFWwindow *window, int width,
-                                         int height) {
+void Window::framebuffer_resize_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
   mge_window->m_data.width = width;
@@ -117,8 +109,7 @@ void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
   float curr_y = 1.0 - y / static_cast<double>(mge_window->m_data.height) * 2.0;
 
   if (!ImGui::GetIO().WantCaptureMouse) {
-    WindowMouseMovedEvent event(*mge_window, {previous_x, previous_y},
-                                {curr_x, curr_y});
+    WindowMouseMovedEvent event(*mge_window, {previous_x, previous_y}, {curr_x, curr_y});
     SendEvent(event);
   }
 
@@ -134,14 +125,11 @@ void Window::scroll_callback(GLFWwindow *window, double, double y_offset) {
   }
 }
 
-void Window::content_scale_callback(GLFWwindow *window, float xscale,
-                                    float yscale) {}
+void Window::content_scale_callback(GLFWwindow *window, float xscale, float yscale) {}
 
-void Window::mouse_button_callback(GLFWwindow *window, int button, int action,
-                                   int mods) {
+void Window::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT &&
-      !ImGui::GetIO().WantCaptureMouse) {
+  if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT && !ImGui::GetIO().WantCaptureMouse) {
     double pos_x, pos_y;
     glfwGetCursorPos(window, &pos_x, &pos_y);
     pos_x = -1.0 + pos_x / static_cast<double>(mge_window->m_data.width) * 2.0;
@@ -163,8 +151,7 @@ GLFWwindowclosefun Window::set_close_callback(GLFWwindowclosefun callback) {
   return glfwSetWindowCloseCallback(m_window, callback);
 }
 
-GLFWwindowrefreshfun Window::set_refresh_callback(
-    GLFWwindowrefreshfun callback) {
+GLFWwindowrefreshfun Window::set_refresh_callback(GLFWwindowrefreshfun callback) {
   return glfwSetWindowRefreshCallback(m_window, callback);
 }
 
@@ -172,23 +159,19 @@ GLFWwindowfocusfun Window::set_focus_callback(GLFWwindowfocusfun callback) {
   return glfwSetWindowFocusCallback(m_window, callback);
 }
 
-GLFWwindowiconifyfun Window::set_iconify_callback(
-    GLFWwindowiconifyfun callback) {
+GLFWwindowiconifyfun Window::set_iconify_callback(GLFWwindowiconifyfun callback) {
   return glfwSetWindowIconifyCallback(m_window, callback);
 }
 
-GLFWwindowmaximizefun Window::set_maximize_callback(
-    GLFWwindowmaximizefun callback) {
+GLFWwindowmaximizefun Window::set_maximize_callback(GLFWwindowmaximizefun callback) {
   return glfwSetWindowMaximizeCallback(m_window, callback);
 }
 
-GLFWframebuffersizefun Window::set_framebuffer_resize_callback(
-    GLFWframebuffersizefun callback) {
+GLFWframebuffersizefun Window::set_framebuffer_resize_callback(GLFWframebuffersizefun callback) {
   return glfwSetFramebufferSizeCallback(m_window, callback);
 }
 
-GLFWwindowcontentscalefun Window::set_content_scale_callback(
-    GLFWwindowcontentscalefun callback) {
+GLFWwindowcontentscalefun Window::set_content_scale_callback(GLFWwindowcontentscalefun callback) {
   return glfwSetWindowContentScaleCallback(m_window, callback);
 }
 
@@ -196,12 +179,9 @@ GLFWcursorposfun Window::set_cursor_pos_callback(GLFWcursorposfun callback) {
   return glfwSetCursorPosCallback(m_window, callback);
 }
 
-GLFWscrollfun Window::set_scroll_callback(GLFWscrollfun callback) {
-  return glfwSetScrollCallback(m_window, callback);
-}
+GLFWscrollfun Window::set_scroll_callback(GLFWscrollfun callback) { return glfwSetScrollCallback(m_window, callback); }
 
-GLFWmousebuttonfun Window::set_mouse_button_callback(
-    GLFWmousebuttonfun callback) {
+GLFWmousebuttonfun Window::set_mouse_button_callback(GLFWmousebuttonfun callback) {
   return glfwSetMouseButtonCallback(m_window, callback);
 }
 }  // namespace mge

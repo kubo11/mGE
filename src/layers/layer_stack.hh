@@ -15,9 +15,7 @@ class LayerStack {
   void pop();
   void terminate();
 
-  std::vector<std::unique_ptr<Layer>>::iterator begin() {
-    return m_layers.begin();
-  }
+  std::vector<std::unique_ptr<Layer>>::iterator begin() { return m_layers.begin(); }
   std::vector<std::unique_ptr<Layer>>::iterator end() { return m_layers.end(); }
 
  private:

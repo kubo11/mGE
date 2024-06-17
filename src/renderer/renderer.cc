@@ -22,8 +22,7 @@ void Renderer<RendererType::TRIANGLES>::draw(unsigned int vertices_count) {
 }
 
 template <>
-void Renderer<RendererType::TRIANGLES>::draw_indexed(
-    unsigned int indices_count) {
+void Renderer<RendererType::TRIANGLES>::draw_indexed(unsigned int indices_count) {
   glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, 0);
   glCheckError();
 }

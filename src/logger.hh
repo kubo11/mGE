@@ -11,9 +11,7 @@ class Logger {
   ~Logger();
   static std::shared_ptr<Logger> create();
   inline static Logger& get_instance() { return *s_instance; }
-  inline static std::shared_ptr<spdlog::logger> get_mge_logger() {
-    return s_instance->m_mge_logger;
-  }
+  inline static std::shared_ptr<spdlog::logger> get_mge_logger() { return s_instance->m_mge_logger; }
 
   void terminate();
 

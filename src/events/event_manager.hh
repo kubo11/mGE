@@ -12,22 +12,16 @@ namespace mge {
 using TypeInfoRef = std::reference_wrapper<const std::type_info>;
 
 struct Hasher {
-  std::size_t operator()(TypeInfoRef code) const {
-    return code.get().hash_code();
-  }
+  std::size_t operator()(TypeInfoRef code) const { return code.get().hash_code(); }
 };
 
 struct EqualTo {
-  bool operator()(TypeInfoRef lhs, TypeInfoRef rhs) const {
-    return lhs.get() == rhs.get();
-  }
+  bool operator()(TypeInfoRef lhs, TypeInfoRef rhs) const { return lhs.get() == rhs.get(); }
 };
 
 template <class... T>
 using DispatcherMap =
-    std::unordered_map<TypeInfoRef,
-                       std::unique_ptr<std::variant<EventDispatcher<T>...>>,
-                       Hasher, EqualTo>;
+    std::unordered_map<TypeInfoRef, std::unique_ptr<std::variant<EventDispatcher<T>...>>, Hasher, EqualTo>;
 
 template <class... T>
 class _EventManager {
@@ -57,14 +51,9 @@ class _EventManager {
       .add_listener(event_type, std::bind(&func, arg, std::placeholders::_1))
 
 #define RemoveEventListener(event_type, handle) \
-  EventManager::get_instance()                  \
-      .get_dispatcher(event_type)               \
-      .remove_listener(handle)
+  EventManager::get_instance().get_dispatcher(event_type).remove_listener(handle)
 
-#define SendEvent(_event)                \
-  EventManager::get_instance()           \
-      .get_dispatcher(_event.get_type()) \
-      .send_event(_event)
+#define SendEvent(_event) EventManager::get_instance().get_dispatcher(_event.get_type()).send_event(_event)
 
 }  // namespace mge
 

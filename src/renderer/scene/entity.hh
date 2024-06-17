@@ -9,16 +9,12 @@ class Entity {
   ~Entity() {
     m_registry.destroy(m_entity);
     for (auto& child : m_children) {
-      child.get().m_parents.erase(
-          std::remove(child.get().m_parents.begin(),
-                      child.get().m_parents.end(), *this),
-          child.get().m_parents.end());
+      child.get().m_parents.erase(std::remove(child.get().m_parents.begin(), child.get().m_parents.end(), *this),
+                                  child.get().m_parents.end());
     }
     for (auto& parent : m_parents) {
-      parent.get().m_children.erase(
-          std::remove(parent.get().m_children.begin(),
-                      parent.get().m_children.end(), *this),
-          parent.get().m_children.end());
+      parent.get().m_children.erase(std::remove(parent.get().m_children.begin(), parent.get().m_children.end(), *this),
+                                    parent.get().m_children.end());
     }
   }
 
@@ -31,8 +27,7 @@ class Entity {
 
   template <class T, class... Args>
   inline decltype(auto) add_or_replace_component(Args&&... args) {
-    return m_registry.emplace_or_replace<T>(m_entity,
-                                            std::forward<Args>(args)...);
+    return m_registry.emplace_or_replace<T>(m_entity, std::forward<Args>(args)...);
   }
 
   template <class T>
@@ -61,13 +56,9 @@ class Entity {
     return m_registry.try_get<T>(m_entity);
   }
 
-  inline bool operator<(const Entity& other) const {
-    return m_entity < other.m_entity;
-  }
+  inline bool operator<(const Entity& other) const { return m_entity < other.m_entity; }
 
-  inline bool operator==(const Entity& other) const {
-    return m_entity == other.m_entity;
-  }
+  inline bool operator==(const Entity& other) const { return m_entity == other.m_entity; }
 
   inline void add_child(Entity& child) {
     child.m_parents.emplace_back(*this);
@@ -81,25 +72,15 @@ class Entity {
   }
 
   inline void remove_child(Entity& child) {
-    child.m_parents.erase(
-        std::remove(child.m_parents.begin(), child.m_parents.end(), *this),
-        child.m_parents.end());
-    m_children.erase(std::remove(m_children.begin(), m_children.end(), child),
-                     m_children.end());
-    m_owned_children.erase(
-        std::remove(m_owned_children.begin(), m_owned_children.end(), child),
-        m_owned_children.end());
+    child.m_parents.erase(std::remove(child.m_parents.begin(), child.m_parents.end(), *this), child.m_parents.end());
+    m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
+    m_owned_children.erase(std::remove(m_owned_children.begin(), m_owned_children.end(), child),
+                           m_owned_children.end());
   }
 
-  inline std::vector<std::reference_wrapper<Entity>>& get_children() {
-    return m_children;
-  }
-  inline std::vector<std::reference_wrapper<Entity>>& get_owned_children() {
-    return m_owned_children;
-  }
-  inline std::vector<std::reference_wrapper<Entity>>& get_parents() {
-    return m_parents;
-  }
+  inline std::vector<std::reference_wrapper<Entity>>& get_children() { return m_children; }
+  inline std::vector<std::reference_wrapper<Entity>>& get_owned_children() { return m_owned_children; }
+  inline std::vector<std::reference_wrapper<Entity>>& get_parents() { return m_parents; }
 
   inline void propagate(const std::function<void(Entity&)>& func) {
     for (auto& child : m_children) {
@@ -113,8 +94,7 @@ class Entity {
   }
 
  private:
-  Entity(entt::registry& registry)
-      : m_registry(registry), m_entity(m_registry.create()) {}
+  Entity(entt::registry& registry) : m_registry(registry), m_entity(m_registry.create()) {}
 
   entt::registry& m_registry;
   entt::entity m_entity;
@@ -125,10 +105,7 @@ class Entity {
   friend class Scene;
 };
 
-inline bool operator<(const std::reference_wrapper<Entity>& lhs,
-                      const Entity& rhs) {
-  return lhs.get() < rhs;
-}
+inline bool operator<(const std::reference_wrapper<Entity>& lhs, const Entity& rhs) { return lhs.get() < rhs; }
 
 using EntityVector = std::vector<std::reference_wrapper<mge::Entity>>;
 using OptionalEntity = std::optional<std::reference_wrapper<Entity>>;

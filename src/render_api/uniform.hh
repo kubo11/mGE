@@ -34,15 +34,9 @@ class Uniform {
   virtual void commit_data() = 0;
 
   bool set_data(bool value) { return set_data(static_cast<GLint>(value)); }
-  bool set_data(glm::bvec2 value) {
-    return set_data(glm::ivec2(value.x, value.y));
-  }
-  bool set_data(glm::bvec3 value) {
-    return set_data(glm::ivec3(value.x, value.y, value.z));
-  }
-  bool set_data(glm::bvec4 value) {
-    return set_data(glm::ivec4(value.x, value.y, value.z, value.w));
-  }
+  bool set_data(glm::bvec2 value) { return set_data(glm::ivec2(value.x, value.y)); }
+  bool set_data(glm::bvec3 value) { return set_data(glm::ivec3(value.x, value.y, value.z)); }
+  bool set_data(glm::bvec4 value) { return set_data(glm::ivec4(value.x, value.y, value.z, value.w)); }
 
 #define DECLARE_SET_DATA(type) \
   virtual bool set_data(const type& value) { return type_error(#type); }

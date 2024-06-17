@@ -5,19 +5,12 @@
 #include "event.hh"
 
 namespace mge {
-enum class WindowEvents {
-  WindowClosed,
-  WindowMouseMoved,
-  WindowScroll,
-  WindowMousePressed,
-  WindowFramebufferResized
-};
+enum class WindowEvents { WindowClosed, WindowMouseMoved, WindowScroll, WindowMousePressed, WindowFramebufferResized };
 
 class WindowClosedEvent : public Event<WindowEvents> {
  public:
   WindowClosedEvent(const Window& window)
-      : Event<WindowEvents>(WindowEvents::WindowClosed, "WindowClosedEvent"),
-        window(window) {}
+      : Event<WindowEvents>(WindowEvents::WindowClosed, "WindowClosedEvent"), window(window) {}
   virtual ~WindowClosedEvent() = default;
   const Window& window;
 };
@@ -25,8 +18,7 @@ class WindowClosedEvent : public Event<WindowEvents> {
 class WindowMouseMovedEvent : public Event<WindowEvents> {
  public:
   WindowMouseMovedEvent(const Window& window, glm::vec2 beg, glm::vec2 end)
-      : Event<WindowEvents>(WindowEvents::WindowMouseMoved,
-                            "WindowMouseMovedEvent"),
+      : Event<WindowEvents>(WindowEvents::WindowMouseMoved, "WindowMouseMovedEvent"),
         window(window),
         beg(beg),
         end(end) {}
@@ -39,9 +31,7 @@ class WindowMouseMovedEvent : public Event<WindowEvents> {
 class WindowScrollEvent : public Event<WindowEvents> {
  public:
   WindowScrollEvent(const Window& window, float y_offset)
-      : Event<WindowEvents>(WindowEvents::WindowScroll, "WindowScrollEvent"),
-        window(window),
-        y_offset(y_offset) {}
+      : Event<WindowEvents>(WindowEvents::WindowScroll, "WindowScrollEvent"), window(window), y_offset(y_offset) {}
   virtual ~WindowScrollEvent() = default;
   const Window& window;
   float y_offset;
@@ -50,8 +40,7 @@ class WindowScrollEvent : public Event<WindowEvents> {
 class WindowMousePressedEvent : public Event<WindowEvents> {
  public:
   WindowMousePressedEvent(const Window& window, int button, glm::vec2 position)
-      : Event<WindowEvents>(WindowEvents::WindowMousePressed,
-                            "WindowMousePressedEvent"),
+      : Event<WindowEvents>(WindowEvents::WindowMousePressed, "WindowMousePressedEvent"),
         window(window),
         button(button),
         position(position) {}
@@ -63,10 +52,8 @@ class WindowMousePressedEvent : public Event<WindowEvents> {
 
 class WindowFramebufferResizedEvent : public Event<WindowEvents> {
  public:
-  WindowFramebufferResizedEvent(const Window& window, uint16_t width,
-                                uint16_t height)
-      : Event<WindowEvents>(WindowEvents::WindowFramebufferResized,
-                            "WindowFramebufferResizedEvent"),
+  WindowFramebufferResizedEvent(const Window& window, uint16_t width, uint16_t height)
+      : Event<WindowEvents>(WindowEvents::WindowFramebufferResized, "WindowFramebufferResizedEvent"),
         window(window),
         width(width),
         height(height) {}

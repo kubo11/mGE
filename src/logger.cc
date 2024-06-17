@@ -30,7 +30,5 @@ void Logger::terminate() {
   m_mge_logger = nullptr;
 }
 
-void Logger::set_level(LogLevel level) {
-  s_instance->m_mge_logger->set_level(level);
-}
+void Logger::set_level(LogLevel level) { s_instance->m_mge_logger->set_level(level); }
 }  // namespace mge

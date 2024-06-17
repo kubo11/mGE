@@ -6,12 +6,8 @@
 namespace mge {
 struct TransformComponent {
   TransformComponent(const glm::vec3& position = {0.0f, 0.0f, 0.0f},
-                     const glm::quat& rotation = {1.0f, 0.0f, 0.0f, 0.0f},
-                     const glm::vec3& scale = {1.0f, 1.0f, 1.0f})
-      : m_position(position),
-        m_rotation(rotation),
-        m_scale(scale),
-        m_model_mat(1.0f) {
+                     const glm::quat& rotation = {1.0f, 0.0f, 0.0f, 0.0f}, const glm::vec3& scale = {1.0f, 1.0f, 1.0f})
+      : m_position(position), m_rotation(rotation), m_scale(scale), m_model_mat(1.0f) {
     update_model_mat();
   }
   TransformComponent(TransformComponent&& other)

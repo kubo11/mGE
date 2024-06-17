@@ -14,8 +14,7 @@ bool check_compile_erros(unsigned int shader_id) {
 }  // namespace
 
 namespace mge {
-Shader::Shader(Shader::Type type)
-    : m_id(glCreateShader(to_gl_shader_type(type))), m_type(type) {}
+Shader::Shader(Shader::Type type) : m_id(glCreateShader(to_gl_shader_type(type))), m_type(type) {}
 
 Shader::~Shader() { release(); }
 

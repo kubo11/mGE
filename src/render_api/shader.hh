@@ -7,14 +7,7 @@
 namespace mge {
 class Shader {
  public:
-  enum class Type {
-    VERTEX,
-    TESSELLATION_CONTROL,
-    TESSELLATION_EVALUATION,
-    GEOMETRY,
-    FRAGMENT,
-    COMPUTE
-  };
+  enum class Type { VERTEX, TESSELLATION_CONTROL, TESSELLATION_EVALUATION, GEOMETRY, FRAGMENT, COMPUTE };
 
   Shader(Type type);
   ~Shader();

@@ -11,9 +11,7 @@ std::shared_ptr<WindowManager> WindowManager::create() {
   return s_instance;
 }
 
-WindowManager& WindowManager::get_instance() {
-  return *WindowManager::s_instance;
-}
+WindowManager& WindowManager::get_instance() { return *WindowManager::s_instance; }
 
 Window& WindowManager::create_window(WindowData data) {
   s_instance->m_windows.emplace_back(std::make_unique<Window>(std::move(data)));
@@ -25,9 +23,8 @@ Window& WindowManager::create_window(WindowData data) {
 }
 
 void WindowManager::destroy_window(Window& window) {
-  s_instance->m_windows.erase(
-      std::remove_if(s_instance->m_windows.begin(), s_instance->m_windows.end(),
-                     [&window](const auto& w) { return *w == window; }));
+  s_instance->m_windows.erase(std::remove_if(s_instance->m_windows.begin(), s_instance->m_windows.end(),
+                                             [&window](const auto& w) { return *w == window; }));
 }
 
 void WindowManager::glfw_error_callback(int error, const char* description) {

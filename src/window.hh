@@ -11,8 +11,7 @@ struct WindowData {
   uint16_t height;
   std::string title;
 
-  WindowData(const std::string &title = "mGE application",
-             uint16_t width = 1280, uint16_t height = 720)
+  WindowData(const std::string &title = "mGE application", uint16_t width = 1280, uint16_t height = 720)
       : title(title), width(width), height(height) {}
 };
 
@@ -40,10 +39,8 @@ class Window {
   GLFWwindowfocusfun set_focus_callback(GLFWwindowfocusfun callback);
   GLFWwindowiconifyfun set_iconify_callback(GLFWwindowiconifyfun callback);
   GLFWwindowmaximizefun set_maximize_callback(GLFWwindowmaximizefun callback);
-  GLFWframebuffersizefun set_framebuffer_resize_callback(
-      GLFWframebuffersizefun callback);
-  GLFWwindowcontentscalefun set_content_scale_callback(
-      GLFWwindowcontentscalefun callback);
+  GLFWframebuffersizefun set_framebuffer_resize_callback(GLFWframebuffersizefun callback);
+  GLFWwindowcontentscalefun set_content_scale_callback(GLFWwindowcontentscalefun callback);
   GLFWcursorposfun set_cursor_pos_callback(GLFWcursorposfun callback);
   GLFWscrollfun set_scroll_callback(GLFWscrollfun callback);
   GLFWmousebuttonfun set_mouse_button_callback(GLFWmousebuttonfun callback);
@@ -65,14 +62,11 @@ class Window {
   static void focus_callback(GLFWwindow *window, int focused);
   static void iconify_callback(GLFWwindow *window, int iconified);
   static void maximize_callback(GLFWwindow *window, int maximized);
-  static void framebuffer_resize_callback(GLFWwindow *window, int width,
-                                          int height);
-  static void content_scale_callback(GLFWwindow *window, float xscale,
-                                     float yscale);
+  static void framebuffer_resize_callback(GLFWwindow *window, int width, int height);
+  static void content_scale_callback(GLFWwindow *window, float xscale, float yscale);
   static void cursor_pos_callback(GLFWwindow *window, double x, double y);
   static void scroll_callback(GLFWwindow *window, double, double yOffset);
-  static void mouse_button_callback(GLFWwindow *window, int button, int action,
-                                    int mods);
+  static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 };
 }  // namespace mge
 

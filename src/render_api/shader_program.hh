@@ -25,9 +25,7 @@ class ShaderProgram {
   inline const GLuint get_id() const { return m_id; }
   inline Shader &get_shader(Shader::Type type) { return *m_shaders.at(type); }
 
-  inline bool has_uniform(const std::string &name) const {
-    return m_uniforms.contains(name);
-  }
+  inline bool has_uniform(const std::string &name) const { return m_uniforms.contains(name); }
 
   template <typename T>
   inline void set_uniform_value(const std::string &name, const T &value) {

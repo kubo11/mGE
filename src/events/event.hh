@@ -8,8 +8,7 @@ template <typename T>
 class Event {
  public:
   Event() = default;
-  Event(T type, const std::string& name = "")
-      : m_type(type), m_name(name), m_handled(false) {}
+  Event(T type, const std::string& name = "") : m_type(type), m_name(name), m_handled(false) {}
   virtual ~Event() {}
   inline const T get_type() const { return m_type; }
 
@@ -60,8 +59,7 @@ class EventDispatcher {
  private:
   std::map<T, std::vector<Func>> m_listeners;
   int m_next_listener_id = 0;
-  std::map<int, std::pair<T, typename std::vector<Func>::iterator>>
-      m_listener_handles;
+  std::map<int, std::pair<T, typename std::vector<Func>::iterator>> m_listener_handles;
 };
 }  // namespace mge
 

@@ -6,18 +6,12 @@
 namespace mge {
 class Camera {
  public:
-  Camera(float view_width, float aspect_ratio, float near_plane,
-         float far_plane);
+  Camera(float view_width, float aspect_ratio, float near_plane, float far_plane);
 
-  inline glm::mat4 get_projection_view_matrix() const {
-    return m_projection_view_matrix;
-  }
-  inline glm::mat4 get_unzoomed_projection_view_matrix() const {
-    return m_unzoomed_projection_view_matrix;
-  }
+  inline glm::mat4 get_projection_view_matrix() const { return m_projection_view_matrix; }
+  inline glm::mat4 get_unzoomed_projection_view_matrix() const { return m_unzoomed_projection_view_matrix; }
   inline glm::vec3 get_position() const {
-    return glm::vec3(m_inverse_view_matrix[3][0], m_inverse_view_matrix[3][1],
-                     m_inverse_view_matrix[3][2]);
+    return glm::vec3(m_inverse_view_matrix[3][0], m_inverse_view_matrix[3][1], m_inverse_view_matrix[3][2]);
   }
   void add_elevation(float elevation);
   void add_azimuth(float azimuth);

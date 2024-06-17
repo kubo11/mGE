@@ -4,12 +4,10 @@ namespace mge {
 Application::Application(const ApplicationParams& config)
     : m_running(true),
       m_layer_stack(),
-      m_main_window(WindowManager::create_window(
-          WindowData(config.name, config.window_width, config.window_height))),
+      m_main_window(WindowManager::create_window(WindowData(config.name, config.window_width, config.window_height))),
       m_timer(),
       m_name(config.name),
-      m_scene(
-          std::make_unique<Camera>(20.0f, 1280.0f / 720.0f, 0.1f, 1000.0f)) {
+      m_scene(std::make_unique<Camera>(20.0f, 1280.0f / 720.0f, 0.1f, 1000.0f)) {
   glViewport(0, 0, m_main_window.get_width(), m_main_window.get_height());
   glfwSwapInterval(0);
 
@@ -22,8 +20,7 @@ Application::~Application() {
   if (m_running) terminate();
 }
 
-std::unique_ptr<Application> Application::create(
-    const ApplicationParams& config) {
+std::unique_ptr<Application> Application::create(const ApplicationParams& config) {
   m_logger = Logger::create();
   m_event_manager = EventManager::create();
   m_window_manager = WindowManager::create();

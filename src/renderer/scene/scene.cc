@@ -25,8 +25,7 @@ Entity& Scene::create_entity(const std::string& tag) {
   return entity_ref;
 }
 
-Entity& Scene::create_entity(const std::string& tag,
-                             const std::function<void(Entity&)> func) {
+Entity& Scene::create_entity(const std::string& tag, const std::function<void(Entity&)> func) {
   if (m_entities_by_tag.contains(tag)) {
     throw std::runtime_error("Entity tag duplicated");
   }
@@ -51,15 +50,13 @@ void Scene::destroy_entity(const std::string& tag) {
   }
 }
 
-bool Scene::rename_entity(const std::string& old_tag,
-                          const std::string& new_tag) {
+bool Scene::rename_entity(const std::string& old_tag, const std::string& new_tag) {
   if (m_entities_by_tag.contains(new_tag)) {
     return false;
   }
   auto node = m_entities_by_tag.extract(old_tag);
   node.key() = new_tag;
-  node.mapped()->patch<mge::TagComponent>(
-      [&new_tag](auto& tag) { tag.set_tag(new_tag); });
+  node.mapped()->patch<mge::TagComponent>([&new_tag](auto& tag) { tag.set_tag(new_tag); });
   m_entities_by_tag.insert(std::move(node));
   return true;
 }
