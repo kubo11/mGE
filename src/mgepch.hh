@@ -47,12 +47,14 @@ namespace fs = std::filesystem;
 #include <misc/cpp/imgui_stdlib.h>
 
 // spdlog
+#include <spdlog/fmt/bundled/core.h>
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 // mGE
 #include "logger.hh"
+#include "mge_assert.hh"
 
 #define PREVENT_COPY(class_name)          \
   class_name(const class_name&) = delete; \
