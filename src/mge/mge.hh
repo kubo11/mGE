@@ -3,8 +3,6 @@
 
 #include "../application.hh"
 #include "../layers/layer.hh"
-#include "../math/matrix_operations.hh"
-#include "../math/quat.hh"
 #include "../render_api/vertex_array.hh"
 #include "../renderer/camera.hh"
 #include "../renderer/renderer.hh"

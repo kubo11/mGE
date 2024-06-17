@@ -4,7 +4,6 @@
 #include "mgepch.hh"
 
 #include "events/event.hh"
-#include "math/vec4.hh"
 
 namespace mge {
 struct WindowData {
@@ -58,7 +57,7 @@ class Window {
  private:
   WindowData m_data;
   GLFWwindow *m_window;
-  vec4<float> m_clear_color;
+  glm::vec4 m_clear_color;
 
   void set_default_window_callbacks();
 
