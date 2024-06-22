@@ -3,6 +3,8 @@
 
 ### Project ###
 build/
+.idea/
+cmake-build-*/
 
 ### C ###
 # Prerequisites
