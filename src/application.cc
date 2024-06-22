@@ -7,7 +7,10 @@ Application::Application(const ApplicationParams& config)
       m_main_window(WindowManager::create_window(WindowData(config.name, config.window_width, config.window_height))),
       m_timer(),
       m_name(config.name),
-      m_scene(std::make_unique<Camera>(20.0f, 1280.0f / 720.0f, 0.1f, 1000.0f)) {
+      m_scene(std::make_unique<Camera>(
+          glm::vec3(0.0f, 10.0f, -10.0f), -45.0f, 0.0f, 20.0f,
+          static_cast<float>(m_main_window.get_width()) / static_cast<float>(m_main_window.get_width()), 0.1f,
+          100.0f)) {
   WindowManager::get_instance().set_swap_interval(0);
 
   m_ui_manager = UIManager::create(m_main_window);

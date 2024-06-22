@@ -1,105 +1,87 @@
 #include "camera.hh"
 
 namespace mge {
-Camera::Camera(float view_width, float aspect_ratio, float near_plane, float far_plane)
-    : m_view_width(view_width),
-      m_unzoomed_view_width(view_width),
+Camera::Camera(glm::vec3 position, float yaw, float pitch, float fov, float aspect_ratio, float near_plane,
+               float far_plane)
+    : m_pos(position),
+      m_world_up(glm::vec3(0.0f, 1.0f, 0.0f)),
+      m_yaw(yaw),
+      m_pitch(pitch),
+      m_fov(fov),
       m_aspect_ratio(aspect_ratio),
       m_near_plane(near_plane),
-      m_far_plane(far_plane) {
-  update_inverse_view_matrix();
-  set_aspect_ratio(aspect_ratio);
+      m_far_plane(far_plane),
+      m_update_view(false),
+      m_update_projection(false),
+      m_update_camera_vectors(false) {
+  update_camera_vectors();
 }
 
-void Camera::add_elevation(float elevation) {
-  m_elevation += elevation;
-
-  float bound = glm::radians(89.0f);
-  m_elevation = std::clamp(m_elevation, -bound, bound);
-
-  update_inverse_view_matrix();
-  update_projection_view_matrix();
-}
-
-void Camera::add_azimuth(float azimuth) {
-  m_azimuth += azimuth;
-
-  float pi = glm::pi<float>();
-  while (m_azimuth < -pi) {
-    m_azimuth += 2 * pi;
+const glm::mat4& Camera::get_view_matrix() {
+  if (m_update_camera_vectors) {
+    m_update_camera_vectors = false;
+    update_camera_vectors();
   }
-  while (m_azimuth >= pi) {
-    m_azimuth -= 2 * pi;
+  if (m_update_view) {
+    m_update_view = false;
+    m_view = glm::lookAt(m_pos, m_front, m_up);
   }
 
-  update_inverse_view_matrix();
-  update_projection_view_matrix();
+  return m_view;
 }
 
-void Camera::add_radius(float radius) {
-  m_radius += radius;
-  m_radius = std::max(m_radius, 0.1f);
+const glm::mat4& Camera::get_projection_matrix() {
+  if (m_update_projection) {
+    m_update_projection = false;
+    m_projection = glm::perspective(glm::radians(m_fov), m_aspect_ratio, m_near_plane, m_far_plane);
+  }
 
-  update_inverse_view_matrix();
-  update_projection_view_matrix();
+  return m_projection;
 }
 
-void Camera::move(glm::vec2 pos) {
-  m_target_position += m_view_width * glm::mat3{m_inverse_view_matrix} * glm::vec3(pos, 0.0f);
-
-  update_inverse_view_matrix();
-  update_projection_view_matrix();
+void Camera::move(Camera::MoveDirection dir, float dt) {
+  switch (dir) {
+    case MoveDirection::FRONT:
+      m_pos += m_front * m_velocity * dt;
+      break;
+    case MoveDirection::BACK:
+      m_pos -= m_front * m_velocity * dt;
+      break;
+    case MoveDirection::RIGHT:
+      m_pos += m_right * m_velocity * dt;
+      break;
+    case MoveDirection::LEFT:
+      m_pos -= m_right * m_velocity * dt;
+      break;
+    case MoveDirection::UP:
+      m_pos += m_up * m_velocity * dt;
+      break;
+    case MoveDirection::DOWN:
+      m_pos -= m_up * m_velocity * dt;
+      break;
+  }
+  m_update_view = true;
 }
 
-void Camera::zoom(float zoom) {
-  m_view_width *= zoom;
-
-  update_projection_matrix();
-  update_projection_view_matrix();
+void Camera::rotate(float yaw, float pitch) {
+  m_yaw = std::clamp(m_yaw + yaw * m_rotation_sensitivity, -89.0f, 89.0f);
+  m_pitch = std::clamp(m_pitch + pitch * m_rotation_sensitivity, -89.0f, 89.0f);
+  m_update_view = true;
+  m_update_camera_vectors = true;
 }
 
-void Camera::set_aspect_ratio(float aspect_ratio) {
-  m_aspect_ratio = aspect_ratio;
-
-  update_projection_matrix();
-  update_projection_view_matrix();
+void Camera::zoom(float zoom_amount) {
+  m_fov = std::clamp(m_fov + zoom_amount, 1.0f, 45.0f);
+  m_update_projection = true;
 }
 
-void Camera::set_view_width(float view_width) {
-  m_view_width = view_width;
-
-  update_projection_matrix();
-  update_projection_view_matrix();
-}
-
-void Camera::update_inverse_view_matrix() {
-  glm::vec3 position =
-      m_target_position + m_radius * glm::vec3(std::cos(m_elevation) * std::sin(m_azimuth), std::sin(m_elevation),
-                                               std::cos(m_elevation) * std::cos(m_azimuth));
-
-  glm::vec3 direction = normalize(position - m_target_position);
-  glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), direction));
-  glm::vec3 up = cross(direction, right);
-
-  m_inverse_view_matrix = {right.x,     right.y,     right.z,     0, up.x,       up.y,       up.z,       0,
-                           direction.x, direction.y, direction.z, 0, position.x, position.y, position.z, 1};
-}
-
-void Camera::update_projection_matrix() {
-  float view_height = m_view_width / m_aspect_ratio;
-  m_projection_matrix =
-      glm::mat4(2 / m_view_width, 0, 0, 0, 0, 2 / view_height, 0, 0, 0, 0, -2 / (m_far_plane - m_near_plane), 0, 0, 0,
-                -(m_far_plane + m_near_plane) / (m_far_plane - m_near_plane), 1);
-
-  float unzoomed_view_height = m_unzoomed_view_width / m_aspect_ratio;
-  m_unzoomed_projection_matrix = glm::mat4(2 / m_unzoomed_view_width, 0, 0, 0, 0, 2 / unzoomed_view_height, 0, 0, 0, 0,
-                                           -2 / (m_far_plane - m_near_plane), 0, 0, 0,
-                                           -(m_far_plane + m_near_plane) / (m_far_plane - m_near_plane), 1);
-}
-
-void Camera::update_projection_view_matrix() {
-  m_projection_view_matrix = inverse(m_inverse_view_matrix * inverse(m_projection_matrix));
-
-  m_unzoomed_projection_view_matrix = inverse(m_inverse_view_matrix * inverse(m_unzoomed_projection_matrix));
+void Camera::update_camera_vectors() {
+  glm::vec3 front;
+  front.x = glm::cos(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
+  front.y = glm::sin(glm::radians(m_pitch));
+  front.z = glm::sin(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
+  m_front = glm::normalize(front);
+  m_right = glm::normalize(glm::cross(m_front, m_world_up));
+  m_up = glm::normalize(glm::cross(m_right, m_front));
 }
 }  // namespace mge
