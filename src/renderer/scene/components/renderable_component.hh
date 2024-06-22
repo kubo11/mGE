@@ -26,7 +26,7 @@ inline std::string to_string(RenderMode mode) {
 
 template <class T>
 struct RenderableComponent {
-  RenderableComponent(std::shared_ptr<Shader> shader, std::unique_ptr<VertexArray<T>> vertex_array = nullptr,
+  RenderableComponent(std::shared_ptr<Shader> shader, std::unique_ptr<VertexArray> vertex_array = nullptr,
                       glm::vec3 color = {0.0f, 0.0f, 0.0f})
       : m_shader(shader),
         m_vertex_array(std::move(vertex_array)),
@@ -49,7 +49,7 @@ struct RenderableComponent {
   }
 
   inline std::shared_ptr<Shader> get_shader() const { return m_shader; }
-  inline VertexArray<T>& get_vertex_array() const { return *m_vertex_array; }
+  inline VertexArray& get_vertex_array() const { return *m_vertex_array; }
   inline glm::vec3 get_color() const { return m_color; }
   inline RenderMode get_render_mode() const { return m_render_mode; }
   inline void set_render_mode(RenderMode mode) { m_render_mode = mode; }
@@ -60,7 +60,7 @@ struct RenderableComponent {
 
  private:
   std::shared_ptr<Shader> m_shader;
-  std::unique_ptr<VertexArray<T>> m_vertex_array;
+  std::unique_ptr<VertexArray> m_vertex_array;
   glm::vec3 m_color;
   RenderMode m_render_mode;
   bool m_enabled;

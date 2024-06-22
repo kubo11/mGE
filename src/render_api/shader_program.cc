@@ -67,7 +67,7 @@ bool ShaderProgram::link() {
 }
 
 void ShaderProgram::bind() {
-  RenderContext::get().bind_shader_program(m_id);
+  RenderContext::get_instance().bind_shader_program(m_id);
 
   for (const auto& [_, uniform] : m_uniforms) {
     uniform->commit();

@@ -3,109 +3,73 @@
 
 #include "../mgepch.hh"
 #include "../render_context.hh"
+#include "render_api/buffer.hh"
 
 namespace mge {
 struct VertexAttribute {
-  unsigned int size;
+  GLuint size;
   GLenum type;
 };
 
-template <class T>
+struct VertexInstanceAttribute {
+  GLuint size;
+  GLenum type;
+  GLuint divisor;
+};
+
 class VertexArray {
  public:
-  inline VertexArray(std::vector<T> vertices, std::vector<VertexAttribute> vertex_attributes,
-                     std::vector<unsigned int> indices = {}) {
-    glGenVertexArrays(1, &m_vertex_array_id);
-    glBindVertexArray(m_vertex_array_id);
+  inline VertexArray()
+      : m_id(RenderContext::get_instance().create_vertex_array()), m_last_attribute(0), m_is_instanced(false) {}
 
-    glGenBuffers(1, &m_vertex_buffer_id);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer_id);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(), GL_STATIC_DRAW);
+  inline ~VertexArray() { destroy(); }
 
-    m_count = vertices.size();
-
-    if (!indices.empty()) {
-      glGenBuffers(1, &m_element_buffer_id);
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_element_buffer_id);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-      m_count = indices.size();
+  inline void destroy() {
+    if (m_id) {
+      RenderContext::get_instance().destroy_vertex_array(m_id);
     }
-
-    size_t stride = 0;
-    for (int i = 0; i < vertex_attributes.size(); ++i) {
-      glVertexAttribPointer(i, vertex_attributes[i].size, vertex_attributes[i].type, GL_FALSE, sizeof(T),
-                            reinterpret_cast<void*>(stride));
-      glEnableVertexAttribArray(i);
-      stride += vertex_attributes[i].size * RenderContext::glSizeofType(vertex_attributes[i].type);
-    }
-
-    glCheckError();
   }
 
-  inline ~VertexArray() {
-    if (m_vertex_array_id) {
-      glDeleteVertexArrays(1, &m_vertex_array_id);
-    }
-    if (m_vertex_buffer_id) {
-      glDeleteBuffers(1, &m_vertex_buffer_id);
-    }
-    if (m_element_buffer_id) {
-      glDeleteBuffers(1, &m_element_buffer_id);
-    }
+  inline void bind() { RenderContext::get_instance().bind_vertex_array(m_id); }
 
-    glCheckError();
+  inline void unbind() { RenderContext::get_instance().unbind_vertex_array(m_id); }
+
+  inline bool is_bound() const { return RenderContext::get_instance().get_bound_vertex_array() == m_id; }
+
+  template <class T>
+  inline void attach_buffer(Buffer<T>& buffer, const std::vector<VertexAttribute>& attributes) {
+    buffer.bind();
+    GLuint max_attribute = m_last_attribute + attributes.size();
+    GLuint stride = 0;
+    for (GLuint i = 0; i < attributes.size(); ++i) {
+      RenderContext::get_instance().add_vertex_array_attribute(m_id, m_last_attribute + i, attributes[i].size,
+                                                               attributes[i].type, sizeof(T),
+                                                               reinterpret_cast<void*>(stride));
+    }
+    buffer.unbind();
+    m_last_attribute += attributes.size();
   }
 
-  inline void bind() const {
-    glBindVertexArray(m_vertex_array_id);
-    glCheckError();
-  }
-  inline void unbind() const {
-    glBindVertexArray(0);
-    glCheckError();
-  }
-
-  inline void update_vertices(std::vector<T> vertices) {
-    GLint size = 0;
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer_id);
-    glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-
-    if (!m_element_buffer_id) {
-      m_count = vertices.size();
+  template <class T>
+  inline void attach_instance_buffer(Buffer<T>& buffer, const std::vector<VertexInstanceAttribute>& attributes) {
+    buffer.bind();
+    GLuint stride = 0;
+    for (GLuint i = 0; i < attributes.size(); ++i) {
+      RenderContext::get_instance().add_vertex_array_instanced_attribute(
+          m_id, m_last_attribute + i, attributes[i].size, attributes[i].type, sizeof(T),
+          reinterpret_cast<void*>(stride), attributes[i].divisor);
     }
-
-    if (size < vertices.size() * sizeof(T)) {
-      glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(), GL_STATIC_DRAW);
-    } else {
-      glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(T), vertices.data());
-    }
-
-    glCheckError();
-  }
-  inline void update_indices(std::vector<unsigned int> indices) {
-    GLint size = 0;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_element_buffer_id);
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-
-    m_count = indices.size();
-
-    if (size < indices.size() * sizeof(unsigned int)) {
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-    } else {
-      glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), indices.data());
-    }
-
-    glCheckError();
+    buffer.unbind();
+    m_last_attribute += attributes.size();
+    m_is_instanced = true;
   }
 
-  inline unsigned int get_count() const { return m_count; }
-  inline bool has_indices() const { return m_element_buffer_id != 0; }
+  inline bool is_instanced() const { return m_is_instanced; }
 
  private:
-  unsigned int m_vertex_array_id = 0;
-  unsigned int m_vertex_buffer_id = 0;
-  unsigned int m_element_buffer_id = 0;
-  unsigned int m_count = 0;
+  GLuint m_id;
+  GLuint m_last_attribute;
+  bool m_is_instanced;
 };
 }  // namespace mge
 

@@ -4,8 +4,8 @@ namespace mge {
 std::shared_ptr<RenderContext> RenderContext::s_instance = nullptr;
 
 RenderContext::RenderContext() {
-  MGE_INFO("Render context created");
   s_instance->init();
+  MGE_INFO("Render context created");
 }
 
 RenderContext::~RenderContext() {
@@ -15,18 +15,15 @@ RenderContext::~RenderContext() {
 }
 
 std::shared_ptr<RenderContext> RenderContext::create() {
-  if (s_instance) {
-    throw std::runtime_error("Render context already exists!");
-  }
+  MGE_ASSERT(s_instance == nullptr, "Render context already exists!");
 
   s_instance = std::shared_ptr<RenderContext>(new RenderContext());
   return s_instance;
 }
 
 void RenderContext::init() {
-  if (!gladLoadGL(glfwGetProcAddress)) {
-    throw std::runtime_error("Failed to initialize GLAD");
-  }
+  auto res = gladLoadGL(glfwGetProcAddress);
+  MGE_ASSERT(res == 0, "Failed to initialize GLAD");
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -90,12 +87,144 @@ GLenum RenderContext::glCheckError_(const char* file, int line) {
     }
     MGE_ERROR("{} | {} ({})", error, file, line);
   }
+  MGE_ASSERT(errorCode == GL_NO_ERROR, "Aborting due to opengl errors.");
   return errorCode;
 }
 
 void RenderContext::bind_shader_program(GLuint program) {
   glUseProgram(program);
-  m_program = program;
+  glCheckError();
+  m_bound_program = program;
+}
+
+void RenderContext::unbind_shader_program(GLuint program) {
+  MGE_ASSERT(m_bound_program == program, "Cannot unbind shader program as it is not currently bound: {}", program);
+
+  glUseProgram(0);
+  glCheckError();
+  m_bound_program = 0;
+}
+
+GLuint RenderContext::get_bound_shader_program() const { return m_bound_program; }
+
+GLuint RenderContext::create_buffer() {
+  GLuint id;
+  glGenBuffers(1, &id);
+  glCheckError();
+  return id;
+}
+void RenderContext::destroy_buffer(GLuint id) {
+  glDeleteBuffers(1, &id);
+  glCheckError();
+}
+
+void RenderContext::bind_buffer(GLenum type, GLuint id) {
+  glBindBuffer(type, id);
+  glCheckError();
+  m_bound_buffers[type] = {.id = id, .is_mapped = false};
+}
+
+void RenderContext::unbind_buffer(GLenum type, GLuint id) {
+  MGE_ASSERT(m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id,
+             "Cannot unbind buffer as it is not currently bound: {}", id);
+
+  glBindBuffer(type, 0);
+  glCheckError();
+  m_bound_buffers[type] = {.id = 0, .is_mapped = false};
+}
+
+GLuint RenderContext::get_bound_buffer(GLenum type) const {
+  if (!m_bound_buffers.contains(type)) {
+    return 0;
+  }
+
+  return m_bound_buffers.at(type).id;
+}
+
+void* RenderContext::map_buffer(GLenum type, GLuint id, GLenum access_mode) {
+  MGE_ASSERT(m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id,
+             "Cannot map buffer as it is not currently bound: {}", id);
+
+  m_bound_buffers.at(type).is_mapped = true;
+  auto ptr = glMapBuffer(type, access_mode);
+  glCheckError();
+  return ptr;
+}
+
+void RenderContext::unmap_buffer(GLenum type, GLuint id) {
+  MGE_ASSERT(m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id && m_bound_buffers.at(type).is_mapped,
+             "Cannot unmap buffer as it is not currently mapped: {}", id);
+
+  glUnmapBuffer(type);
+  glCheckError();
+  m_bound_buffers.at(type).is_mapped = false;
+}
+
+GLuint RenderContext::get_mapped_buffer(GLenum type) const {
+  if (!m_bound_buffers.contains(type) || !m_bound_buffers.at(type).is_mapped) {
+    return 0;
+  }
+
+  return m_bound_buffers.at(type).id;
+}
+
+void RenderContext::copy_buffer(GLenum type, GLuint id, unsigned int size, void* data, GLenum usage) {
+  MGE_ASSERT(m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id,
+             "Cannot copy to buffer as it is not currently bound: {}", id);
+
+  glBufferData(type, size, data, usage);
+  glCheckError();
+}
+
+void RenderContext::copy_buffer_subregion(GLenum type, GLuint id, unsigned int offset, unsigned int size, void* data) {
+  MGE_ASSERT(m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id,
+             "Cannot copy to buffer's subregion as it is not currently bound: {}", id);
+
+  glBufferSubData(type, offset, size, data);
+  glCheckError();
+}
+
+GLuint RenderContext::create_vertex_array() {
+  GLuint id;
+  glGenVertexArrays(1, &id);
+  glCheckError();
+  return id;
+}
+
+void RenderContext::destroy_vertex_array(GLuint id) {
+  glDeleteVertexArrays(1, &id);
+  glCheckError();
+}
+
+void RenderContext::bind_vertex_array(GLuint id) {
+  glBindVertexArray(id);
+  glCheckError();
+  m_bound_vertex_array = id;
+}
+
+void RenderContext::unbind_vertex_array(GLuint id) {
+  MGE_ASSERT(m_bound_vertex_array == id, "Attempted to unbind vertex array that is not currently bound: {}", id);
+  glBindVertexArray(0);
+  m_bound_vertex_array = 0;
+}
+
+GLuint RenderContext::get_bound_vertex_array() const { return m_bound_vertex_array; }
+
+void RenderContext::add_vertex_array_attribute(GLuint array_id, GLuint attrib_idx, GLuint size, GLenum type,
+                                               GLsizei stride, const void* ptr) {
+  MGE_ASSERT(m_bound_vertex_array == array_id, "Attempted to add attribute to vertex array that is not bound: {}",
+             array_id);
+  glEnableVertexAttribArray(attrib_idx);
+  glCheckError();
+  glVertexAttribPointer(attrib_idx, size, type, GL_FALSE, stride, ptr);
+  glCheckError();
+}
+
+void RenderContext::add_vertex_array_instanced_attribute(GLuint array_id, GLuint attrib_idx, GLuint size, GLenum type,
+                                                         GLsizei stride, const void* ptr, GLuint divisor) {
+  add_vertex_array_attribute(array_id, attrib_idx, size, type, stride, ptr);
+  glVertexAttribDivisor(attrib_idx, divisor);
+  glCheckError();
 }
 
 }  // namespace mge
