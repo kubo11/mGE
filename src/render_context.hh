@@ -21,9 +21,24 @@ class RenderContext {
 
   inline static RenderContext& get_instance() { return *s_instance; }
 
-  void bind_shader_program(GLuint program);
-  void unbind_shader_program(GLuint program);
+  GLuint create_shader(GLenum type);
+  void destroy_shader(GLuint id);
+
+  void set_shader_source(GLuint id, const char* source);
+  void compile_shader(GLuint id);
+
+  GLuint create_shader_program();
+  void destroy_shader_program(GLuint id);
+
+  void bind_shader_program(GLuint id);
+  void unbind_shader_program(GLuint id);
   GLuint get_bound_shader_program() const;
+
+  std::vector<std::pair<std::string, GLenum>> get_uniforms(GLuint id);
+  GLuint get_uniform_location(GLuint id, const std::string& name);
+
+  void attach_shader(GLuint program_id, GLuint shader_id);
+  void link_shader_program(GLuint id);
 
   GLuint create_buffer();
   void destroy_buffer(GLuint id);
@@ -50,6 +65,8 @@ class RenderContext {
                                   const void* ptr);
   void add_vertex_array_instanced_attribute(GLuint array_id, GLuint attrib_idx, GLuint size, GLenum type,
                                             GLsizei stride, const void* ptr, GLuint divisor);
+
+  void set_viewport_dims(GLuint minx, GLuint miny, GLuint maxx, GLuint maxy);
 
  private:
   static std::shared_ptr<RenderContext> s_instance;

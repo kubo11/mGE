@@ -1,5 +1,49 @@
 #include "render_context.hh"
 
+namespace {
+bool check_shader_compile_erros(unsigned int shader_id) {
+  int success;
+  char log_buffer[1024];
+  glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(shader_id, sizeof(log_buffer), NULL, log_buffer);
+    MGE_ERROR("Shader compilation error \n{}", log_buffer);
+  }
+  return success;
+}
+
+bool check_shader_program_compile_erros(unsigned int program_id) {
+  int success;
+  char log_buffer[1024];
+  glGetProgramiv(program_id, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(program_id, sizeof(log_buffer), NULL, log_buffer);
+    MGE_ERROR("Shader program linker error \n{}", log_buffer);
+  }
+  return success;
+}
+
+std::vector<std::string> parse_uniform_names(const char* buffer, GLsizei length, GLint size) {
+  MGE_ASSERT(size > 0, "");
+
+  if (size == 1) {
+    return {buffer};
+  }
+
+  MGE_ASSERT(length > 3 && buffer[length - 3] == '[' && buffer[length - 2] == '0' && buffer[length - 1] == ']');
+  std::string base_name(buffer, length - 3);
+
+  std::vector<std::string> names(size);
+  for (GLint i = 0; i < size; ++i) {
+    std::stringstream ss;
+    ss << base_name << "[" << i << "]";
+    names[i] = ss.str();
+  }
+
+  return names;
+}
+};  // namespace
+
 namespace mge {
 std::shared_ptr<RenderContext> RenderContext::s_instance = nullptr;
 
@@ -91,6 +135,68 @@ GLenum RenderContext::glCheckError_(const char* file, int line) {
   return errorCode;
 }
 
+std::vector<std::pair<std::string, GLenum>> RenderContext::get_uniforms(GLuint id) {
+  GLint size = 0;
+  std::vector<std::pair<std::string, GLenum>> uniforms;
+  glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &size);
+
+  for (GLint i = 0; i < size; ++i) {
+    std::array<GLchar, 256> buffer;
+    GLsizei length = 0;
+    GLint size = 0;
+    GLenum type;
+    glGetActiveUniform(id, i, static_cast<GLsizei>(buffer.size()), &length, &size, &type, buffer.data());
+
+    MGE_ASSERT(length >= 1, "Unable to get active uniform {} for program {}", i, id);
+
+    auto names = parse_uniform_names(buffer.data(), length, size);
+    for (const auto& name : names) {
+      uniforms.push_back({name, type});
+    }
+  }
+
+  return uniforms;
+}
+
+GLuint RenderContext::get_uniform_location(GLuint id, const std::string& name) {
+  auto location = glGetUniformLocation(id, name.c_str());
+  MGE_ASSERT(location >= 0);
+  glCheckError();
+  return location;
+}
+
+GLuint RenderContext::create_shader(GLenum type) {
+  GLuint id = glCreateShader(type);
+  glCheckError();
+  return id;
+}
+
+void RenderContext::destroy_shader(GLuint id) {
+  glDeleteShader(id);
+  glCheckError();
+}
+
+void RenderContext::set_shader_source(GLuint id, const char* source) {
+  glShaderSource(id, 1, &source, nullptr);
+  glCheckError();
+}
+
+void RenderContext::compile_shader(GLuint id) {
+  glCompileShader(id);
+  MGE_ASSERT(check_shader_compile_erros(id), "Aborting due to shader compile errors: {}", id);
+}
+
+GLuint RenderContext::create_shader_program() {
+  auto id = glCreateProgram();
+  glCheckError();
+  return id;
+}
+
+void RenderContext::destroy_shader_program(GLuint id) {
+  glDeleteProgram(id);
+  glCheckError();
+}
+
 void RenderContext::bind_shader_program(GLuint program) {
   glUseProgram(program);
   glCheckError();
@@ -106,6 +212,16 @@ void RenderContext::unbind_shader_program(GLuint program) {
 }
 
 GLuint RenderContext::get_bound_shader_program() const { return m_bound_program; }
+
+void RenderContext::attach_shader(GLuint program_id, GLuint shader_id) {
+  glAttachShader(program_id, shader_id);
+  glCheckError();
+}
+
+void RenderContext::link_shader_program(GLuint id) {
+  glLinkProgram(id);
+  MGE_ASSERT(check_shader_program_compile_erros(id), "Aborting due to shader program linking errors: {}", id);
+}
 
 GLuint RenderContext::create_buffer() {
   GLuint id;
@@ -225,6 +341,10 @@ void RenderContext::add_vertex_array_instanced_attribute(GLuint array_id, GLuint
   add_vertex_array_attribute(array_id, attrib_idx, size, type, stride, ptr);
   glVertexAttribDivisor(attrib_idx, divisor);
   glCheckError();
+}
+
+void RenderContext::set_viewport_dims(GLuint minx, GLuint miny, GLuint maxx, GLuint maxy) {
+  glViewport(minx, miny, maxx, maxy);
 }
 
 }  // namespace mge

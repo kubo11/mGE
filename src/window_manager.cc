@@ -1,5 +1,7 @@
 #include "window_manager.hh"
 
+#include "render_context.hh"
+
 namespace mge {
 std::shared_ptr<WindowManager> WindowManager::s_instance = nullptr;
 
@@ -18,6 +20,8 @@ Window& WindowManager::create_window(WindowData data) {
   s_instance->m_windows.back()->init();
   if (s_instance->m_windows.size() == 1) {
     s_instance->m_windows.back()->make_context_current();
+    RenderContext::get_instance().set_viewport_dims(0, 0, s_instance->m_windows.back()->get_width(),
+                                                    s_instance->m_windows.back()->get_height());
   }
   return *s_instance->m_windows.back();
 }
@@ -56,4 +60,6 @@ void WindowManager::init() {
 
   MGE_INFO("Window manager initialized");
 }
+
+void WindowManager::set_swap_interval(int interval) { glfwSwapInterval(interval); }
 }  // namespace mge

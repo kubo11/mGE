@@ -1,30 +1,21 @@
 #include "shader.hh"
 
-namespace {
-bool check_compile_erros(unsigned int shader_id) {
-  int success;
-  char log_buffer[1024];
-  glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(shader_id, sizeof(log_buffer), NULL, log_buffer);
-    MGE_ERROR("Shader compilation error \n{}", log_buffer);
-  }
-  return success;
-}
-}  // namespace
-
 namespace mge {
-Shader::Shader(Shader::Type type) : m_id(glCreateShader(to_gl_shader_type(type))), m_type(type) {}
+Shader::Shader(Shader::Type type)
+    : m_id(RenderContext::get_instance().create_shader(to_gl_shader_type(type))), m_type(type) {}
 
 Shader::~Shader() { release(); }
 
-void Shader::release() { glDeleteShader(m_id); }
+void Shader::release() {
+  if (m_id) {
+    RenderContext::get_instance().destroy_shader(m_id);
+    m_id = 0;
+  }
+}
 
-bool Shader::compile(const char *source) {
-  glShaderSource(m_id, 1, &source, nullptr);
-  glCompileShader(m_id);
-
-  return check_compile_erros(m_id);
+void Shader::compile(const char *source) {
+  RenderContext::get_instance().set_shader_source(m_id, source);
+  RenderContext::get_instance().compile_shader(m_id);
 }
 
 GLenum Shader::to_gl_shader_type(Shader::Type type) {

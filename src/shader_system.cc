@@ -59,9 +59,9 @@ std::shared_ptr<ShaderProgram> ShaderSystem::load(const fs::path& shader_path) {
     auto path = fs::path(shader_path).replace_extension(extension);
     if (fs::exists(path)) {
       auto shader = std::make_unique<Shader>(type);
-      if (!shader->compile(read_shader_code(path).c_str())) return nullptr;
+      shader->compile(read_shader_code(path).c_str());
       shader_program->attach(std::move(shader));
-      if (!shader_program->link()) return nullptr;
+      shader_program->link();
     }
   }
 

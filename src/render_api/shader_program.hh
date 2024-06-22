@@ -19,7 +19,7 @@ class ShaderProgram {
   PREVENT_COPY(ShaderProgram);
 
   void attach(std::unique_ptr<Shader> shader);
-  bool link();
+  void link();
   void bind();
 
   inline const GLuint get_id() const { return m_id; }
@@ -44,7 +44,6 @@ class ShaderProgram {
 
   void release();
   void load_uniforms();
-  void load_uniforms_at_index(GLuint index);
 };
 }  // namespace mge
 

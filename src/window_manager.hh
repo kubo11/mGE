@@ -15,6 +15,7 @@ class WindowManager {
   static Window& create_window(WindowData data);
   static void destroy_window(Window& window);
   static void glfw_error_callback(int error, const char* description);
+  void set_swap_interval(int interval);
 
   void terminate();
 

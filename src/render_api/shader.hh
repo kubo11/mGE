@@ -14,7 +14,7 @@ class Shader {
 
   PREVENT_COPY(Shader);
 
-  bool compile(const char* source);
+  void compile(const char* source);
 
   inline const GLuint get_id() const { return m_id; }
 
