@@ -21,13 +21,19 @@ Application::~Application() {
 }
 
 std::unique_ptr<Application> Application::create(const ApplicationParams& config) {
-  m_logger = Logger::create();
-  m_event_manager = EventManager::create();
-  m_window_manager = WindowManager::create();
-  m_render_context = RenderContext::create();
-  m_shader_system = ShaderSystem::create();
+  auto logger = Logger::create();
+  auto event_manager = EventManager::create();
+  auto window_manager = WindowManager::create();
+  auto render_context = RenderContext::create();
+  auto shader_system = ShaderSystem::create();
+  auto app = std::unique_ptr<Application>(new Application(config));
+  app->m_logger = logger;
+  app->m_event_manager = event_manager;
+  app->m_window_manager = window_manager;
+  app->m_render_context = render_context;
+  app->m_shader_system = shader_system;
 
-  return std::unique_ptr<Application>(new Application(config));
+  return app;
 }
 
 void Application::run() {

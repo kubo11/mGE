@@ -25,7 +25,7 @@ class Application {
  public:
   virtual ~Application();
 
-  std::unique_ptr<Application> create(const ApplicationParams& config = {});
+  static std::unique_ptr<Application> create(const ApplicationParams& config = {});
   void run();
   void terminate();
   void push_layer(std::unique_ptr<Layer> layer);
