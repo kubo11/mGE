@@ -24,11 +24,11 @@ namespace fs = std::filesystem;
 #include <entt/entt.hpp>
 
 // glad
-#define GLAD_GL_IMPLEMENTATION
+// #define GLAD_GL_IMPLEMENTATION
 #include <glad/gl.h>
 
 // glfw
-#define GLFW_INCLUDE_NONE
+// #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 // glm

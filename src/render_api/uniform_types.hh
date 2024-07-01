@@ -1,9 +1,9 @@
 #ifndef MGE_RENDER_API_UNIFORM_TYPES
 #define MGE_RENDER_API_UNIFORM_TYPES
 
-#include "mgepch.hh"
+#include "../mgepch.hh"
 
-#include "render_api/uniform.hh"
+#include "uniform.hh"
 
 namespace mge {
 

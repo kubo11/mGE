@@ -1,7 +1,7 @@
 #ifndef MGE_RENDER_API_UNIFORM
 #define MGE_RENDER_API_UNIFORM
 
-#include "mgepch.hh"
+#include "../mgepch.hh"
 
 namespace mge {
 class Uniform {

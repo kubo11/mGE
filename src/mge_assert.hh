@@ -4,12 +4,12 @@
 #include "mgepch.hh"
 
 namespace mge {
-void vlog(const char* condition, const char* file, int line, fmt::string_view fmt, fmt::format_args args) {
-  fmt::print("assertion failed: {}\n{}: {}: {}", condition, file, line, fmt::vformat(fmt, args));
+inline void vlog(const char* condition, const char* file, int line, fmt::string_view fmt, fmt::format_args args) {
+  fmt::print("assertion failed: {}\n{}: {}: {}\n", condition, file, line, fmt::vformat(fmt, args));
 }
 
 template <typename... T>
-void log(const char* condition, const char* file, int line, fmt::format_string<T...> fmt, T&&... args) {
+inline void log(const char* condition, const char* file, int line, fmt::format_string<T...> fmt, T&&... args) {
   vlog(condition, file, line, fmt, fmt::make_format_args(args...));
 }
 }  // namespace mge

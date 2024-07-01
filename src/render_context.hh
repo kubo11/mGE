@@ -51,8 +51,8 @@ class RenderContext {
   void unmap_buffer(GLenum type, GLuint id);
   GLuint get_mapped_buffer(GLenum type) const;
 
-  void copy_buffer(GLenum type, GLuint id, unsigned int size, void* data, GLenum usage);
-  void copy_buffer_subregion(GLenum type, GLuint id, unsigned int offset, unsigned int size, void* data);
+  void copy_buffer(GLenum type, GLuint id, unsigned int size, const void* data, GLenum usage);
+  void copy_buffer_subregion(GLenum type, GLuint id, unsigned int offset, unsigned int size, const void* data);
 
   GLuint create_vertex_array();
   void destroy_vertex_array(GLuint id);

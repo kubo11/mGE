@@ -17,7 +17,7 @@ Window::~Window() {
 
 void Window::init() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
@@ -54,6 +54,8 @@ bool Window::is_key_pressed(int key) const { return glfwGetKey(m_window, key) ==
 bool Window::is_mouse_pressed(int key) const { return glfwGetMouseButton(m_window, key) == GLFW_PRESS; }
 
 void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
+
+bool Window::operator==(Window &w) { return m_window == w.m_window; }
 
 bool Window::operator==(const Window &w) { return m_window == w.m_window; }
 

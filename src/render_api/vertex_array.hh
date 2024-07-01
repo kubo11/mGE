@@ -3,7 +3,7 @@
 
 #include "../mgepch.hh"
 #include "../render_context.hh"
-#include "render_api/buffer.hh"
+#include "buffer.hh"
 
 namespace mge {
 struct VertexAttribute {
@@ -45,6 +45,7 @@ class VertexArray {
       RenderContext::get_instance().add_vertex_array_attribute(m_id, m_last_attribute + i, attributes[i].size,
                                                                attributes[i].type, sizeof(T),
                                                                reinterpret_cast<void*>(stride));
+      stride += attributes[i].size * RenderContext::glSizeofType(attributes[i].type);
     }
     buffer.unbind();
     m_last_attribute += attributes.size();

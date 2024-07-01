@@ -67,7 +67,7 @@ std::shared_ptr<RenderContext> RenderContext::create() {
 
 void RenderContext::init() {
   auto res = gladLoadGL(glfwGetProcAddress);
-  MGE_ASSERT(res == 0, "Failed to initialize GLAD");
+  MGE_ASSERT(res != 0, "Failed to initialize GLAD");
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -284,7 +284,7 @@ GLuint RenderContext::get_mapped_buffer(GLenum type) const {
   return m_bound_buffers.at(type).id;
 }
 
-void RenderContext::copy_buffer(GLenum type, GLuint id, unsigned int size, void* data, GLenum usage) {
+void RenderContext::copy_buffer(GLenum type, GLuint id, unsigned int size, const void* data, GLenum usage) {
   MGE_ASSERT(m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id,
              "Cannot copy to buffer as it is not currently bound: {}", id);
 
@@ -292,7 +292,7 @@ void RenderContext::copy_buffer(GLenum type, GLuint id, unsigned int size, void*
   glCheckError();
 }
 
-void RenderContext::copy_buffer_subregion(GLenum type, GLuint id, unsigned int offset, unsigned int size, void* data) {
+void RenderContext::copy_buffer_subregion(GLenum type, GLuint id, unsigned int offset, unsigned int size, const void* data) {
   MGE_ASSERT(m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id,
              "Cannot copy to buffer's subregion as it is not currently bound: {}", id);
 
@@ -345,6 +345,7 @@ void RenderContext::add_vertex_array_instanced_attribute(GLuint array_id, GLuint
 
 void RenderContext::set_viewport_dims(GLuint minx, GLuint miny, GLuint maxx, GLuint maxy) {
   glViewport(minx, miny, maxx, maxy);
+  glCheckError();
 }
 
 }  // namespace mge

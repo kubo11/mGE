@@ -61,10 +61,10 @@ std::shared_ptr<ShaderProgram> ShaderSystem::load(const fs::path& shader_path) {
       auto shader = std::make_unique<Shader>(type);
       shader->compile(read_shader_code(path).c_str());
       shader_program->attach(std::move(shader));
-      shader_program->link();
     }
   }
 
+  shader_program->link();
   s_instance->m_shaders.insert({shader_path, shader_program});
 
   return s_instance->m_shaders.at(shader_path);

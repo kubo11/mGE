@@ -5,6 +5,7 @@
 
 #include "events/event.hh"
 #include "events/events.hh"
+#include "events/event_manager.hh"
 #include "layers/layer_stack.hh"
 #include "render_context.hh"
 #include "renderer/camera.hh"
@@ -25,20 +26,21 @@ class Application {
  public:
   virtual ~Application();
 
-  static std::unique_ptr<Application> create(const ApplicationParams& config = {});
+  PREVENT_COPY(Application);
+
   void run();
   void terminate();
   void push_layer(std::unique_ptr<Layer> layer);
 
-  inline Scene& get_scene() { return m_scene; }
+  inline Scene& get_scene() { return *m_scene; }
 
  protected:
-  Timer m_timer;
-  Window& m_main_window;
-  LayerStack m_layer_stack;
-  Scene m_scene;
-  std::string m_name;
   bool m_running;
+  std::string m_name;
+  std::unique_ptr<Timer> m_timer;
+  std::unique_ptr<LayerStack> m_layer_stack;
+  std::unique_ptr<Scene> m_scene;
+  std::shared_ptr<Window> m_main_window;
 
   std::shared_ptr<Logger> m_logger;
   std::shared_ptr<EventManager> m_event_manager;
@@ -47,10 +49,9 @@ class Application {
   std::shared_ptr<UIManager> m_ui_manager;
   std::shared_ptr<RenderContext> m_render_context;
 
-  bool on_window_closed(WindowClosedEvent& event);
+  Application(const ApplicationParams& config = {});
 
- private:
-  Application(const ApplicationParams& config);
+  bool on_window_closed(WindowClosedEvent& event);
 };
 }  // namespace mge
 

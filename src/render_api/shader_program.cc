@@ -38,6 +38,10 @@ void ShaderProgram::bind() {
   }
 }
 
+void ShaderProgram::unbind() {
+  RenderContext::get_instance().unbind_shader_program(m_id);
+}
+
 void ShaderProgram::load_uniforms() {
   auto uniforms = RenderContext::get_instance().get_uniforms(m_id);
   for (const auto& [name, type] : uniforms) {

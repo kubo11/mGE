@@ -12,7 +12,7 @@ class WindowManager {
 
   static std::shared_ptr<WindowManager> create();
   static WindowManager& get_instance();
-  static Window& create_window(WindowData data);
+  static std::shared_ptr<Window> create_window(WindowData data);
   static void destroy_window(Window& window);
   static void glfw_error_callback(int error, const char* description);
   void set_swap_interval(int interval);
@@ -21,7 +21,7 @@ class WindowManager {
 
  private:
   static std::shared_ptr<WindowManager> s_instance;
-  std::vector<std::unique_ptr<Window>> m_windows;
+  std::vector<std::shared_ptr<Window>> m_windows;
 
   WindowManager();
 

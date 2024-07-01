@@ -1,11 +1,11 @@
 #ifndef MGE_RENDER_API_SHADER_PROGRAM
 #define MGE_RENDER_API_SHADER_PROGRAM
 
-#include "mgepch.hh"
+#include "../mgepch.hh"
 
-#include "render_api/shader.hh"
-#include "render_api/uniform.hh"
-#include "render_api/uniform_types.hh"
+#include "shader.hh"
+#include "uniform.hh"
+#include "uniform_types.hh"
 
 namespace mge {
 using UniformMap = std::unordered_map<std::string, std::unique_ptr<Uniform>>;
@@ -21,6 +21,7 @@ class ShaderProgram {
   void attach(std::unique_ptr<Shader> shader);
   void link();
   void bind();
+  void unbind();
 
   inline const GLuint get_id() const { return m_id; }
   inline Shader &get_shader(Shader::Type type) { return *m_shaders.at(type); }

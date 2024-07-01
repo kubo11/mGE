@@ -30,6 +30,7 @@ class Window {
   inline const std::string &get_title() const { return m_data.title; }
   inline GLFWwindow *get_instance() { return m_window; }
 
+  bool operator==(Window &w);
   bool operator==(const Window &w);
 
   GLFWwindowposfun set_position_callback(GLFWwindowposfun callback);

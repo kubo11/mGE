@@ -15,15 +15,13 @@ std::shared_ptr<WindowManager> WindowManager::create() {
 
 WindowManager& WindowManager::get_instance() { return *WindowManager::s_instance; }
 
-Window& WindowManager::create_window(WindowData data) {
-  s_instance->m_windows.emplace_back(std::make_unique<Window>(std::move(data)));
+std::shared_ptr<Window> WindowManager::create_window(WindowData data) {
+  s_instance->m_windows.emplace_back(std::make_shared<Window>(std::move(data)));
   s_instance->m_windows.back()->init();
   if (s_instance->m_windows.size() == 1) {
     s_instance->m_windows.back()->make_context_current();
-    RenderContext::get_instance().set_viewport_dims(0, 0, s_instance->m_windows.back()->get_width(),
-                                                    s_instance->m_windows.back()->get_height());
   }
-  return *s_instance->m_windows.back();
+  return s_instance->m_windows.back();
 }
 
 void WindowManager::destroy_window(Window& window) {
@@ -36,7 +34,7 @@ void WindowManager::glfw_error_callback(int error, const char* description) {
 }
 
 void WindowManager::terminate() {
-  std::vector<std::unique_ptr<Window>> empty_vector;
+  std::vector<std::shared_ptr<Window>> empty_vector;
   m_windows.swap(empty_vector);
   glfwTerminate();
   s_instance = nullptr;
