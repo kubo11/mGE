@@ -20,6 +20,8 @@ Application::Application(const ApplicationParams& config)
           static_cast<float>(config.window_width) / static_cast<float>(config.window_height), 0.1f,
           100.0f));
 
+  AddEventListener(WindowEvents::WindowClosed, Application::on_window_closed, this);
+
   MGE_INFO("Application \"{}\" created", m_main_window->get_title());
 }
 
@@ -44,12 +46,15 @@ void Application::terminate() {
   m_ui_manager->terminate();
   m_shader_system->terminate();
   WindowManager::destroy_window(*m_main_window);
+  m_main_window = nullptr;
   m_window_manager->terminate();
   m_render_context->terminate();
   m_event_manager->terminate();
-  m_logger->terminate();
+  m_timer = nullptr;
 
   MGE_INFO("Application \"{}\" terminated", m_name);
+
+  m_logger->terminate();
 }
 
 void Application::push_layer(std::unique_ptr<Layer> layer) {

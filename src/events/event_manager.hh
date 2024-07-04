@@ -5,6 +5,16 @@
 
 #include "event.hh"
 
+namespace {
+  template<class A, class B>
+  std::function<bool(A&)> cast_to_base_function(const std::function<bool(B&)>& func_b) {
+    return [func_b](A& a) -> bool {
+        B& b = dynamic_cast<B&>(a);
+        return func_b(b);
+    };
+}
+} // namespace
+
 namespace mge {
 
 // type map implementation from
@@ -48,6 +58,13 @@ class _EventManager {
     return std::get<EventDispatcher<E>>(*m_event_dispatchers.at(typeid(E)));
   }
 
+  template <class E, class F, class G>
+  inline void add_listener(E event_type, bool (G::*func_ptr)(F&), G* arg) {
+    std::function<bool(G*, F&)> func = func_ptr;
+    std::function<bool(Event<E>&)> cast_func = cast_to_base_function<Event<E>, F>(static_cast<std::function<bool(F&)>>(std::bind(func, arg, std::placeholders::_1)));
+    get_dispatcher(event_type).add_listener(event_type, cast_func);
+  }
+
  private:
   inline static std::shared_ptr<_EventManager> s_instance = nullptr;
   DispatcherMap<T...> m_event_dispatchers;
@@ -67,9 +84,7 @@ class _EventManager {
 #define DeclareEventManager(...) using EventManager = _EventManager<__VA_ARGS__>
 
 #define AddEventListener(event_type, func, arg) \
-  EventManager::get_instance()                  \
-      .get_dispatcher(event_type)               \
-      .add_listener(event_type, std::bind(&func, arg, std::placeholders::_1))
+  EventManager::get_instance().add_listener(event_type, &func, arg)
 
 #define RemoveEventListener(event_type, handle) \
   EventManager::get_instance().get_dispatcher(event_type).remove_listener(handle)

@@ -34,6 +34,8 @@ class Application {
 
   inline Scene& get_scene() { return *m_scene; }
 
+  bool on_window_closed(WindowClosedEvent& event);
+
  protected:
   bool m_running;
   std::string m_name;
@@ -50,8 +52,6 @@ class Application {
   std::shared_ptr<RenderContext> m_render_context;
 
   Application(const ApplicationParams& config = {});
-
-  bool on_window_closed(WindowClosedEvent& event);
 };
 }  // namespace mge
 

@@ -28,10 +28,10 @@ class Event {
 
 template <typename T>
 class EventDispatcher {
-  using Func = std::function<void(const Event<T>&)>;
+  using Func = std::function<bool(Event<T>&)>;
 
  public:
-  int add_listener(T type, const Func& func) {
+  int add_listener(T type, Func& func) {
     m_listeners[type].push_back(func);
     int handle = m_next_listener_id++;
     m_listener_handles[handle] = {type, std::prev(m_listeners[type].end())};
@@ -48,7 +48,7 @@ class EventDispatcher {
     }
   }
 
-  void send_event(const Event<T>& event) {
+  void send_event(Event<T>& event) {
     if (m_listeners.find(event.get_type()) == m_listeners.end()) return;
 
     for (auto&& listener : m_listeners.at(event.get_type())) {
