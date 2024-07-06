@@ -131,7 +131,7 @@ void Window::content_scale_callback(GLFWwindow *window, float xscale, float ysca
 
 void Window::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT && !ImGui::GetIO().WantCaptureMouse) {
+  if (action == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse) {
     double pos_x, pos_y;
     glfwGetCursorPos(window, &pos_x, &pos_y);
     pos_x = -1.0 + pos_x / static_cast<double>(mge_window->m_data.width) * 2.0;
