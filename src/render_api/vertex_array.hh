@@ -20,7 +20,7 @@ struct VertexInstanceAttribute {
 class VertexArray {
  public:
   inline VertexArray()
-      : m_id(RenderContext::get_instance().create_vertex_array()), m_last_attribute(0), m_is_instanced(false) {}
+      : m_id(RenderContext::get_instance().create_vertex_array()), m_last_attribute(0), m_instance_count(0) {}
 
   inline ~VertexArray() { destroy(); }
 
@@ -33,6 +33,8 @@ class VertexArray {
   inline void bind() { RenderContext::get_instance().bind_vertex_array(m_id); }
 
   inline void unbind() { RenderContext::get_instance().unbind_vertex_array(m_id); }
+
+  inline void try_unbind() { RenderContext::get_instance().try_unbind_vertex_array(m_id); }
 
   inline bool is_bound() const { return RenderContext::get_instance().get_bound_vertex_array() == m_id; }
 
@@ -49,6 +51,7 @@ class VertexArray {
     }
     buffer.unbind();
     m_last_attribute += attributes.size();
+    m_count = buffer.get_count();
   }
 
   template <class T>
@@ -62,15 +65,18 @@ class VertexArray {
     }
     buffer.unbind();
     m_last_attribute += attributes.size();
-    m_is_instanced = true;
+    m_instance_count = buffer.get_count();
   }
 
-  inline bool is_instanced() const { return m_is_instanced; }
+  inline const unsigned int get_count() const { return m_count; }
+  inline const unsigned int get_instance_count() const { return m_instance_count; }
+  inline bool is_instanced() const { return m_instance_count == 0; }
 
  private:
   GLuint m_id;
   GLuint m_last_attribute;
-  bool m_is_instanced;
+  unsigned int m_count;
+  unsigned int m_instance_count;
 };
 }  // namespace mge
 

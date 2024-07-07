@@ -22,8 +22,10 @@ class ShaderProgram {
   void link();
   void bind();
   void unbind();
+  void try_unbind();
 
   inline const GLuint get_id() const { return m_id; }
+  inline bool has_shader(Shader::Type type) const { return m_shaders.contains(type); }
   inline Shader &get_shader(Shader::Type type) { return *m_shaders.at(type); }
 
   inline bool has_uniform(const std::string &name) const { return m_uniforms.contains(name); }

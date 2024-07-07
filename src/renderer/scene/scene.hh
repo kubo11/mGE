@@ -4,7 +4,6 @@
 #include "../mgepch.hh"
 
 #include "../camera.hh"
-#include "../renderer.hh"
 #include "components/components.hh"
 #include "entity.hh"
 
@@ -43,21 +42,15 @@ class Scene {
 
       if (renderable.get_render_mode() == RenderMode::SURFACE) {
         if (vertex_array.has_indices()) {
-          Renderer<RendererType::TRIANGLES>::draw_indexed(vertex_array.get_count());
         } else {
-          Renderer<RendererType::TRIANGLES>::draw(vertex_array.get_count());
         }
       } else if (renderable.get_render_mode() == RenderMode::WIREFRAME) {
         if (vertex_array.has_indices()) {
-          Renderer<RendererType::LINES>::draw_indexed(vertex_array.get_count());
         } else {
-          Renderer<RendererType::LINES>::draw(vertex_array.get_count());
         }
       } else if (renderable.get_render_mode() == RenderMode::PATCHES) {
         if (vertex_array.has_indices()) {
-          Renderer<RendererType::PATCHES>::draw_indexed(vertex_array.get_count());
         } else {
-          Renderer<RendererType::PATCHES>::draw(vertex_array.get_count());
         }
       }
 

@@ -38,9 +38,9 @@ void ShaderProgram::bind() {
   }
 }
 
-void ShaderProgram::unbind() {
-  RenderContext::get_instance().unbind_shader_program(m_id);
-}
+void ShaderProgram::unbind() { RenderContext::get_instance().unbind_shader_program(m_id); }
+
+void ShaderProgram::try_unbind() { RenderContext::get_instance().try_unbind_shader_program(m_id); }
 
 void ShaderProgram::load_uniforms() {
   auto uniforms = RenderContext::get_instance().get_uniforms(m_id);

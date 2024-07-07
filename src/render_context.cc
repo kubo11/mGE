@@ -211,6 +211,12 @@ void RenderContext::unbind_shader_program(GLuint program) {
   m_bound_program = 0;
 }
 
+void RenderContext::try_unbind_shader_program(GLuint id) {
+  if (m_bound_program == id) {
+    unbind_shader_program(id);
+  }
+}
+
 GLuint RenderContext::get_bound_shader_program() const { return m_bound_program; }
 
 void RenderContext::attach_shader(GLuint program_id, GLuint shader_id) {
@@ -247,6 +253,12 @@ void RenderContext::unbind_buffer(GLenum type, GLuint id) {
   glBindBuffer(type, 0);
   glCheckError();
   m_bound_buffers[type] = {.id = 0, .is_mapped = false};
+}
+
+void RenderContext::try_unbind_buffer(GLenum type, GLuint id) {
+  if (m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id) {
+    unbind_buffer(type, id);
+  }
 }
 
 GLuint RenderContext::get_bound_buffer(GLenum type) const {
@@ -292,7 +304,8 @@ void RenderContext::copy_buffer(GLenum type, GLuint id, unsigned int size, const
   glCheckError();
 }
 
-void RenderContext::copy_buffer_subregion(GLenum type, GLuint id, unsigned int offset, unsigned int size, const void* data) {
+void RenderContext::copy_buffer_subregion(GLenum type, GLuint id, unsigned int offset, unsigned int size,
+                                          const void* data) {
   MGE_ASSERT(m_bound_buffers.contains(type) && m_bound_buffers.at(type).id == id,
              "Cannot copy to buffer's subregion as it is not currently bound: {}", id);
 
@@ -324,6 +337,12 @@ void RenderContext::unbind_vertex_array(GLuint id) {
   m_bound_vertex_array = 0;
 }
 
+void RenderContext::try_unbind_vertex_array(GLuint id) {
+  if (m_bound_vertex_array == id) {
+    unbind_vertex_array(id);
+  }
+}
+
 GLuint RenderContext::get_bound_vertex_array() const { return m_bound_vertex_array; }
 
 void RenderContext::add_vertex_array_attribute(GLuint array_id, GLuint attrib_idx, GLuint size, GLenum type,
@@ -348,4 +367,19 @@ void RenderContext::set_viewport_dims(GLuint minx, GLuint miny, GLuint maxx, GLu
   glCheckError();
 }
 
+void RenderContext::set_patch_count(unsigned int patches) { glPatchParameteri(GL_PATCH_VERTICES, patches); }
+
+void RenderContext::draw(GLenum type, unsigned int vertex_count) { glDrawArrays(type, 0, vertex_count); }
+
+void RenderContext::draw_elements(GLenum type, unsigned int element_count) {
+  glDrawElements(type, element_count, GL_UNSIGNED_INT, 0);
+}
+
+void RenderContext::draw_instanced(GLenum type, unsigned int vertex_count, unsigned int instance_count) {
+  glDrawArraysInstanced(type, 0, vertex_count, instance_count);
+}
+
+void RenderContext::draw_instanced_elements(GLenum type, unsigned int element_count, unsigned int instance_count) {
+  glDrawElementsInstanced(type, element_count, GL_UNSIGNED_INT, 0, instance_count);
+}
 }  // namespace mge

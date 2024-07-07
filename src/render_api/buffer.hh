@@ -30,9 +30,11 @@ class Buffer {
 
   inline const unsigned int get_size() const { return m_size; }
   inline const unsigned int get_count() const { return m_size / sizeof(T); }
+  inline const Type get_type() const { return m_type; }
 
   inline void bind() { RenderContext::get_instance().bind_buffer(buffer_type_to_gl(m_type), m_id); };
   inline void unbind() { RenderContext::get_instance().unbind_buffer(buffer_type_to_gl(m_type), m_id); }
+  inline void try_unbind() { RenderContext::get_instance().try_unbind_buffer(buffer_type_to_gl(m_type), m_id); }
   inline bool is_bound() { return RenderContext::get_instance().get_bound_buffer(buffer_type_to_gl(m_type)) == m_id; }
 
   inline void* map(AccessMode mode) {
@@ -42,7 +44,8 @@ class Buffer {
   inline bool is_mapped() { return RenderContext::get_instance().get_mapped_buffer(buffer_type_to_gl(m_type)) == m_id; }
 
   inline void copy(unsigned int size, const T* data) {
-    RenderContext::get_instance().copy_buffer(buffer_type_to_gl(m_type), m_id, size, data, buffer_hint_to_gl(m_frequency, m_usage));
+    RenderContext::get_instance().copy_buffer(buffer_type_to_gl(m_type), m_id, size, data,
+                                              buffer_hint_to_gl(m_frequency, m_usage));
     m_size = size;
   }
   inline void copy(const std::vector<T>& data) { copy(data.size() * sizeof(T), data.data()); }
@@ -72,77 +75,77 @@ class Buffer {
 
   inline static GLenum buffer_type_to_gl(Type type) {
     switch (type) {
-    case Type::ARRAY:
-      return GL_ARRAY_BUFFER;
-    case Type::ELEMENT_ARRAY:
-      return GL_ELEMENT_ARRAY_BUFFER;
-    case Type::UNIFORM:
-      return GL_UNIFORM_BUFFER;
-    case Type::TEXTURE:
-      return GL_TEXTURE_BUFFER;
-    case Type::SHADER_STORAGE:
-      return GL_SHADER_STORAGE_BUFFER;
-    
-    default:
-      return GL_NONE;
+      case Type::ARRAY:
+        return GL_ARRAY_BUFFER;
+      case Type::ELEMENT_ARRAY:
+        return GL_ELEMENT_ARRAY_BUFFER;
+      case Type::UNIFORM:
+        return GL_UNIFORM_BUFFER;
+      case Type::TEXTURE:
+        return GL_TEXTURE_BUFFER;
+      case Type::SHADER_STORAGE:
+        return GL_SHADER_STORAGE_BUFFER;
+
+      default:
+        return GL_NONE;
     }
   }
 
   inline static GLenum buffer_access_mode_to_gl(AccessMode mode) {
     switch (mode) {
-    case AccessMode::READ:
-      return GL_READ_ONLY;
-    case AccessMode::WRITE:
-      return GL_WRITE_ONLY;
-    case AccessMode::READ_WRITE:
-      return GL_READ_WRITE;
+      case AccessMode::READ:
+        return GL_READ_ONLY;
+      case AccessMode::WRITE:
+        return GL_WRITE_ONLY;
+      case AccessMode::READ_WRITE:
+        return GL_READ_WRITE;
 
-    default:
-      return GL_NONE;
+      default:
+        return GL_NONE;
     }
   }
 
   inline static GLenum buffer_hint_to_gl(FrequencyHint frequency, UsageHint usage) {
     switch (frequency) {
-    case FrequencyHint::STATIC:
-      switch (usage) {
-      case UsageHint::DRAW:
-        return GL_STATIC_DRAW;
-      case UsageHint::READ:
-        return GL_STATIC_READ;
-      case UsageHint::COPY:
-        return GL_STATIC_COPY;
-      
+      case FrequencyHint::STATIC:
+        switch (usage) {
+          case UsageHint::DRAW:
+            return GL_STATIC_DRAW;
+          case UsageHint::READ:
+            return GL_STATIC_READ;
+          case UsageHint::COPY:
+            return GL_STATIC_COPY;
+
+          default:
+            return GL_NONE;
+        }
+      case FrequencyHint::DYNAMIC:
+        switch (usage) {
+          case UsageHint::DRAW:
+            return GL_DYNAMIC_DRAW;
+          case UsageHint::READ:
+            return GL_DYNAMIC_READ;
+          case UsageHint::COPY:
+            return GL_DYNAMIC_COPY;
+
+          default:
+            return GL_NONE;
+        }
+      case FrequencyHint::STREAM:
+        switch (usage) {
+          case UsageHint::DRAW:
+            return GL_STREAM_DRAW;
+          case UsageHint::READ:
+            return GL_STREAM_READ;
+          case UsageHint::COPY:
+            return GL_STREAM_COPY;
+
+          default:
+            return GL_NONE;
+        }
+
       default:
         return GL_NONE;
-      }
-    case FrequencyHint::DYNAMIC:
-      switch (usage) {
-      case UsageHint::DRAW:
-        return GL_DYNAMIC_DRAW;
-      case UsageHint::READ:
-        return GL_DYNAMIC_READ;
-      case UsageHint::COPY:
-        return GL_DYNAMIC_COPY;
-      
-      default:
-        return GL_NONE;
-      }
-    case FrequencyHint::STREAM:
-      switch (usage) {
-      case UsageHint::DRAW:
-        return GL_STREAM_DRAW;
-      case UsageHint::READ:
-        return GL_STREAM_READ;
-      case UsageHint::COPY:
-        return GL_STREAM_COPY;
-      
-      default:
-        return GL_NONE;
-      }
-    
-    default:
-      return GL_NONE;
     }
   }
 };

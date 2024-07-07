@@ -32,6 +32,7 @@ class RenderContext {
 
   void bind_shader_program(GLuint id);
   void unbind_shader_program(GLuint id);
+  void try_unbind_shader_program(GLuint id);
   GLuint get_bound_shader_program() const;
 
   std::vector<std::pair<std::string, GLenum>> get_uniforms(GLuint id);
@@ -45,6 +46,7 @@ class RenderContext {
 
   void bind_buffer(GLenum type, GLuint id);
   void unbind_buffer(GLenum type, GLuint id);
+  void try_unbind_buffer(GLenum type, GLuint id);
   GLuint get_bound_buffer(GLenum type) const;
 
   void* map_buffer(GLenum type, GLuint id, GLenum access_mode);
@@ -59,6 +61,7 @@ class RenderContext {
 
   void bind_vertex_array(GLuint id);
   void unbind_vertex_array(GLuint id);
+  void try_unbind_vertex_array(GLuint id);
   GLuint get_bound_vertex_array() const;
 
   void add_vertex_array_attribute(GLuint array_id, GLuint attrib_idx, GLuint size, GLenum type, GLsizei stride,
@@ -67,6 +70,13 @@ class RenderContext {
                                             GLsizei stride, const void* ptr, GLuint divisor);
 
   void set_viewport_dims(GLuint minx, GLuint miny, GLuint maxx, GLuint maxy);
+
+  void set_patch_count(unsigned int patches);
+
+  void draw(GLenum type, unsigned int vertex_count);
+  void draw_elements(GLenum type, unsigned int element_count);
+  void draw_instanced(GLenum type, unsigned int vertex_count, unsigned int instance_count);
+  void draw_instanced_elements(GLenum type, unsigned int element_count, unsigned int instance_count);
 
  private:
   static std::shared_ptr<RenderContext> s_instance;

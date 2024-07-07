@@ -1,6 +1,5 @@
 #include "scene.hh"
 
-#include "../renderer.hh"
 #include "entity.hh"
 
 namespace mge {
