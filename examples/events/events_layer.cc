@@ -6,31 +6,26 @@
 #include <random>
 namespace fs = std::filesystem;
 
-EventsLayer::EventsLayer()
-    : m_shader(mge::ShaderSystem::acquire(fs::current_path() / "examples" / "events" / "shaders" / "figure")),
-      m_vertex_buffer(std::make_unique<mge::Buffer<FigureVertex>>()),
-      m_vertex_array(std::make_unique<mge::VertexArray>()) {}
-
 void EventsLayer::configure() {
-  m_vertex_buffer->bind();
-  m_vertex_buffer->copy(m_shapes[m_current_shape_idx]);
-  m_vertex_buffer->unbind();
-  m_vertex_array->bind();
-  m_vertex_array->attach_buffer(*m_vertex_buffer.get(), FigureVertex::get_attributes());
-  m_vertex_array->unbind();
-  m_shader->set_uniform_value("color", glm::vec3{1.0f, 0.0f, 0.0f});
+  auto vertex_buffer = std::make_unique<mge::Buffer<FigureVertex>>();
+  vertex_buffer->bind();
+  vertex_buffer->copy(m_shapes[m_current_shape_idx]);
+  vertex_buffer->unbind();
+  auto vertex_array =
+      std::make_unique<mge::VertexArray<FigureVertex>>(std::move(vertex_buffer), FigureVertex::get_attributes());
+  auto shader_program = mge::ShaderSystem::acquire(fs::current_path() / "examples" / "events" / "shaders" / "figure");
+  shader_program->set_uniform_value("color", glm::vec3{1.0f, 0.0f, 0.0f});
+  mge::RenderPipelineBuilder pipeline_builder;
+  m_render_pipeline = std::move(pipeline_builder.add_shader_program(shader_program).build<FigureVertex>());
+  m_figure = std::move(std::make_unique<mge::RenderableComponent<FigureVertex>>(
+      std::move(mge::RenderPipelineMap<FigureVertex>{{mge::RenderMode::SOLID, *m_render_pipeline}}),
+      mge::RenderMode::SOLID, std::move(vertex_array), glm::vec3{}));
   mge::AddEventListener(mge::WindowEvents::WindowMousePressed, EventsLayer::on_mouse_pressed, this);
   AddEventListener(FigureEvents::ShapeChanged, EventsLayer::on_figure_shape_changed, this);
   AddEventListener(FigureEvents::ColorChanged, EventsLayer::on_figure_color_changed, this);
 }
 
-void EventsLayer::update() {
-  m_shader->bind();
-  m_vertex_array->bind();
-  glDrawArrays(GL_TRIANGLES, 0, m_vertex_buffer->get_count());
-  m_vertex_array->unbind();
-  m_shader->unbind();
-}
+void EventsLayer::update() { m_render_pipeline->run(); }
 
 bool EventsLayer::on_mouse_pressed(mge::WindowMousePressedEvent& event) {
   static std::default_random_engine generator;
@@ -49,13 +44,14 @@ bool EventsLayer::on_mouse_pressed(mge::WindowMousePressedEvent& event) {
 }
 
 bool EventsLayer::on_figure_shape_changed(FigureShapeChangedEvent& event) {
-  m_vertex_buffer->bind();
-  m_vertex_buffer->copy(event.shape);
-  m_vertex_buffer->unbind();
+  auto& vertex_buffer = m_figure->get_vertex_array().get_vertex_buffer();
+  vertex_buffer.bind();
+  vertex_buffer.copy(event.shape);
+  vertex_buffer.unbind();
   return true;
 }
 
 bool EventsLayer::on_figure_color_changed(FigureColorChangedEvent& event) {
-  m_shader->set_uniform_value("color", event.color);
+  m_render_pipeline->dynamic_uniform_update<glm::vec3>("color", [&event]() { return event.color; });
   return true;
 }

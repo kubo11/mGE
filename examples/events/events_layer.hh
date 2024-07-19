@@ -8,7 +8,7 @@
 
 class EventsLayer : public mge::Layer {
  public:
-  EventsLayer();
+  EventsLayer() = default;
   ~EventsLayer() = default;
 
   virtual void configure() override;
@@ -19,9 +19,8 @@ class EventsLayer : public mge::Layer {
   bool on_figure_color_changed(FigureColorChangedEvent& event);
 
  private:
-  std::unique_ptr<mge::VertexArray> m_vertex_array = nullptr;
-  std::unique_ptr<mge::Buffer<FigureVertex>> m_vertex_buffer = nullptr;
-  std::shared_ptr<mge::ShaderProgram> m_shader = nullptr;
+  std::unique_ptr<mge::RenderableComponent<FigureVertex>> m_figure = nullptr;
+  std::unique_ptr<mge::RenderPipeline<FigureVertex>> m_render_pipeline = nullptr;
   unsigned int m_current_shape_idx = 0;
   const std::array<std::vector<FigureVertex>, 2> m_shapes = {
       {{{{-0.5f, -0.5f, 0.0f}}, {{0.5f, -0.5f, 0.0f}}, {{0.0f, 0.5f, 0.0f}}},
