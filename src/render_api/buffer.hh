@@ -149,6 +149,8 @@ class Buffer {
     }
   }
 };
+
+using ElementBuffer = Buffer<unsigned int>;
 }  // namespace mge
 
 #endif  // MGE_RENDER_API_BUFFER

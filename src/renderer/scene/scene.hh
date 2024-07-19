@@ -40,15 +40,11 @@ class Scene {
       func(shader, *m_entities_by_tag.at(tag));
       vertex_array.bind();
 
-      if (renderable.get_render_mode() == RenderMode::SURFACE) {
+      if (renderable.get_render_mode() == RenderMode::SOLID) {
         if (vertex_array.has_indices()) {
         } else {
         }
       } else if (renderable.get_render_mode() == RenderMode::WIREFRAME) {
-        if (vertex_array.has_indices()) {
-        } else {
-        }
-      } else if (renderable.get_render_mode() == RenderMode::PATCHES) {
         if (vertex_array.has_indices()) {
         } else {
         }

@@ -17,29 +17,56 @@ struct VertexInstanceAttribute {
   GLuint divisor;
 };
 
+template <class T>
 class VertexArray {
  public:
-  inline VertexArray()
-      : m_id(RenderContext::get_instance().create_vertex_array()), m_last_attribute(0), m_instance_count(0) {}
+  VertexArray(std::unique_ptr<Buffer<T>> vertex_buffer, const std::vector<VertexAttribute>& vertex_attributes,
+              std::unique_ptr<ElementBuffer> element_buffer = nullptr)
+      : m_id(RenderContext::get_instance().create_vertex_array()),
+        m_last_attribute(0),
+        m_vertex_buffer(std::move(vertex_buffer)),
+        m_element_buffer(std::move(element_buffer)) {
+    bind();
+    attach_buffer(*m_vertex_buffer, vertex_attributes);
+    unbind();
+  }
 
-  inline ~VertexArray() { destroy(); }
+  virtual ~VertexArray() { destroy(); }
 
-  inline void destroy() {
+  void destroy() {
     if (m_id) {
       RenderContext::get_instance().destroy_vertex_array(m_id);
     }
   }
 
-  inline void bind() { RenderContext::get_instance().bind_vertex_array(m_id); }
+  void bind() { RenderContext::get_instance().bind_vertex_array(m_id); }
 
-  inline void unbind() { RenderContext::get_instance().unbind_vertex_array(m_id); }
+  void unbind() { RenderContext::get_instance().unbind_vertex_array(m_id); }
 
-  inline void try_unbind() { RenderContext::get_instance().try_unbind_vertex_array(m_id); }
+  void try_unbind() { RenderContext::get_instance().try_unbind_vertex_array(m_id); }
 
-  inline bool is_bound() const { return RenderContext::get_instance().get_bound_vertex_array() == m_id; }
+  bool is_bound() const { return RenderContext::get_instance().get_bound_vertex_array() == m_id; }
 
-  template <class T>
-  inline void attach_buffer(Buffer<T>& buffer, const std::vector<VertexAttribute>& attributes) {
+  Buffer<T>& get_vertex_buffer() { return *m_vertex_buffer; }
+
+  bool has_element_buffer() const { return m_element_buffer != nullptr; }
+
+  ElementBuffer& get_element_buffer() {
+    MGE_ASSERT(has_element_buffer(), "Attempted to return non existant element buffer");
+    return *m_element_buffer;
+  }
+
+  unsigned int get_draw_size() const {
+    return has_element_buffer() ? m_element_buffer->get_count() : m_vertex_buffer->get_count();
+  }
+
+ protected:
+  GLuint m_id;
+  GLuint m_last_attribute;
+  std::unique_ptr<Buffer<T>> m_vertex_buffer;
+  std::unique_ptr<ElementBuffer> m_element_buffer;
+
+  void attach_buffer(Buffer<T>& buffer, const std::vector<VertexAttribute>& attributes) {
     buffer.bind();
     GLuint max_attribute = m_last_attribute + attributes.size();
     GLuint stride = 0;
@@ -51,32 +78,39 @@ class VertexArray {
     }
     buffer.unbind();
     m_last_attribute += attributes.size();
-    m_count = buffer.get_count();
+  }
+};
+
+template <class T, class N>
+class InstancedVertexArray : public VertexArray<T> {
+ public:
+  InstancedVertexArray(std::unique_ptr<Buffer<T>> vertex_buffer, const std::vector<VertexAttribute>& vertex_attributes,
+                       std::unique_ptr<Buffer<N>> instance_buffer,
+                       const std::vector<VertexInstanceAttribute>& instance_attributes,
+                       std::unique_ptr<ElementBuffer> element_buffer = nullptr)
+      : VertexArray<T>(vertex_buffer, vertex_attributes, element_buffer),
+        m_instance_buffer(std::move(instance_buffer)) {
+    this->bind();
+    attach_instance_buffer(*m_instance_buffer, instance_attributes);
+    this->unbind();
   }
 
-  template <class T>
-  inline void attach_instance_buffer(Buffer<T>& buffer, const std::vector<VertexInstanceAttribute>& attributes) {
+  Buffer<N>& get_instance_buffer() { return *m_instance_buffer; }
+
+ protected:
+  std::unique_ptr<Buffer<N>> m_instance_buffer;
+
+  void attach_instance_buffer(Buffer<N>& buffer, const std::vector<VertexInstanceAttribute>& attributes) {
     buffer.bind();
     GLuint stride = 0;
     for (GLuint i = 0; i < attributes.size(); ++i) {
       RenderContext::get_instance().add_vertex_array_instanced_attribute(
-          m_id, m_last_attribute + i, attributes[i].size, attributes[i].type, sizeof(T),
+          this->m_id, this->m_last_attribute + i, attributes[i].size, attributes[i].type, sizeof(N),
           reinterpret_cast<void*>(stride), attributes[i].divisor);
     }
     buffer.unbind();
-    m_last_attribute += attributes.size();
-    m_instance_count = buffer.get_count();
+    this->m_last_attribute += attributes.size();
   }
-
-  inline const unsigned int get_count() const { return m_count; }
-  inline const unsigned int get_instance_count() const { return m_instance_count; }
-  inline bool is_instanced() const { return m_instance_count == 0; }
-
- private:
-  GLuint m_id;
-  GLuint m_last_attribute;
-  unsigned int m_count;
-  unsigned int m_instance_count;
 };
 }  // namespace mge
 
