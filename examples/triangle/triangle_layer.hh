@@ -14,16 +14,15 @@ struct TriangleVertex {
 
 class TriangleLayer : public mge::Layer {
  public:
-  TriangleLayer();
+  TriangleLayer() = default;
   ~TriangleLayer() = default;
 
   virtual void configure() override;
   virtual void update() override;
 
  private:
-  std::unique_ptr<mge::VertexArray> m_vertex_array = nullptr;
-  std::unique_ptr<mge::Buffer<TriangleVertex>> m_vertex_buffer = nullptr;
-  std::shared_ptr<mge::ShaderProgram> m_shader = nullptr;
+  std::unique_ptr<mge::RenderPipeline<TriangleVertex>> m_render_pipeline = nullptr;
+  std::unique_ptr<mge::RenderableComponent<TriangleVertex>> m_triangle = nullptr;
 };
 
 #endif  // MGE_TRIANGLE_LAYER
