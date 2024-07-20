@@ -16,7 +16,8 @@ void EventsLayer::configure() {
   auto shader_program = mge::ShaderSystem::acquire(fs::current_path() / "examples" / "events" / "shaders" / "figure");
   shader_program->set_uniform_value("color", glm::vec3{1.0f, 0.0f, 0.0f});
   mge::RenderPipelineBuilder pipeline_builder;
-  m_render_pipeline = std::move(pipeline_builder.add_shader_program(shader_program).build<FigureVertex>());
+  m_render_pipeline = std::move(
+      pipeline_builder.add_shader_program(shader_program).build<FigureVertex>(mge::DrawPrimitiveType::TRIANGLE));
   m_figure = std::move(std::make_unique<mge::RenderableComponent<FigureVertex>>(
       std::move(mge::RenderPipelineMap<FigureVertex>{{mge::RenderMode::SOLID, *m_render_pipeline}}),
       mge::RenderMode::SOLID, std::move(vertex_array), glm::vec3{}));

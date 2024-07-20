@@ -8,28 +8,6 @@
 #include "../../render_api/vertex_array.hh"
 
 namespace mge {
-enum class DrawPrimitiveType { POINT, LINE, LINE_STRIP, TRIANGLE, TRIANGLE_STRIP, PATCH };
-
-inline GLenum draw_primitive_type_to_gl(DrawPrimitiveType type) {
-  switch (type) {
-    case DrawPrimitiveType::POINT:
-      return GL_POINT;
-    case DrawPrimitiveType::LINE:
-      return GL_LINE;
-    case DrawPrimitiveType::LINE_STRIP:
-      return GL_LINE_STRIP;
-    case DrawPrimitiveType::TRIANGLE:
-      return GL_TRIANGLES;
-    case DrawPrimitiveType::TRIANGLE_STRIP:
-      return GL_TRIANGLE_STRIP;
-    case DrawPrimitiveType::PATCH:
-      return GL_PATCHES;
-
-    default:
-      return GL_NONE;
-  }
-}
-
 class RenderPipelineAction {
  public:
   RenderPipelineAction() = default;

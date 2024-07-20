@@ -17,10 +17,10 @@ void TriangleLayer::configure() {
   m_render_pipeline = std::move(pipeline_builder
                                     .add_shader_program(mge::ShaderSystem::acquire(fs::current_path() / "examples" /
                                                                                    "triangle" / "shaders" / "triangle"))
-                                    .build<TriangleVertex>());
+                                    .build<TriangleVertex>(mge::DrawPrimitiveType::TRIANGLE));
   m_triangle = std::move(std::make_unique<mge::RenderableComponent<TriangleVertex>>(
       std::move(mge::RenderPipelineMap<TriangleVertex>{{mge::RenderMode::SOLID, *m_render_pipeline}}),
-      mge::RenderMode::SOLID, std::move(vertex_array), glm::vec3{}));
+      mge::RenderMode::SOLID, std::move(vertex_array)));
 }
 
 void TriangleLayer::update() { m_render_pipeline->run(); }
