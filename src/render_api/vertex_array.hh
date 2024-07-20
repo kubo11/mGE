@@ -88,7 +88,7 @@ class InstancedVertexArray : public VertexArray<T> {
                        std::unique_ptr<Buffer<N>> instance_buffer,
                        const std::vector<VertexInstanceAttribute>& instance_attributes,
                        std::unique_ptr<ElementBuffer> element_buffer = nullptr)
-      : VertexArray<T>(vertex_buffer, vertex_attributes, element_buffer),
+      : VertexArray<T>(std::move(vertex_buffer), vertex_attributes, std::move(element_buffer)),
         m_instance_buffer(std::move(instance_buffer)) {
     this->bind();
     attach_instance_buffer(*m_instance_buffer, instance_attributes);

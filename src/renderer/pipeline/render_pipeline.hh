@@ -138,7 +138,7 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
       m_do_full_instance_data_update = false;
     }
     this->m_shader_program.bind();
-    m_vertex_array.bind();
+    m_vertex_array->bind();
     for (auto& action : this->m_uniform_actions) {
       action->run();
     }
@@ -151,13 +151,13 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
     }
 
     if (m_vertex_array->has_element_buffer()) {
-      RenderContext::get_instance().draw_instanced_elements(
-          draw_primitive_type_to_gl(m_vertex_array->get_draw_primitive_type()), m_vertex_array->get_draw_size(),
-          m_vertex_array->get_instance_count());
+      RenderContext::get_instance().draw_instanced_elements(draw_primitive_type_to_gl(this->m_draw_primitive_type),
+                                                            m_vertex_array->get_draw_size(),
+                                                            m_vertex_array->get_instance_buffer().get_count());
     } else {
-      RenderContext::get_instance().draw_instanced(draw_primitive_type_to_gl(m_vertex_array->get_draw_primitive_type()),
+      RenderContext::get_instance().draw_instanced(draw_primitive_type_to_gl(this->m_draw_primitive_type),
                                                    m_vertex_array->get_draw_size(),
-                                                   m_vertex_array->get_instance_count());
+                                                   m_vertex_array->get_instance_buffer().get_count());
     }
 
     for (auto& action : this->m_buffer_actions | std::views::reverse) {
@@ -166,6 +166,7 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
     for (auto& action : this->m_uniform_actions | std::views::reverse) {
       action->cleanup();
     }
+    m_vertex_array->unbind();
     this->m_shader_program.unbind();
   }
 
@@ -181,21 +182,25 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
 
   void update_instance_data(InstancedRenderableComponent<T, N>& renderable) {
     unsigned int idx = std::find(m_renderables.begin(), m_renderables.end(), renderable) - m_renderables.begin();
+    m_vertex_array->get_instance_buffer().bind();
     m_vertex_array->get_instance_buffer().copy_subregion(idx * sizeof(N), sizeof(N), &renderable.get_instance_data());
+    m_vertex_array->get_instance_buffer().unbind();
   }
 
  protected:
-  InstancedRenderPipeline(ShaderProgram& shader_program, std::unique_ptr<InstancedVertexArray<T, N>> vertex_array)
-      : BaseRenderPipeline<T>(shader_program, vertex_array->get_draw_primitive_type()),
-        m_vertex_array(std::move(vertex_array)) {}
+  InstancedRenderPipeline(ShaderProgram& shader_program, DrawPrimitiveType type,
+                          std::unique_ptr<InstancedVertexArray<T, N>> vertex_array)
+      : BaseRenderPipeline<T>(shader_program, type), m_vertex_array(std::move(vertex_array)) {}
 
   void update_instance_buffer() {
     std::vector<N> instance_data;
-    instance_data.reserve(m_vertex_array->get_instance_count());
+    instance_data.reserve(m_vertex_array->get_instance_buffer().get_count());
     for (auto& renderable : m_renderables) {
-      instance_data.push_back(renderable.get_instance_data());
+      instance_data.push_back(renderable.get().get_instance_data());
     }
+    m_vertex_array->get_instance_buffer().bind();
     m_vertex_array->get_instance_buffer().copy(instance_data);
+    m_vertex_array->get_instance_buffer().unbind();
   }
 
   std::vector<std::reference_wrapper<InstancedRenderableComponent<T, N>>> m_renderables;

@@ -27,6 +27,9 @@ inline std::string to_string(RenderMode mode) {
 template <class T>
 class RenderPipeline;
 
+template <class T, class N>
+class InstancedRenderPipeline;
+
 enum class DrawPrimitiveType;
 GLenum draw_primitive_type_to_gl(DrawPrimitiveType type);
 
@@ -62,8 +65,8 @@ struct RenderableComponent {
     if (!m_enabled) return;
     m_vertex_array->bind();
     if (m_vertex_array->has_element_buffer()) {
-      RenderContext::get_instance().draw_elements(draw_primitive_type_to_gl(get_render_pipeline().get_draw_primitive_type()),
-                                                  m_vertex_array->get_draw_size());
+      RenderContext::get_instance().draw_elements(
+          draw_primitive_type_to_gl(get_render_pipeline().get_draw_primitive_type()), m_vertex_array->get_draw_size());
     } else {
       RenderContext::get_instance().draw(draw_primitive_type_to_gl(get_render_pipeline().get_draw_primitive_type()),
                                          m_vertex_array->get_draw_size());
@@ -79,8 +82,11 @@ struct RenderableComponent {
 };
 
 template <class T, class N>
-class InstancedRenderableComponent {
-  InstancedRenderableComponent(RenderPipelineMap<T> render_pipelines, RenderMode mode, N instance_data)
+using InstancedRenderPipelineMap = std::map<RenderMode, std::reference_wrapper<InstancedRenderPipeline<T, N>>>;
+
+template <class T, class N>
+struct InstancedRenderableComponent {
+  InstancedRenderableComponent(InstancedRenderPipelineMap<T, N> render_pipelines, RenderMode mode, N instance_data)
       : m_render_pipelines(std::move(render_pipelines)),
         m_instance_data(std::move(instance_data)),
         m_render_mode(mode),
@@ -94,7 +100,7 @@ class InstancedRenderableComponent {
     get_render_pipeline().update_instance_data(*this);
   }
   inline RenderMode get_render_mode() const { return m_render_mode; }
-  inline RenderPipeline<T>& get_render_pipeline() { return m_render_pipelines.at(m_render_mode); }
+  inline InstancedRenderPipeline<T, N>& get_render_pipeline() { return m_render_pipelines.at(m_render_mode); }
   inline void set_render_mode(RenderMode mode) {
     MGE_ASSERT(m_render_pipelines.contains(mode),
                "Attempted to set render mode for renderable component that is not avaliable: {}", to_string(mode));
@@ -107,7 +113,7 @@ class InstancedRenderableComponent {
   inline bool is_enabled() const { return m_enabled; }
 
  private:
-  RenderPipelineMap<T> m_render_pipelines;
+  InstancedRenderPipelineMap<T, N> m_render_pipelines;
   N m_instance_data;
   RenderMode m_render_mode;
   bool m_enabled;

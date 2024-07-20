@@ -20,7 +20,7 @@ void EventsLayer::configure() {
       pipeline_builder.add_shader_program(shader_program).build<FigureVertex>(mge::DrawPrimitiveType::TRIANGLE));
   m_figure = std::move(std::make_unique<mge::RenderableComponent<FigureVertex>>(
       std::move(mge::RenderPipelineMap<FigureVertex>{{mge::RenderMode::SOLID, *m_render_pipeline}}),
-      mge::RenderMode::SOLID, std::move(vertex_array), glm::vec3{}));
+      mge::RenderMode::SOLID, std::move(vertex_array)));
   mge::AddEventListener(mge::WindowEvents::WindowMousePressed, EventsLayer::on_mouse_pressed, this);
   AddEventListener(FigureEvents::ShapeChanged, EventsLayer::on_figure_shape_changed, this);
   AddEventListener(FigureEvents::ColorChanged, EventsLayer::on_figure_color_changed, this);

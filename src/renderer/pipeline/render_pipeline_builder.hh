@@ -56,10 +56,11 @@ class RenderPipelineBuilder {
     return pipeline;
   }
   template <class T, class N>
-  std::unique_ptr<InstancedRenderPipeline<T, N>> build_instanced(std::unique_ptr<VertexArray<T>> vertex_array) {
+  std::unique_ptr<InstancedRenderPipeline<T, N>> build_instanced(
+      DrawPrimitiveType type, std::unique_ptr<InstancedVertexArray<T, N>> vertex_array) {
     MGE_ASSERT(m_shader_program != nullptr, "Cannot build instanced render pipeline without shader program");
-    auto pipeline = std::unique_ptr<InstancedRenderPipeline<T, N>>(new InstancedRenderPipeline<T, N>(
-        *m_shader_program, vertex_array->get_draw_primitive_type(), std::move(vertex_array)));
+    auto pipeline = std::unique_ptr<InstancedRenderPipeline<T, N>>(
+        new InstancedRenderPipeline<T, N>(*m_shader_program, type, std::move(vertex_array)));
     pipeline->m_uniform_actions = std::move(m_uniform_actions);
     pipeline->m_buffer_actions = std::move(m_buffer_actions);
     pipeline->m_patch_count = m_patch_count;
