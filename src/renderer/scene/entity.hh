@@ -3,84 +3,96 @@
 
 #include "../../mgepch.hh"
 
+#include "../../utils.hh"
+
 namespace mge {
+class Entity;
+
+using EntityId = entt::entity;
+using EntityVector = std::vector<std::reference_wrapper<mge::Entity>>;
+using OptionalEntity = std::optional<std::reference_wrapper<Entity>>;
+
 class Entity {
  public:
   ~Entity() {
-    m_registry.destroy(m_entity);
-    for (auto& child : m_children) {
-      child.get().m_parents.erase(std::remove(child.get().m_parents.begin(), child.get().m_parents.end(), *this),
-                                  child.get().m_parents.end());
-    }
-    for (auto& parent : m_parents) {
-      parent.get().m_children.erase(std::remove(parent.get().m_children.begin(), parent.get().m_children.end(), *this),
-                                    parent.get().m_children.end());
-    }
+    if (!m_registry.valid(m_id)) return;
+    destroy_recursively();
   }
 
   PREVENT_COPY(Entity);
 
+  void destroy() {
+    m_registry.destroy(m_id);
+    for (auto& parent : m_parents) {
+      vector_remove(parent.get().m_children, *this);
+    }
+    for (auto& child : m_children) {
+      vector_remove(child.get().m_parents, *this);
+    }
+  }
+
+  void destroy_recursively() {
+    m_registry.destroy(m_id);
+    for (auto& parent : m_parents) {
+      vector_remove(parent.get().m_children, *this);
+    }
+    for (auto& child : m_children) {
+      child.get().destroy_recursively();
+    }
+  }
+
   template <class T, class... Args>
   inline decltype(auto) add_component(Args&&... args) {
-    return m_registry.emplace<T>(m_entity, std::forward<Args>(args)...);
+    return m_registry.emplace<T>(m_id, std::forward<Args>(args)...);
   }
 
   template <class T, class... Args>
   inline decltype(auto) add_or_replace_component(Args&&... args) {
-    return m_registry.emplace_or_replace<T>(m_entity, std::forward<Args>(args)...);
+    return m_registry.emplace_or_replace<T>(m_id, std::forward<Args>(args)...);
   }
 
   template <class T>
   inline const T& get_component() const {
-    return m_registry.get<T>(m_entity);
+    return m_registry.get<T>(m_id);
   }
 
   template <class T, class F>
   inline void patch(F func) {
-    m_registry.patch<T>(m_entity, func);
+    m_registry.patch<T>(m_id, func);
   }
 
   template <typename T>
   inline std::optional<const T&> try_get_component() const {
-    auto component = m_registry.try_get<T>(m_entity);
+    auto component = m_registry.try_get<T>(m_id);
     return component ? *component : std::nullopt;
   }
 
   template <typename T>
   inline void remove_component() {
-    m_registry.remove<T>(m_entity);
+    m_registry.remove<T>(m_id);
   }
 
   template <typename T>
   inline bool has_component() const {
-    return m_registry.try_get<T>(m_entity);
+    return m_registry.try_get<T>(m_id);
   }
 
-  inline bool operator<(const Entity& other) const { return m_entity < other.m_entity; }
+  inline bool operator<(const Entity& other) const { return m_id < other.m_id; }
 
-  inline bool operator==(const Entity& other) const { return m_entity == other.m_entity; }
+  inline bool operator==(const Entity& other) const { return m_id == other.m_id; }
 
   inline void add_child(Entity& child) {
     child.m_parents.emplace_back(*this);
     m_children.emplace_back(child);
   }
 
-  inline void add_owned_child(Entity& child) {
-    child.m_parents.emplace_back(*this);
-    m_children.emplace_back(child);
-    m_owned_children.emplace_back(child);
-  }
-
   inline void remove_child(Entity& child) {
     child.m_parents.erase(std::remove(child.m_parents.begin(), child.m_parents.end(), *this), child.m_parents.end());
     m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
-    m_owned_children.erase(std::remove(m_owned_children.begin(), m_owned_children.end(), child),
-                           m_owned_children.end());
   }
 
-  inline std::vector<std::reference_wrapper<Entity>>& get_children() { return m_children; }
-  inline std::vector<std::reference_wrapper<Entity>>& get_owned_children() { return m_owned_children; }
-  inline std::vector<std::reference_wrapper<Entity>>& get_parents() { return m_parents; }
+  inline EntityVector& get_children() { return m_children; }
+  inline EntityVector& get_parents() { return m_parents; }
 
   inline void propagate(const std::function<void(Entity&)>& func) {
     for (auto& child : m_children) {
@@ -93,23 +105,20 @@ class Entity {
     propagate(func);
   }
 
+  inline const EntityId get_id() const { return m_id; }
+
  private:
-  Entity(entt::registry& registry) : m_registry(registry), m_entity(m_registry.create()) {}
+  Entity(entt::registry& registry) : m_registry(registry), m_id(m_registry.create()) {}
 
   entt::registry& m_registry;
-  entt::entity m_entity;
-  std::vector<std::reference_wrapper<Entity>> m_children;
-  std::vector<std::reference_wrapper<Entity>> m_owned_children;
-  std::vector<std::reference_wrapper<Entity>> m_parents;
+  EntityId m_id;
+  EntityVector m_children;
+  EntityVector m_parents;
 
   friend class Scene;
 };
 
 inline bool operator<(const std::reference_wrapper<Entity>& lhs, const Entity& rhs) { return lhs.get() < rhs; }
-
-using EntityVector = std::vector<std::reference_wrapper<mge::Entity>>;
-using OptionalEntity = std::optional<std::reference_wrapper<Entity>>;
-
 }  // namespace mge
 
 #endif  // MGE_RENDERER_SCENE_ENTITY_HH
