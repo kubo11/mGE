@@ -46,7 +46,6 @@ void Window::update() {
 void Window::clear() {
   glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //   glClear(GL_COLOR_BUFFER_BIT);
 }
 
 bool Window::is_key_pressed(int key) const { return glfwGetKey(m_window, key) == GLFW_PRESS; }
@@ -72,6 +71,7 @@ void Window::set_default_window_callbacks() {
   glfwSetCursorPosCallback(m_window, Window::cursor_pos_callback);
   glfwSetScrollCallback(m_window, Window::scroll_callback);
   glfwSetMouseButtonCallback(m_window, Window::mouse_button_callback);
+  glfwSetKeyCallback(m_window, Window::keyboard_key_callback);
 }
 
 void Window::position_callback(GLFWwindow *window, int xpos, int ypos) {}
@@ -111,7 +111,7 @@ void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
   float curr_y = 1.0 - y / static_cast<double>(mge_window->m_data.height) * 2.0;
 
   if (!ImGui::GetIO().WantCaptureMouse) {
-    WindowMouseMovedEvent event(*mge_window, {previous_x, previous_y}, {curr_x, curr_y});
+    MouseMovedEvent event(*mge_window, {previous_x, previous_y}, {curr_x, curr_y});
     SendEvent(event);
   }
 
@@ -122,7 +122,7 @@ void Window::cursor_pos_callback(GLFWwindow *window, double x, double y) {
 void Window::scroll_callback(GLFWwindow *window, double, double y_offset) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
   if (!ImGui::GetIO().WantCaptureMouse) {
-    WindowScrollEvent event(*mge_window, y_offset);
+    MouseScrollEvent event(*mge_window, y_offset);
     SendEvent(event);
   }
 }
@@ -136,7 +136,16 @@ void Window::mouse_button_callback(GLFWwindow *window, int button, int action, i
     glfwGetCursorPos(window, &pos_x, &pos_y);
     pos_x = -1.0 + pos_x / static_cast<double>(mge_window->m_data.width) * 2.0;
     pos_y = 1.0 - pos_y / static_cast<double>(mge_window->m_data.height) * 2.0;
-    WindowMousePressedEvent event(*mge_window, button, {pos_x, pos_y});
+    MouseButtonPressedEvent event(*mge_window, {pos_x, pos_y}, mouse_button_from_glfw(button),
+                                  modifier_flags_from_glfw(mods));
+    SendEvent(event);
+  }
+}
+
+void Window::keyboard_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+  Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  if (action == GLFW_PRESS && !ImGui::GetIO().WantCaptureKeyboard) {
+    KeyboardKeyPressedEvent event(*mge_window, keyboard_key_from_glfw(key), modifier_flags_from_glfw(mods));
     SendEvent(event);
   }
 }
@@ -186,4 +195,6 @@ GLFWscrollfun Window::set_scroll_callback(GLFWscrollfun callback) { return glfwS
 GLFWmousebuttonfun Window::set_mouse_button_callback(GLFWmousebuttonfun callback) {
   return glfwSetMouseButtonCallback(m_window, callback);
 }
+
+GLFWkeyfun Window::set_keyboard_key_callback(GLFWkeyfun callback) { return glfwSetKeyCallback(m_window, callback); }
 }  // namespace mge

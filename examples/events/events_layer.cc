@@ -21,21 +21,21 @@ void EventsLayer::configure() {
   m_figure = std::move(std::make_unique<mge::RenderableComponent<FigureVertex>>(
       std::move(mge::RenderPipelineMap<FigureVertex>{{mge::RenderMode::SOLID, *m_render_pipeline}}),
       mge::RenderMode::SOLID, std::move(vertex_array)));
-  mge::AddEventListener(mge::WindowEvents::WindowMousePressed, EventsLayer::on_mouse_pressed, this);
+  mge::AddEventListener(mge::MouseEvents::MouseButtonPressed, EventsLayer::on_mouse_pressed, this);
   AddEventListener(FigureEvents::ShapeChanged, EventsLayer::on_figure_shape_changed, this);
   AddEventListener(FigureEvents::ColorChanged, EventsLayer::on_figure_color_changed, this);
 }
 
 void EventsLayer::update() { m_render_pipeline->run(); }
 
-bool EventsLayer::on_mouse_pressed(mge::WindowMousePressedEvent& event) {
+bool EventsLayer::on_mouse_pressed(mge::MouseButtonPressedEvent& event) {
   static std::default_random_engine generator;
   static std::uniform_real_distribution distribution(0.0f, 1.0f);
-  if (event.button == GLFW_MOUSE_BUTTON_LEFT) {
+  if (event.button == mge::MouseButton::Left) {
     FigureColorChangedEvent color_event({distribution(generator), distribution(generator), distribution(generator)});
     SendEvent(color_event);
     return true;
-  } else if (event.button == GLFW_MOUSE_BUTTON_RIGHT) {
+  } else if (event.button == mge::MouseButton::Right) {
     m_current_shape_idx = 1 - m_current_shape_idx;
     FigureShapeChangedEvent shape_event(m_shapes[m_current_shape_idx]);
     SendEvent(shape_event);

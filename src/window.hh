@@ -45,6 +45,7 @@ class Window {
   GLFWcursorposfun set_cursor_pos_callback(GLFWcursorposfun callback);
   GLFWscrollfun set_scroll_callback(GLFWscrollfun callback);
   GLFWmousebuttonfun set_mouse_button_callback(GLFWmousebuttonfun callback);
+  GLFWkeyfun set_keyboard_key_callback(GLFWkeyfun callback);
 
   bool is_key_pressed(int key) const;
   bool is_mouse_pressed(int key) const;
@@ -68,6 +69,7 @@ class Window {
   static void cursor_pos_callback(GLFWwindow *window, double x, double y);
   static void scroll_callback(GLFWwindow *window, double, double yOffset);
   static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
+  static void keyboard_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 };
 }  // namespace mge
 
