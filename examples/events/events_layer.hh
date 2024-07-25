@@ -14,7 +14,7 @@ class EventsLayer : public mge::Layer {
   virtual void configure() override;
   virtual void update() override;
 
-  bool on_mouse_pressed(mge::MouseButtonPressedEvent& event);
+  bool on_mouse_pressed(mge::MouseButtonUpdatedEvent& event);
   bool on_figure_shape_changed(FigureShapeChangedEvent& event);
   bool on_figure_color_changed(FigureColorChangedEvent& event);
 

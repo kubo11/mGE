@@ -5,18 +5,17 @@
 
 namespace mge {
 class Camera {
-  enum class MoveDirection { FRONT, BACK, RIGHT, LEFT, UP, DOWN };
-
  public:
+  enum class MoveDirection { FRONT, BACK, RIGHT, LEFT, UP, DOWN };
   Camera(glm::vec3 position, float yaw, float pitch, float fov, float aspect_ratio, float near_plane, float far_plane);
   ~Camera() = default;
 
-  const glm::mat4& get_view_matrix();
-  const glm::mat4& get_projection_matrix();
+  glm::mat4 get_view_matrix();
+  glm::mat4 get_projection_matrix();
 
   void move(MoveDirection dir, float dt);
-  void rotate(float yaw, float pitch);
-  void zoom(float zoom_amount);
+  void rotate(float yaw, float pitch, float dt);
+  void zoom(float zoom_amount, float dt);
 
   inline const float get_velocity() const { return m_velocity; }
   inline const float get_rotation_sensitivity() const { return m_rotation_sensitivity; }
@@ -24,10 +23,10 @@ class Camera {
   inline const float get_aspect_ratio() const { return m_aspect_ratio; }
   inline const float get_near_plane() const { return m_near_plane; }
   inline const float get_far_plane() const { return m_far_plane; }
-  inline const glm::vec3& get_position() const { return m_pos; }
-  inline const glm::vec3& get_front() const { return m_front; }
-  inline const glm::vec3& get_up() const { return m_up; }
-  inline const glm::vec3& get_right() const { return m_right; }
+  inline const glm::vec3 get_position() const { return m_pos; }
+  inline const glm::vec3 get_front() const { return m_front; }
+  inline const glm::vec3 get_up() const { return m_up; }
+  inline const glm::vec3 get_right() const { return m_right; }
   inline const glm::vec3 get_world_up() const { return m_world_up; }
   inline const float get_yaw() const { return m_yaw; }
   inline const float get_pitch() const { return m_pitch; }

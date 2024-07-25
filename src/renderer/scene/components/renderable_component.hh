@@ -38,12 +38,14 @@ using RenderPipelineMap = std::map<RenderMode, std::reference_wrapper<RenderPipe
 
 template <class T>
 struct RenderableComponent {
-  RenderableComponent(RenderPipelineMap<T> render_pipelines, RenderMode mode,
-                      std::unique_ptr<VertexArray<T>> vertex_array)
+  RenderableComponent(
+      RenderPipelineMap<T> render_pipelines, RenderMode mode, std::unique_ptr<VertexArray<T>> vertex_array,
+      const std::function<void(RenderPipeline<T>&)>& dynamic_update_func = [](RenderPipeline<T>&) {})
       : m_render_pipelines(std::move(render_pipelines)),
         m_vertex_array(std::move(vertex_array)),
         m_render_mode(mode),
-        m_enabled(true) {
+        m_enabled(true),
+        m_dynamic_update_func(dynamic_update_func) {
     get_render_pipeline().add_renderable(*this);
   }
 
@@ -64,6 +66,7 @@ struct RenderableComponent {
   inline void draw() {
     if (!m_enabled) return;
     m_vertex_array->bind();
+    m_dynamic_update_func(get_render_pipeline());
     if (m_vertex_array->has_element_buffer()) {
       RenderContext::get_instance().draw_elements(
           draw_primitive_type_to_gl(get_render_pipeline().get_draw_primitive_type()), m_vertex_array->get_draw_size());
@@ -79,6 +82,7 @@ struct RenderableComponent {
   std::unique_ptr<VertexArray<T>> m_vertex_array;
   RenderMode m_render_mode;
   bool m_enabled;
+  std::function<void(RenderPipeline<T>&)> m_dynamic_update_func;
 };
 
 template <class T, class N>

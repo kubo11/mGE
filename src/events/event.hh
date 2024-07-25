@@ -10,20 +10,24 @@ class Event {
   Event() = default;
   Event(T type, const std::string& name = "") : m_type(type), m_name(name), m_handled(false) {}
   virtual ~Event() {}
-  inline const T get_type() const { return m_type; }
+  const T get_type() const { return m_type; }
 
   template <typename EventType>
-  inline EventType to_type() const {
+  EventType to_type() const {
     return static_cast<const EventType&>(*this);
   }
 
-  inline const std::string& get_name() const { return m_name; }
+  const std::string& get_name() const { return m_name; }
   virtual bool is_handled() const { return m_handled; }
+
+  void set_dt(float dt) { m_dt = dt; }
+  float get_dt() const { return m_dt; }
 
  protected:
   T m_type;
   std::string m_name;
   bool m_handled;
+  float m_dt = 0.0f;
 };
 
 template <typename T>
@@ -49,6 +53,7 @@ class EventDispatcher {
   }
 
   void send_event(Event<T>& event) {
+    // MGE_INFO("{} sent!", event.get_name());
     if (m_listeners.find(event.get_type()) == m_listeners.end()) return;
 
     for (auto&& listener : m_listeners.at(event.get_type())) {

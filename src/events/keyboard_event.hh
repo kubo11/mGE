@@ -8,19 +8,22 @@
 #include "inputs.hh"
 
 namespace mge {
-enum class KeyboardEvents { KeyboardKeyPressed };
+enum class KeyboardEvents { KeyboardKeyUpdated };
 
-class KeyboardKeyPressedEvent : public Event<KeyboardEvents> {
+class KeyboardKeyUpdatedEvent : public Event<KeyboardEvents> {
  public:
-  KeyboardKeyPressedEvent(const Window& source_window, KeyboardKey key, InputModifierKeyFlags mods = 0)
-      : Event<KeyboardEvents>(KeyboardEvents::KeyboardKeyPressed, "KeyboardKeyPressedEvent"),
+  KeyboardKeyUpdatedEvent(const Window& source_window, KeyboardKey key, InputState state,
+                          InputModifierKeyFlags mods = 0)
+      : Event<KeyboardEvents>(KeyboardEvents::KeyboardKeyUpdated, "KeyboardKeyUpdatedEvent"),
         source_window(source_window),
         key(key),
-        mods(mods) {}
-  virtual ~KeyboardKeyPressedEvent() = default;
+        mods(mods),
+        state(state) {}
+  virtual ~KeyboardKeyUpdatedEvent() = default;
   const Window& source_window;
   KeyboardKey key;
   InputModifierKeyFlags mods;
+  InputState state;
 };
 }  // namespace mge
 

@@ -38,9 +38,9 @@ class UniformAction : public RenderPipelineAction {
   virtual void cleanup() override {}
 
  private:
-  const std::string& m_uniform_name;
+  std::string m_uniform_name;
   ShaderProgram& m_shader_program;
-  const std::function<T(void)>& m_update_func;
+  std::function<T(void)> m_update_func;
 
   // template <class N>
   // friend class RenderPipeline<N>;

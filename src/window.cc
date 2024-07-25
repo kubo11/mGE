@@ -131,21 +131,22 @@ void Window::content_scale_callback(GLFWwindow *window, float xscale, float ysca
 
 void Window::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (action == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse) {
+  if (action == GLFW_PRESS || action == GLFW_RELEASE && !ImGui::GetIO().WantCaptureMouse) {
     double pos_x, pos_y;
     glfwGetCursorPos(window, &pos_x, &pos_y);
     pos_x = -1.0 + pos_x / static_cast<double>(mge_window->m_data.width) * 2.0;
     pos_y = 1.0 - pos_y / static_cast<double>(mge_window->m_data.height) * 2.0;
-    MouseButtonPressedEvent event(*mge_window, {pos_x, pos_y}, mouse_button_from_glfw(button),
-                                  modifier_flags_from_glfw(mods));
+    MouseButtonUpdatedEvent event(*mge_window, {pos_x, pos_y}, mouse_button_from_glfw(button),
+                                  input_state_from_glfw(action), modifier_flags_from_glfw(mods));
     SendEvent(event);
   }
 }
 
 void Window::keyboard_key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (action == GLFW_PRESS && !ImGui::GetIO().WantCaptureKeyboard) {
-    KeyboardKeyPressedEvent event(*mge_window, keyboard_key_from_glfw(key), modifier_flags_from_glfw(mods));
+  if (action == GLFW_PRESS || action == GLFW_RELEASE && !ImGui::GetIO().WantCaptureKeyboard) {
+    KeyboardKeyUpdatedEvent event(*mge_window, keyboard_key_from_glfw(key), input_state_from_glfw(action),
+                                  modifier_flags_from_glfw(mods));
     SendEvent(event);
   }
 }

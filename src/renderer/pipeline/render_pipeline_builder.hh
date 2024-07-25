@@ -23,7 +23,7 @@ class RenderPipelineBuilder {
     MGE_ASSERT(m_shader_program->has_uniform(name),
                "Uniform not present in shader program bound by render pipeline: {}", name);
     m_uniform_actions.push_back(unique_cast<RenderPipelineAction>(
-        std::move(std::make_unique<UniformAction>(name, &m_shader_program, update_func))));
+        std::move(std::make_unique<UniformAction<T>>(name, *m_shader_program, update_func))));
     return *this;
   }
   template <class T>

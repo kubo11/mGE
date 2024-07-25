@@ -16,7 +16,7 @@ class Scene {
   Scene(std::unique_ptr<Camera> camera);
   ~Scene() = default;
 
-  inline Camera& get_current_camera() const { return m_current_camera; }
+  inline Camera& get_current_camera() { return m_current_camera; }
   inline void set_current_camera(unsigned int idx) {
     if (idx < m_cameras.size()) m_current_camera = *m_cameras[idx];
   }

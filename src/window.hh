@@ -27,6 +27,9 @@ class Window {
 
   inline const uint16_t get_width() const { return m_data.width; }
   inline const uint16_t get_height() const { return m_data.height; }
+  inline const float get_aspect_ratio() const {
+    return static_cast<float>(m_data.width) / static_cast<float>(m_data.height);
+  }
   inline const std::string &get_title() const { return m_data.title; }
   inline GLFWwindow *get_instance() { return m_window; }
 

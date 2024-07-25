@@ -8,7 +8,7 @@
 #include "inputs.hh"
 
 namespace mge {
-enum class MouseEvents { MouseMoved, MouseScroll, MouseButtonPressed };
+enum class MouseEvents { MouseMoved, MouseScroll, MouseButtonUpdated };
 
 class MouseMovedEvent : public Event<MouseEvents> {
  public:
@@ -34,20 +34,22 @@ class MouseScrollEvent : public Event<MouseEvents> {
   float y_offset;
 };
 
-class MouseButtonPressedEvent : public Event<MouseEvents> {
+class MouseButtonUpdatedEvent : public Event<MouseEvents> {
  public:
-  MouseButtonPressedEvent(const Window& source_window, glm::vec2 position, MouseButton button,
+  MouseButtonUpdatedEvent(const Window& source_window, glm::vec2 position, MouseButton button, InputState state,
                           InputModifierKeyFlags mods = 0)
-      : Event<MouseEvents>(MouseEvents::MouseButtonPressed, "MouseButtonPressedEvent"),
+      : Event<MouseEvents>(MouseEvents::MouseButtonUpdated, "MouseButtonUpdatedEvent"),
         source_window(source_window),
         button(button),
         mods(mods),
-        position(position) {}
-  virtual ~MouseButtonPressedEvent() = default;
+        position(position),
+        state(state) {}
+  virtual ~MouseButtonUpdatedEvent() = default;
   const Window& source_window;
   MouseButton button;
   InputModifierKeyFlags mods;
   glm::vec2 position;
+  InputState state;
 };
 }  // namespace mge
 

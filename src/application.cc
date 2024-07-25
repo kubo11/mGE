@@ -1,10 +1,10 @@
 #include "application.hh"
 
 namespace mge {
-Application::Application(const ApplicationParams& config)
-    : m_running(true), m_name(config.name) {
+Application::Application(const ApplicationParams& config) : m_running(true), m_name(config.name) {
   m_logger = Logger::create();
-  m_event_manager = EventManager::create();
+  m_timer = std::make_unique<Timer>();
+  m_event_manager = EventManager::create(*m_timer);
   m_window_manager = WindowManager::create();
   m_main_window = WindowManager::create_window(WindowData(config.name, config.window_width, config.window_height));
   m_render_context = RenderContext::create();
@@ -14,11 +14,9 @@ Application::Application(const ApplicationParams& config)
   m_ui_manager = UIManager::create(*m_main_window);
 
   m_layer_stack = std::make_unique<LayerStack>();
-  m_timer = std::make_unique<Timer>();
-  m_scene = std::make_unique<Scene>(std::make_unique<Camera>(
-          glm::vec3(0.0f, 10.0f, -10.0f), -45.0f, 0.0f, 20.0f,
-          static_cast<float>(config.window_width) / static_cast<float>(config.window_height), 0.1f,
-          100.0f));
+  m_scene = std::make_unique<mge::Scene>(std::move(std::make_unique<mge::Camera>(
+      glm::vec3{2.0f, 2.0f, 2.0f}, -135, -35, 45,
+      static_cast<float>(config.window_width) / static_cast<float>(config.window_height), 0.1f, 100.0f)));
 
   AddEventListener(WindowEvents::WindowClosed, Application::on_window_closed, this);
 
@@ -38,6 +36,7 @@ void Application::run() {
     }
 
     m_main_window->update();
+    m_timer->tick();
   }
 }
 

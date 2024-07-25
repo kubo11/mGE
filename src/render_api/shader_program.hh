@@ -40,6 +40,17 @@ class ShaderProgram {
     m_uniforms.at(name)->set_value(value);
   }
 
+  template <typename T>
+  inline void set_and_commit_uniform_value(const std::string &name, const T &value) {
+    if (!m_uniforms.contains(name)) {
+      MGE_ASSERT(false, "Uniform {} doesn't exist", name.c_str());
+      return;
+    }
+
+    m_uniforms.at(name)->set_value(value);
+    m_uniforms.at(name)->commit();
+  }
+
  private:
   GLuint m_id;
   ShaderMap m_shaders;

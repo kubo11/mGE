@@ -21,14 +21,15 @@ void EventsLayer::configure() {
   m_figure = std::move(std::make_unique<mge::RenderableComponent<FigureVertex>>(
       std::move(mge::RenderPipelineMap<FigureVertex>{{mge::RenderMode::SOLID, *m_render_pipeline}}),
       mge::RenderMode::SOLID, std::move(vertex_array)));
-  mge::AddEventListener(mge::MouseEvents::MouseButtonPressed, EventsLayer::on_mouse_pressed, this);
+  mge::AddEventListener(mge::MouseEvents::MouseButtonUpdated, EventsLayer::on_mouse_pressed, this);
   AddEventListener(FigureEvents::ShapeChanged, EventsLayer::on_figure_shape_changed, this);
   AddEventListener(FigureEvents::ColorChanged, EventsLayer::on_figure_color_changed, this);
 }
 
 void EventsLayer::update() { m_render_pipeline->run(); }
 
-bool EventsLayer::on_mouse_pressed(mge::MouseButtonPressedEvent& event) {
+bool EventsLayer::on_mouse_pressed(mge::MouseButtonUpdatedEvent& event) {
+  if (event.state != mge::InputState::Press) return false;
   static std::default_random_engine generator;
   static std::uniform_real_distribution distribution(0.0f, 1.0f);
   if (event.button == mge::MouseButton::Left) {

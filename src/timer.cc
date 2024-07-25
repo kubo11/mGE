@@ -9,9 +9,9 @@ Timer::Timer() {
 Timer::~Timer() { MGE_INFO("Timer terminated"); }
 
 void Timer::tick() {
-  m_delta_time = std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() -
-                                                                            m_reference_time)
-                     .count();
+  auto now = std::chrono::high_resolution_clock::now();
+  m_delta_time = std::chrono::duration<float, std::chrono::seconds::period>(now - m_reference_time).count();
+  m_reference_time = now;
 }
 
 void Timer::reset() { m_reference_time = std::chrono::high_resolution_clock::now(); }

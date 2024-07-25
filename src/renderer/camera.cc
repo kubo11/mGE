@@ -13,24 +13,29 @@ Camera::Camera(glm::vec3 position, float yaw, float pitch, float fov, float aspe
       m_far_plane(far_plane),
       m_update_view(false),
       m_update_projection(false),
-      m_update_camera_vectors(false) {
+      m_update_camera_vectors(false),
+      m_rotation_sensitivity(100000.0f),
+      m_zoom_sensitivity(1.0f),
+      m_velocity(1.0f) {
   update_camera_vectors();
+  m_view = glm::lookAt(m_pos, m_pos + m_front, m_up);
+  m_projection = glm::perspective(glm::radians(m_fov), m_aspect_ratio, m_near_plane, m_far_plane);
 }
 
-const glm::mat4& Camera::get_view_matrix() {
+glm::mat4 Camera::get_view_matrix() {
   if (m_update_camera_vectors) {
     m_update_camera_vectors = false;
     update_camera_vectors();
   }
   if (m_update_view) {
     m_update_view = false;
-    m_view = glm::lookAt(m_pos, m_front, m_up);
+    m_view = glm::lookAt(m_pos, m_pos + m_front, m_up);
   }
 
   return m_view;
 }
 
-const glm::mat4& Camera::get_projection_matrix() {
+glm::mat4 Camera::get_projection_matrix() {
   if (m_update_projection) {
     m_update_projection = false;
     m_projection = glm::perspective(glm::radians(m_fov), m_aspect_ratio, m_near_plane, m_far_plane);
@@ -63,15 +68,17 @@ void Camera::move(Camera::MoveDirection dir, float dt) {
   m_update_view = true;
 }
 
-void Camera::rotate(float yaw, float pitch) {
-  m_yaw = std::clamp(m_yaw + yaw * m_rotation_sensitivity, -89.0f, 89.0f);
-  m_pitch = std::clamp(m_pitch + pitch * m_rotation_sensitivity, -89.0f, 89.0f);
+void Camera::rotate(float yaw, float pitch, float dt) {
+  m_yaw += yaw * m_rotation_sensitivity * dt;
+  while (m_yaw > 360.0f) m_yaw -= 360.0f;
+  while (m_yaw < 0.0f) m_yaw += 360.0f;
+  m_pitch = std::clamp(m_pitch + pitch * m_rotation_sensitivity * dt, -89.0f, 89.0f);
   m_update_view = true;
   m_update_camera_vectors = true;
 }
 
-void Camera::zoom(float zoom_amount) {
-  m_fov = std::clamp(m_fov + zoom_amount, 1.0f, 45.0f);
+void Camera::zoom(float zoom_amount, float dt) {
+  m_fov = std::clamp(m_fov + zoom_amount * m_zoom_sensitivity * dt, 1.0f, 45.0f);
   m_update_projection = true;
 }
 

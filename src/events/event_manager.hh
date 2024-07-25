@@ -3,6 +3,7 @@
 
 #include "../mgepch.hh"
 
+#include "../timer.hh"
 #include "event.hh"
 
 namespace {
@@ -40,33 +41,36 @@ class _EventManager {
     if (s_instance) terminate();
   }
 
-  inline static std::shared_ptr<_EventManager> create() {
-    s_instance = std::shared_ptr<_EventManager<T...>>(new _EventManager());
+  static std::shared_ptr<_EventManager> create(const Timer& timer) {
+    s_instance = std::shared_ptr<_EventManager<T...>>(new _EventManager(timer));
     return s_instance;
   }
 
-  inline void terminate() { s_instance = nullptr; }
+  void terminate() { s_instance = nullptr; }
 
-  inline static _EventManager& get_instance() { return *s_instance; }
+  static _EventManager& get_instance() { return *s_instance; }
 
   template <class E>
-  inline EventDispatcher<E>& get_dispatcher(E event_type) {
+  EventDispatcher<E>& get_dispatcher(E event_type) {
     return std::get<EventDispatcher<E>>(*m_event_dispatchers.at(typeid(E)));
   }
 
   template <class E, class F, class G>
-  inline void add_listener(E event_type, bool (G::*func_ptr)(F&), G* arg) {
+  void add_listener(E event_type, bool (G::*func_ptr)(F&), G* arg) {
     std::function<bool(G*, F&)> func = func_ptr;
     std::function<bool(Event<E>&)> cast_func = cast_to_base_function<Event<E>, F>(
         static_cast<std::function<bool(F&)>>(std::bind(func, arg, std::placeholders::_1)));
     get_dispatcher(event_type).add_listener(event_type, cast_func);
   }
 
+  const Timer& get_timer() const { return m_timer; }
+
  private:
   inline static std::shared_ptr<_EventManager> s_instance = nullptr;
   DispatcherMap<T...> m_event_dispatchers;
+  const Timer& m_timer;
 
-  _EventManager() { (register_dispatcher<T>(), ...); }
+  _EventManager(const Timer& timer) : m_timer(timer) { (register_dispatcher<T>(), ...); }
 
   template <class E>
   void register_dispatcher() {
@@ -85,7 +89,9 @@ class _EventManager {
 #define RemoveEventListener(event_type, handle) \
   EventManager::get_instance().get_dispatcher(event_type).remove_listener(handle)
 
-#define SendEvent(_event) EventManager::get_instance().get_dispatcher(_event.get_type()).send_event(_event)
+#define SendEvent(_event)                                           \
+  _event.set_dt(EventManager::get_instance().get_timer().get_dt()); \
+  EventManager::get_instance().get_dispatcher(_event.get_type()).send_event(_event)
 
 }  // namespace mge
 
