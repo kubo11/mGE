@@ -28,10 +28,10 @@ Entity& Scene::create_entity(const std::function<void(Entity&)> func) {
 }
 
 void Scene::destroy_entity(EntityId id) {
-  MGE_ASSERT(!m_entities_by_id.contains(id), "Failed to destroy entity. Entity doesn't exist.");
+  MGE_ASSERT(m_entities_by_id.contains(id), "Failed to destroy entity. Entity doesn't exist.");
 
   auto node = m_entities_by_id.extract(id);
-  node.mapped().get()->destroy();
+  node.mapped()->destroy();
 }
 
 void Scene::destroy_entity(Entity& entity) { destroy_entity(entity.get_id()); }

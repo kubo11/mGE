@@ -4,7 +4,7 @@ add_subdirectory(entt)
 # glad
 set(OPENGL_EXTENSIONS GL_ARB_shader_storage_buffer_object)
 add_subdirectory(glad/cmake)
-glad_add_library(glad REPRODUCIBLE API gl:core=4.6 EXTENSIONS ${OPENGL_EXTENSIONS})
+glad_add_library(glad REPRODUCIBLE EXCLUDE_FROM_ALL LOADER API gl:core=4.6 EXTENSIONS ${OPENGL_EXTENSIONS})
 
 # glfw
 set(GLFW_BUILD_EXAMPLES OFF)

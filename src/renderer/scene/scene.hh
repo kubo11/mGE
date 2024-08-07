@@ -22,8 +22,8 @@ class Scene {
   }
   inline void add_camera(std::unique_ptr<Camera> camera) { m_cameras.push_back(std::move(camera)); }
 
-  inline Entity& get_entity(EntityId id) { return *m_entities_by_id.at(id); }
-  inline bool contains(EntityId id) { return m_entities_by_id.contains(id); }
+  inline Entity& get_entity(const EntityId id) { return *m_entities_by_id.at(id); }
+  inline bool contains(const EntityId id) const { return m_entities_by_id.contains(id); }
 
   template <class GetT, class ExcludeT>
   inline void foreach (GetT get, ExcludeT exclude, std::function<void(mge::Entity&)> func) {

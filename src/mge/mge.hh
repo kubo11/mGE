@@ -2,6 +2,7 @@
 #define MGE_HH
 
 #include "../application.hh"
+#include "../events/events.hh"
 #include "../layers/layer.hh"
 #include "../render_api/vertex_array.hh"
 #include "../renderer/camera.hh"

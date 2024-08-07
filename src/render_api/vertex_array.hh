@@ -39,11 +39,26 @@ class VertexArray {
     }
   }
 
-  void bind() { RenderContext::get_instance().bind_vertex_array(m_id); }
+  void bind() {
+    RenderContext::get_instance().bind_vertex_array(m_id);
+    if (has_element_buffer()) {
+      m_element_buffer->bind();
+    }
+  }
 
-  void unbind() { RenderContext::get_instance().unbind_vertex_array(m_id); }
+  void unbind() {
+    RenderContext::get_instance().unbind_vertex_array(m_id);
+    if (has_element_buffer()) {
+      m_element_buffer->unbind();
+    }
+  }
 
-  void try_unbind() { RenderContext::get_instance().try_unbind_vertex_array(m_id); }
+  void try_unbind() {
+    RenderContext::get_instance().try_unbind_vertex_array(m_id);
+    if (has_element_buffer()) {
+      m_element_buffer->try_unbind();
+    }
+  }
 
   bool is_bound() const { return RenderContext::get_instance().get_bound_vertex_array() == m_id; }
 
@@ -68,7 +83,6 @@ class VertexArray {
 
   void attach_buffer(Buffer<T>& buffer, const std::vector<VertexAttribute>& attributes) {
     buffer.bind();
-    GLuint max_attribute = m_last_attribute + attributes.size();
     GLuint stride = 0;
     for (GLuint i = 0; i < attributes.size(); ++i) {
       RenderContext::get_instance().add_vertex_array_attribute(m_id, m_last_attribute + i, attributes[i].size,
@@ -107,6 +121,7 @@ class InstancedVertexArray : public VertexArray<T> {
       RenderContext::get_instance().add_vertex_array_instanced_attribute(
           this->m_id, this->m_last_attribute + i, attributes[i].size, attributes[i].type, sizeof(N),
           reinterpret_cast<void*>(stride), attributes[i].divisor);
+      stride += attributes[i].size * RenderContext::glSizeofType(attributes[i].type);
     }
     buffer.unbind();
     this->m_last_attribute += attributes.size();

@@ -14,9 +14,9 @@ enum class DrawPrimitiveType { POINT, LINE, LINE_STRIP, TRIANGLE, TRIANGLE_STRIP
 inline GLenum draw_primitive_type_to_gl(DrawPrimitiveType type) {
   switch (type) {
     case DrawPrimitiveType::POINT:
-      return GL_POINT;
+      return GL_POINTS;
     case DrawPrimitiveType::LINE:
-      return GL_LINE;
+      return GL_LINES;
     case DrawPrimitiveType::LINE_STRIP:
       return GL_LINE_STRIP;
     case DrawPrimitiveType::TRIANGLE:
@@ -89,9 +89,21 @@ class BaseRenderPipeline {
 };
 
 template <class T>
+class RenderPipeline;
+
+template <class T>
+bool operator==(const std::reference_wrapper<RenderPipeline<T>>& a,
+                const std::reference_wrapper<RenderPipeline<T>>& b) {
+  return a.get().m_renderables == b.get().m_renderables;
+}
+
+template <class T>
 class RenderPipeline : public BaseRenderPipeline<T> {
  public:
   PREVENT_COPY(RenderPipeline);
+
+  friend bool operator==
+      <T>(const std::reference_wrapper<RenderPipeline<T>>& a, const std::reference_wrapper<RenderPipeline<T>>& b);
 
   virtual void run() override {
     this->m_shader_program.bind();
@@ -122,7 +134,10 @@ class RenderPipeline : public BaseRenderPipeline<T> {
   void add_renderable(RenderableComponent<T>& renderable) { m_renderables.push_back(renderable); }
 
   void remove_renderable(RenderableComponent<T>& renderable) {
-    m_renderables.erase(std::remove(m_renderables.begin(), m_renderables.end(), renderable), m_renderables.end());
+    vector_remove_if<RenderableComponent<T>>(
+        m_renderables, [&renderable](std::reference_wrapper<RenderableComponent<T>> renderable_ref) -> bool {
+          return renderable_ref.get() == renderable;
+        });
   }
 
  protected:
@@ -134,9 +149,21 @@ class RenderPipeline : public BaseRenderPipeline<T> {
 };
 
 template <class T, class N>
+class InstancedRenderPipeline;
+
+template <class T, class N>
+bool operator==(const std::reference_wrapper<InstancedRenderPipeline<T, N>>& a,
+                const std::reference_wrapper<InstancedRenderPipeline<T, N>>& b) {
+  return a.get().m_vertex_array == b.get().m_vertex_array;
+}
+
+template <class T, class N>
 class InstancedRenderPipeline : public BaseRenderPipeline<T> {
  public:
   PREVENT_COPY(InstancedRenderPipeline);
+
+  friend bool operator== <T, N>(const std::reference_wrapper<InstancedRenderPipeline<T, N>>& a,
+                                const std::reference_wrapper<InstancedRenderPipeline<T, N>>& b);
 
   virtual void run() override {
     if (m_do_full_instance_data_update) {
@@ -182,21 +209,17 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
   }
 
   void remove_renderable(InstancedRenderableComponent<T, N>& renderable) {
-    m_renderables.erase(std::remove(m_renderables.begin(), m_renderables.end(), renderable), m_renderables.end());
+    vector_remove(m_renderables, renderable);
     m_do_full_instance_data_update = true;
   }
 
   void update_instance_data(InstancedRenderableComponent<T, N>& renderable) {
     unsigned int idx = std::find(m_renderables.begin(), m_renderables.end(), renderable) - m_renderables.begin();
+    auto data = renderable.get_instance_data();
     m_vertex_array->get_instance_buffer().bind();
-    m_vertex_array->get_instance_buffer().copy_subregion(idx * sizeof(N), sizeof(N), &renderable.get_instance_data());
+    m_vertex_array->get_instance_buffer().copy_subregion(idx * sizeof(N), sizeof(N), &data);
     m_vertex_array->get_instance_buffer().unbind();
   }
-
- protected:
-  InstancedRenderPipeline(ShaderProgram& shader_program, DrawPrimitiveType type,
-                          std::unique_ptr<InstancedVertexArray<T, N>> vertex_array)
-      : BaseRenderPipeline<T>(shader_program, type), m_vertex_array(std::move(vertex_array)) {}
 
   void update_instance_buffer() {
     std::vector<N> instance_data;
@@ -207,7 +230,13 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
     m_vertex_array->get_instance_buffer().bind();
     m_vertex_array->get_instance_buffer().copy(instance_data);
     m_vertex_array->get_instance_buffer().unbind();
+    m_do_full_instance_data_update = false;
   }
+
+ protected:
+  InstancedRenderPipeline(ShaderProgram& shader_program, DrawPrimitiveType type,
+                          std::unique_ptr<InstancedVertexArray<T, N>> vertex_array)
+      : BaseRenderPipeline<T>(shader_program, type), m_vertex_array(std::move(vertex_array)) {}
 
   std::vector<std::reference_wrapper<InstancedRenderableComponent<T, N>>> m_renderables;
   std::unique_ptr<InstancedVertexArray<T, N>> m_vertex_array;

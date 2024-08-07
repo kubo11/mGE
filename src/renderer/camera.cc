@@ -68,6 +68,26 @@ void Camera::move(Camera::MoveDirection dir, float dt) {
   m_update_view = true;
 }
 
+void Camera::move(glm::vec3 offset, float dt) {
+  if (offset.x > 0) {
+    move(MoveDirection::RIGHT, dt);
+  } else if (offset.x < 0) {
+    move(MoveDirection::LEFT, dt);
+  }
+
+  if (offset.y > 0) {
+    move(MoveDirection::UP, dt);
+  } else if (offset.y < 0) {
+    move(MoveDirection::DOWN, dt);
+  }
+
+  if (offset.z > 0) {
+    move(MoveDirection::FRONT, dt);
+  } else if (offset.z < 0) {
+    move(MoveDirection::BACK, dt);
+  }
+}
+
 void Camera::rotate(float yaw, float pitch, float dt) {
   m_yaw += yaw * m_rotation_sensitivity * dt;
   while (m_yaw > 360.0f) m_yaw -= 360.0f;
@@ -78,7 +98,7 @@ void Camera::rotate(float yaw, float pitch, float dt) {
 }
 
 void Camera::zoom(float zoom_amount, float dt) {
-  m_fov = std::clamp(m_fov + zoom_amount * m_zoom_sensitivity * dt, 1.0f, 45.0f);
+  m_fov = std::clamp(m_fov * zoom_amount, 1.0f, 45.0f);
   m_update_projection = true;
 }
 

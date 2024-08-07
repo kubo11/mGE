@@ -35,7 +35,8 @@ inline void vector_remove_if(std::vector<T&>& vec, const std::function<bool(cons
 }
 
 template <class T>
-inline void vector_remove_if(std::vector<std::reference_wrapper<T>>& vec, const std::function<bool(const T&)>& pred) {
+inline void vector_remove_if(std::vector<std::reference_wrapper<T>>& vec,
+                             const std::function<bool(const std::reference_wrapper<T>)>& pred) {
   vec.erase(std::remove_if(vec.begin(), vec.end(), pred), vec.end());
 }
 }  // namespace mge

@@ -1,5 +1,5 @@
-#ifndef MGE_EVENTS_RENDER_MODE_EVENT_HH
-#define MGE_EVENTS_RENDER_MODE_EVENT_HH
+#ifndef MGE_EVENTS_RENDER_MODE_EVENT
+#define MGE_EVENTS_RENDER_MODE_EVENT
 
 #include "event.hh"
 
@@ -10,11 +10,14 @@ enum class RenderModeEvents { RenderModeUpdated };
 
 class RenderModeUpdatedEvent : public Event<RenderModeEvents> {
  public:
-  RenderModeUpdatedEvent() : Event<RenderModeEvents>(RenderModeEvents::RenderModeUpdated, "RenderModeUpdatedEvent") {}
-  virtual ~RenderModeUpdatedEvent() = default;
-  std::string tag;
+  RenderModeUpdatedEvent(EntityId id, RenderMode render_mode)
+      : Event<RenderModeEvents>(RenderModeEvents::RenderModeUpdated, "RenderModeUpdatedEvent"),
+        id(id),
+        render_mode(render_mode) {}
+
+  EntityId id;
   RenderMode render_mode;
 };
 }  // namespace mge
 
-#endif  // MGE_EVENTS_RENDER_MODE_EVENT_HH
+#endif  // MGE_EVENTS_RENDER_MODE_EVENT

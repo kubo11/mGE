@@ -4,6 +4,7 @@
 #include "mgepch.hh"
 
 #include "events/event.hh"
+#include "events/inputs.hh"
 
 namespace mge {
 struct WindowData {
@@ -50,8 +51,8 @@ class Window {
   GLFWmousebuttonfun set_mouse_button_callback(GLFWmousebuttonfun callback);
   GLFWkeyfun set_keyboard_key_callback(GLFWkeyfun callback);
 
-  bool is_key_pressed(int key) const;
-  bool is_mouse_pressed(int key) const;
+  bool is_key_pressed(KeyboardKey key) const;
+  bool is_mouse_pressed(MouseButton button) const;
 
  private:
   WindowData m_data;

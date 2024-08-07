@@ -93,6 +93,10 @@ class _EventManager {
   _event.set_dt(EventManager::get_instance().get_timer().get_dt()); \
   EventManager::get_instance().get_dispatcher(_event.get_type()).send_event(_event)
 
+#define SendEngineEvent(_event)                                     \
+  _event.set_dt(EventManager::get_instance().get_timer().get_dt()); \
+  mge::EventManager::get_instance().get_dispatcher(_event.get_type()).send_event(_event)
+
 }  // namespace mge
 
 #endif  // MGE_EVENTS_EVENT_MANAGER

@@ -78,7 +78,10 @@ void RenderContext::init() {
   MGE_INFO("Render context initialized");
 }
 
-void RenderContext::terminate() { MGE_INFO("Render context terminated"); }
+void RenderContext::terminate() {
+  s_instance = nullptr;
+  MGE_INFO("Render context terminated");
+}
 
 size_t RenderContext::glSizeofType(GLenum type) {
   switch (type) {
@@ -136,11 +139,11 @@ GLenum RenderContext::glCheckError_(const char* file, int line) {
 }
 
 std::vector<std::pair<std::string, GLenum>> RenderContext::get_uniforms(GLuint id) {
-  GLint size = 0;
+  GLint count = 0;
   std::vector<std::pair<std::string, GLenum>> uniforms;
-  glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &size);
+  glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count);
 
-  for (GLint i = 0; i < size; ++i) {
+  for (GLint i = 0; i < count; ++i) {
     std::array<GLchar, 256> buffer;
     GLsizei length = 0;
     GLint size = 0;

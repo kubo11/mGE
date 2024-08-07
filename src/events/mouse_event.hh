@@ -18,6 +18,8 @@ class MouseMovedEvent : public Event<MouseEvents> {
         start_position(start_position),
         end_position(end_position) {}
   virtual ~MouseMovedEvent() = default;
+
+  const glm::vec2 get_offset() const { return end_position - start_position; }
   const Window& source_window;
   glm::vec2 start_position;
   glm::vec2 end_position;

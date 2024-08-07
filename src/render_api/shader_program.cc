@@ -45,6 +45,7 @@ void ShaderProgram::try_unbind() { RenderContext::get_instance().try_unbind_shad
 void ShaderProgram::load_uniforms() {
   auto uniforms = RenderContext::get_instance().get_uniforms(m_id);
   for (const auto& [name, type] : uniforms) {
+    if (name.starts_with("gl_")) continue;
     auto location = RenderContext::get_instance().get_uniform_location(m_id, name);
     m_uniforms.emplace(name, create_uniform(name, location, type, m_id));
   }

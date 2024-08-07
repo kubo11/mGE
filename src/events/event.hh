@@ -4,6 +4,9 @@
 #include "../mgepch.hh"
 
 namespace mge {
+template <class T>
+class EventDispatcher;
+
 template <typename T>
 class Event {
  public:
@@ -28,6 +31,8 @@ class Event {
   std::string m_name;
   bool m_handled;
   float m_dt = 0.0f;
+
+  friend EventDispatcher<T>;
 };
 
 template <typename T>
@@ -54,10 +59,11 @@ class EventDispatcher {
 
   void send_event(Event<T>& event) {
     // MGE_INFO("{} sent!", event.get_name());
-    if (m_listeners.find(event.get_type()) == m_listeners.end()) return;
+    if (!m_listeners.contains(event.get_type())) return;
 
     for (auto&& listener : m_listeners.at(event.get_type())) {
-      if (!event.is_handled()) listener(event);
+      if (event.is_handled()) return;
+      event.m_handled = listener(event);
     }
   }
 

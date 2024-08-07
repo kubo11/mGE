@@ -8,23 +8,24 @@ enum class CameraEvents { CameraAngleChanged, CameraPositionChanged, CameraZoom 
 
 class CameraAngleChangedEvent : public Event<CameraEvents> {
  public:
-  CameraAngleChangedEvent() : Event<CameraEvents>(CameraEvents::CameraAngleChanged, "CameraAngleChangedEvent") {}
+  CameraAngleChangedEvent(float yaw, float pitch)
+      : Event<CameraEvents>(CameraEvents::CameraAngleChanged, "CameraAngleChangedEvent"), yaw(yaw), pitch(pitch) {}
   virtual ~CameraAngleChangedEvent() = default;
-  float azimuth;
-  float elevation;
+  float yaw;
+  float pitch;
 };
 
 class CameraPositionChangedEvent : public Event<CameraEvents> {
  public:
-  CameraPositionChangedEvent()
-      : Event<CameraEvents>(CameraEvents::CameraPositionChanged, "CameraPositionChangedEvent") {}
+  CameraPositionChangedEvent(glm::vec2 offset)
+      : Event<CameraEvents>(CameraEvents::CameraPositionChanged, "CameraPositionChangedEvent"), offset(offset) {}
   virtual ~CameraPositionChangedEvent() = default;
-  glm::vec2 pos;
+  glm::vec2 offset;
 };
 
 class CameraZoomEvent : public Event<CameraEvents> {
  public:
-  CameraZoomEvent() : Event<CameraEvents>(CameraEvents::CameraZoom, "CameraAngleChangedEvent") {}
+  CameraZoomEvent(float zoom) : Event<CameraEvents>(CameraEvents::CameraZoom, "CameraAngleChangedEvent"), zoom(zoom) {}
   virtual ~CameraZoomEvent() = default;
   float zoom;
 };

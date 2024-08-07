@@ -14,6 +14,7 @@ class Camera {
   glm::mat4 get_projection_matrix();
 
   void move(MoveDirection dir, float dt);
+  void move(glm::vec3 offset, float dt);
   void rotate(float yaw, float pitch, float dt);
   void zoom(float zoom_amount, float dt);
 

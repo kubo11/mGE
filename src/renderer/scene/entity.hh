@@ -87,8 +87,16 @@ class Entity {
   }
 
   inline void remove_child(Entity& child) {
-    child.m_parents.erase(std::remove(child.m_parents.begin(), child.m_parents.end(), *this), child.m_parents.end());
-    m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
+    vector_remove(child.m_parents, *this);
+    vector_remove(m_children, child);
+  }
+
+  inline void remove_all_children() {
+    for (auto& child : m_children) {
+      vector_remove(child.get().m_parents, *this);
+    }
+    EntityVector empty_vector;
+    m_children.swap(empty_vector);
   }
 
   inline EntityVector& get_children() { return m_children; }

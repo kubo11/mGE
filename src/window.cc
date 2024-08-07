@@ -48,9 +48,13 @@ void Window::clear() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-bool Window::is_key_pressed(int key) const { return glfwGetKey(m_window, key) == GLFW_PRESS; }
+bool Window::is_key_pressed(KeyboardKey key) const {
+  return glfwGetKey(m_window, keyboard_key_to_glfw(key)) == GLFW_PRESS;
+}
 
-bool Window::is_mouse_pressed(int key) const { return glfwGetMouseButton(m_window, key) == GLFW_PRESS; }
+bool Window::is_mouse_pressed(MouseButton button) const {
+  return glfwGetMouseButton(m_window, mouse_button_to_glfw(button)) == GLFW_PRESS;
+}
 
 void Window::make_context_current() { glfwMakeContextCurrent(m_window); }
 
@@ -131,7 +135,7 @@ void Window::content_scale_callback(GLFWwindow *window, float xscale, float ysca
 
 void Window::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
   Window *mge_window = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (action == GLFW_PRESS || action == GLFW_RELEASE && !ImGui::GetIO().WantCaptureMouse) {
+  if ((action == GLFW_PRESS || action == GLFW_RELEASE) && !ImGui::GetIO().WantCaptureMouse) {
     double pos_x, pos_y;
     glfwGetCursorPos(window, &pos_x, &pos_y);
     pos_x = -1.0 + pos_x / static_cast<double>(mge_window->m_data.width) * 2.0;

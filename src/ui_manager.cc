@@ -24,8 +24,8 @@ std::shared_ptr<UIManager> UIManager::create(Window& window) {
 }
 
 void UIManager::start_frame() {
-  ImGui_ImplGlfw_NewFrame();
   ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 }
 
@@ -40,12 +40,14 @@ void UIManager::init(Window& window) {
   ImGui::StyleColorsDark();
 
   ImGui_ImplGlfw_InitForOpenGL(window.get_instance(), true);
-  ImGui_ImplOpenGL3_Init("#version 430 core");
+  ImGui_ImplOpenGL3_Init("#version 460 core");
 
   MGE_INFO("UI manager initialized");
 }
 
 void UIManager::terminate() {
+  s_instance = nullptr;
+
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();

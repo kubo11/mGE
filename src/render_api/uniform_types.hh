@@ -17,7 +17,10 @@ namespace mge {
     }                                                                                                  \
                                                                                                        \
    protected:                                                                                          \
-    virtual void commit_data() override { set_function; }                                              \
+    virtual void commit_data() override {                                                              \
+      set_function;                                                                                    \
+      glCheckError();                                                                                  \
+    }                                                                                                  \
                                                                                                        \
     virtual bool set_data(const data_type& value) override {                                           \
       if (m_data != value) {                                                                           \
