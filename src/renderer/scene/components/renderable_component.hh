@@ -144,7 +144,8 @@ struct InstancedRenderableComponent {
   inline const N& get_instance_data() { return m_instance_data; }
   inline void set_instance_data(const N& data) {
     m_instance_data = data;
-    if (is_enabled()) get_render_pipeline().update_instance_data(*this);
+    if (is_enabled() && !m_dirty) get_render_pipeline().schedule_instance_data_update(*this);
+    m_dirty = true;
   }
   inline RenderMode get_render_mode() const { return m_render_mode; }
   inline InstancedRenderPipeline<T, N>& get_render_pipeline() { return m_render_pipelines.at(m_render_mode); }
@@ -154,11 +155,13 @@ struct InstancedRenderableComponent {
     get_render_mode().remove_renderable(*this);
     m_render_mode = mode;
     get_render_mode().add_renderable(*this);
+    if (m_dirty) get_render_pipeline().schedule_instance_data_update(*this);
   }
   inline void enable() {
     if (!m_enabled) {
       m_enabled = true;
       m_render_pipelines.at(get_render_mode()).get().add_renderable(*this);
+      if (m_dirty) get_render_pipeline().schedule_instance_data_update(*this);
     }
   }
   inline void disable() {
@@ -169,11 +172,15 @@ struct InstancedRenderableComponent {
   }
   inline bool is_enabled() const { return m_enabled; }
 
+  bool is_dirty() const { return m_dirty; }
+  void set_clean() { m_dirty = false; }
+
  private:
   InstancedRenderPipelineMap<T, N> m_render_pipelines;
   N m_instance_data;
   RenderMode m_render_mode;
   bool m_enabled;
+  bool m_dirty;
 };
 }  // namespace mge
 

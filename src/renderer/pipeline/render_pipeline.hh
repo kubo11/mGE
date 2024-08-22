@@ -170,6 +170,10 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
       update_instance_buffer();
       m_do_full_instance_data_update = false;
     }
+    if (!m_renderables_to_update.empty()) {
+      flush_scheduled_instance_data_updates();
+    }
+
     this->m_shader_program.bind();
     m_vertex_array->bind();
     for (auto& action : this->m_uniform_actions) {
@@ -216,6 +220,7 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
   void update_instance_data(InstancedRenderableComponent<T, N>& renderable) {
     unsigned int idx = std::find(m_renderables.begin(), m_renderables.end(), renderable) - m_renderables.begin();
     auto data = renderable.get_instance_data();
+    if (renderable.is_dirty()) renderable.set_clean();
     m_vertex_array->get_instance_buffer().bind();
     m_vertex_array->get_instance_buffer().copy_subregion(idx * sizeof(N), sizeof(N), &data);
     m_vertex_array->get_instance_buffer().unbind();
@@ -226,11 +231,17 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
     instance_data.reserve(m_vertex_array->get_instance_buffer().get_count());
     for (auto& renderable : m_renderables) {
       instance_data.push_back(renderable.get().get_instance_data());
+      if (renderable.get().is_dirty()) renderable.get().set_clean();
     }
     m_vertex_array->get_instance_buffer().bind();
     m_vertex_array->get_instance_buffer().copy(instance_data);
     m_vertex_array->get_instance_buffer().unbind();
     m_do_full_instance_data_update = false;
+    m_renderables_to_update.clear();
+  }
+
+  void schedule_instance_data_update(InstancedRenderableComponent<T, N>& renderable) {
+    m_renderables_to_update.push_back(renderable);
   }
 
  protected:
@@ -238,7 +249,24 @@ class InstancedRenderPipeline : public BaseRenderPipeline<T> {
                           std::unique_ptr<InstancedVertexArray<T, N>> vertex_array)
       : BaseRenderPipeline<T>(shader_program, type), m_vertex_array(std::move(vertex_array)) {}
 
+  void flush_scheduled_instance_data_updates() {
+    if (m_renderables_to_update.size() == m_renderables.size()) {
+      update_instance_buffer();
+    } else {
+      m_vertex_array->get_instance_buffer().bind();
+      for (auto& renderable : m_renderables_to_update) {
+        unsigned int idx = std::find(m_renderables.begin(), m_renderables.end(), renderable) - m_renderables.begin();
+        auto data = renderable.get().get_instance_data();
+        m_vertex_array->get_instance_buffer().copy_subregion(idx * sizeof(N), sizeof(N), &data);
+        renderable.get().set_clean();
+      }
+      m_vertex_array->get_instance_buffer().unbind();
+    }
+    m_renderables_to_update.clear();
+  }
+
   std::vector<std::reference_wrapper<InstancedRenderableComponent<T, N>>> m_renderables;
+  std::vector<std::reference_wrapper<InstancedRenderableComponent<T, N>>> m_renderables_to_update;
   std::unique_ptr<InstancedVertexArray<T, N>> m_vertex_array;
   bool m_do_full_instance_data_update = false;
 
