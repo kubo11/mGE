@@ -4,6 +4,7 @@
 #include "../mgepch.hh"
 
 #include "../timer.hh"
+#include "../utils.hh"
 #include "event.hh"
 
 namespace {
@@ -17,19 +18,6 @@ std::function<bool(A&)> cast_to_base_function(const std::function<bool(B&)>& fun
 }  // namespace
 
 namespace mge {
-
-// type map implementation from
-// https://en.cppreference.com/w/cpp/types/type_info/hash_code
-using TypeInfoRef = std::reference_wrapper<const std::type_info>;
-
-struct Hasher {
-  std::size_t operator()(TypeInfoRef code) const { return code.get().hash_code(); }
-};
-
-struct EqualTo {
-  bool operator()(TypeInfoRef lhs, TypeInfoRef rhs) const { return lhs.get() == rhs.get(); }
-};
-
 template <class... T>
 using DispatcherMap =
     std::unordered_map<TypeInfoRef, std::unique_ptr<std::variant<EventDispatcher<T>...>>, Hasher, EqualTo>;

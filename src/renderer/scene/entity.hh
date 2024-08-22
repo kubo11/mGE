@@ -11,6 +11,8 @@ class Entity;
 using EntityId = entt::entity;
 using EntityVector = std::vector<std::reference_wrapper<mge::Entity>>;
 using OptionalEntity = std::optional<std::reference_wrapper<Entity>>;
+using Handler = std::function<void(mge::Entity&)>;
+using HandlerMap = std::unordered_map<TypeInfoRef, std::vector<Handler>, Hasher, EqualTo>;
 
 class Entity {
  public:
@@ -115,13 +117,102 @@ class Entity {
 
   inline const EntityId get_id() const { return m_id; }
 
+  template <class T, class N>
+  unsigned int register_on_construct(void (N::*func_ptr)(mge::Entity&), N* arg) {
+    return register_on_construct<T>(std::bind(func_ptr, arg, std::placeholders::_1));
+  }
+
+  template <class T>
+  unsigned int register_on_construct(const Handler& handler) {
+    m_on_construct_handlers[typeid(T)].push_back(handler);
+    int handle = m_next_handler_id++;
+    m_handler_handles[handle] = std::prev(m_on_construct_handlers.at(typeid(T)).end());
+    return handle;
+  }
+
+  template <class T>
+  void unregister_on_construct(unsigned int handle) {
+    auto it = m_handler_handles.find(handle);
+    if (it != m_handler_handles.end()) {
+      m_on_construct_handlers.at(typeid(T)).erase(it->second);
+    }
+  }
+
+  template <class T, class N>
+  unsigned int register_on_update(void (N::*func_ptr)(mge::Entity&), N* arg) {
+    return register_on_update<T>(std::bind(func_ptr, arg, std::placeholders::_1));
+  }
+
+  template <class T>
+  unsigned int register_on_update(const Handler& handler) {
+    m_on_update_handlers[typeid(T)].push_back(handler);
+    int handle = m_next_handler_id++;
+    m_handler_handles[handle] = std::prev(m_on_update_handlers.at(typeid(T)).end());
+    return handle;
+  }
+
+  template <class T>
+  void unregister_on_update(unsigned int handle) {
+    auto it = m_handler_handles.find(handle);
+    if (it != m_handler_handles.end()) {
+      m_on_update_handlers.at(typeid(T)).erase(it->second);
+    }
+  }
+
+  template <class T, class N>
+  unsigned int register_on_destroy(void (N::*func_ptr)(mge::Entity&), N* arg) {
+    return register_on_destroy<T>(std::bind(func_ptr, arg, std::placeholders::_1));
+  }
+
+  template <class T>
+  unsigned int register_on_destroy(const Handler& handler) {
+    m_on_destroy_handlers[typeid(T)].push_back(handler);
+    int handle = m_next_handler_id++;
+    m_handler_handles[handle] = std::prev(m_on_destroy_handlers.at(typeid(T)).end());
+    return handle;
+  }
+
+  template <class T>
+  void unregister_on_destroy(unsigned int handle) {
+    auto it = m_handler_handles.find(handle);
+    if (it != m_handler_handles.end()) {
+      m_on_destroy_handlers.at(typeid(T)).erase(it->second);
+    }
+  }
+
  private:
   Entity(entt::registry& registry) : m_registry(registry), m_id(m_registry.create()) {}
+
+  template <class T>
+  void on_construct() {
+    for (auto& handler : m_on_construct_handlers.at(typeid(T))) {
+      handler(*this);
+    }
+  }
+
+  template <class T>
+  void on_update() {
+    for (auto& handler : m_on_update_handlers.at(typeid(T))) {
+      handler(*this);
+    }
+  }
+
+  template <class T>
+  void on_destroy() {
+    for (auto& handler : m_on_destroy_handlers.at(typeid(T))) {
+      handler(*this);
+    }
+  }
 
   entt::registry& m_registry;
   EntityId m_id;
   EntityVector m_children;
   EntityVector m_parents;
+  HandlerMap m_on_construct_handlers;
+  HandlerMap m_on_update_handlers;
+  HandlerMap m_on_destroy_handlers;
+  unsigned int m_next_handler_id = 0u;
+  std::unordered_map<unsigned int, typename std::vector<Handler>::iterator> m_handler_handles;
 
   friend class Scene;
 };

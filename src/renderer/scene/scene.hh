@@ -42,6 +42,46 @@ class Scene {
     return m_registry->group<>(get, exclude).size();
   }
 
+  template <class T>
+  void invoke_on_construct(entt::registry&, entt::entity id) {
+    auto& entity = m_entities_by_id.at(id);
+    entity.get()->on_construct<T>();
+  }
+
+  template <class T>
+  void enable_on_construct_listeners() {
+    m_registry->on_construct<T>().template connect<&Scene::invoke_on_construct<T>>(*this);
+  }
+
+  template <class T>
+  void invoke_on_update(entt::registry&, entt::entity id) {
+    auto& entity = m_entities_by_id.at(id);
+    entity.get()->on_update<T>();
+  }
+
+  template <class T>
+  void enable_on_update_listeners() {
+    m_registry->on_update<T>().template connect<&Scene::invoke_on_update<T>>(*this);
+  }
+
+  template <class T>
+  void invoke_on_destroy(entt::registry&, entt::entity id) {
+    auto& entity = m_entities_by_id.at(id);
+    entity.get()->on_destroy<T>();
+  }
+
+  template <class T>
+  void enable_on_destroy_listeners() {
+    m_registry->on_destroy<T>().template connect<&Scene::invoke_on_destroy<T>>(*this);
+  }
+
+  template <class T>
+  void enable_all_listeners() {
+    enable_on_construct_listeners<T>();
+    enable_on_update_listeners<T>();
+    enable_on_destroy_listeners<T>();
+  }
+
   Entity& create_entity();
   Entity& create_entity(const std::function<void(Entity&)> func);
   void destroy_entity(EntityId id);

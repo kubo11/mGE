@@ -39,6 +39,18 @@ inline void vector_remove_if(std::vector<std::reference_wrapper<T>>& vec,
                              const std::function<bool(const std::reference_wrapper<T>)>& pred) {
   vec.erase(std::remove_if(vec.begin(), vec.end(), pred), vec.end());
 }
+
+// type map implementation from
+// https://en.cppreference.com/w/cpp/types/type_info/hash_code
+using TypeInfoRef = std::reference_wrapper<const std::type_info>;
+
+struct Hasher {
+  std::size_t operator()(TypeInfoRef code) const { return code.get().hash_code(); }
+};
+
+struct EqualTo {
+  bool operator()(TypeInfoRef lhs, TypeInfoRef rhs) const { return lhs.get() == rhs.get(); }
+};
 }  // namespace mge
 
 #endif  // MGE_UTILS
