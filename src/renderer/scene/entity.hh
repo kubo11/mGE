@@ -185,21 +185,21 @@ class Entity {
 
   template <class T>
   void on_construct() {
-    for (auto& handler : m_on_construct_handlers.at(typeid(T))) {
+    for (auto& handler : m_on_construct_handlers[typeid(T)]) {
       handler(*this);
     }
   }
 
   template <class T>
   void on_update() {
-    for (auto& handler : m_on_update_handlers.at(typeid(T))) {
+    for (auto& handler : m_on_update_handlers[typeid(T)]) {
       handler(*this);
     }
   }
 
   template <class T>
   void on_destroy() {
-    for (auto& handler : m_on_destroy_handlers.at(typeid(T))) {
+    for (auto& handler : m_on_destroy_handlers[typeid(T)]) {
       handler(*this);
     }
   }
