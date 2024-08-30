@@ -42,14 +42,24 @@ class BaseRenderPipeline {
 
   template <class N>
   void dynamic_uniform_update(const std::string& uniform_name, const std::function<N(void)>& update_func) {
+    dynamic_uniform_update(uniform_name, update_func());
+  }
+
+  template <class N>
+  void dynamic_uniform_update(const std::string& uniform_name, const N& value) {
     MGE_ASSERT(m_shader_program.has_uniform(uniform_name), "Attempted to update unknown uniform: {}", uniform_name);
-    m_shader_program.set_uniform_value(uniform_name, update_func());
+    m_shader_program.set_uniform_value(uniform_name, value);
   }
 
   template <class N>
   void dynamic_uniform_update_and_commit(const std::string& uniform_name, const std::function<N(void)>& update_func) {
+    dynamic_uniform_update_and_commit(uniform_name, update_func());
+  }
+
+  template <class N>
+  void dynamic_uniform_update_and_commit(const std::string& uniform_name, const N& value) {
     MGE_ASSERT(m_shader_program.has_uniform(uniform_name), "Attempted to update unknown uniform: {}", uniform_name);
-    m_shader_program.set_and_commit_uniform_value(uniform_name, update_func());
+    m_shader_program.set_and_commit_uniform_value(uniform_name, value);
   }
 
   void dynamic_buffer_update(Buffer<T>& buffer, const std::function<std::pair<T*, unsigned int>(void)>& update_func) {
