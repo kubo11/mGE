@@ -32,8 +32,19 @@ struct TransformComponent {
     m_rotation = glm::normalize(m_rotation);
     update_model_mat();
   }
+  inline void rotate(const glm::quat& q) {
+    m_rotation *= q;
+    m_rotation = glm::normalize(m_rotation);
+    update_model_mat();
+  }
   inline void scale(float scale) {
     m_scale *= scale;
+    update_model_mat();
+  }
+  inline void scale(glm::vec3 scale) {
+    m_scale.x *= scale.x;
+    m_scale.y *= scale.y;
+    m_scale.z *= scale.z;
     update_model_mat();
   }
 
