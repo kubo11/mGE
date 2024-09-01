@@ -1,8 +1,8 @@
-#include "camera.hh"
+#include "base_camera.hh"
 
 namespace mge {
-Camera::Camera(glm::vec3 position, float yaw, float pitch, float fov, float aspect_ratio, float near_plane,
-               float far_plane)
+BaseCamera::BaseCamera(glm::vec3 position, float yaw, float pitch, float fov, float aspect_ratio, float near_plane,
+                       float far_plane)
     : m_pos(position),
       m_world_up(glm::vec3(0.0f, 1.0f, 0.0f)),
       m_yaw(yaw),
@@ -18,33 +18,9 @@ Camera::Camera(glm::vec3 position, float yaw, float pitch, float fov, float aspe
       m_zoom_sensitivity(1.0f),
       m_velocity(1.0f) {
   update_camera_vectors();
-  m_view = glm::lookAt(m_pos, m_pos + m_front, m_up);
-  m_projection = glm::perspective(glm::radians(m_fov), m_aspect_ratio, m_near_plane, m_far_plane);
 }
 
-glm::mat4 Camera::get_view_matrix() {
-  if (m_update_camera_vectors) {
-    m_update_camera_vectors = false;
-    update_camera_vectors();
-  }
-  if (m_update_view) {
-    m_update_view = false;
-    m_view = glm::lookAt(m_pos, m_pos + m_front, m_up);
-  }
-
-  return m_view;
-}
-
-glm::mat4 Camera::get_projection_matrix() {
-  if (m_update_projection) {
-    m_update_projection = false;
-    m_projection = glm::perspective(glm::radians(m_fov), m_aspect_ratio, m_near_plane, m_far_plane);
-  }
-
-  return m_projection;
-}
-
-void Camera::move(Camera::MoveDirection dir, float dt) {
+void BaseCamera::move(BaseCamera::MoveDirection dir, float dt) {
   switch (dir) {
     case MoveDirection::FRONT:
       m_pos += m_front * m_velocity * dt;
@@ -68,7 +44,7 @@ void Camera::move(Camera::MoveDirection dir, float dt) {
   m_update_view = true;
 }
 
-void Camera::move(glm::vec3 offset, float dt) {
+void BaseCamera::move(glm::vec3 offset, float dt) {
   if (offset.x > 0) {
     move(MoveDirection::RIGHT, dt);
   } else if (offset.x < 0) {
@@ -88,7 +64,7 @@ void Camera::move(glm::vec3 offset, float dt) {
   }
 }
 
-void Camera::rotate(float yaw, float pitch, float dt) {
+void BaseCamera::rotate(float yaw, float pitch, float dt) {
   m_yaw += yaw * m_rotation_sensitivity * dt;
   while (m_yaw > 360.0f) m_yaw -= 360.0f;
   while (m_yaw < 0.0f) m_yaw += 360.0f;
@@ -97,12 +73,12 @@ void Camera::rotate(float yaw, float pitch, float dt) {
   m_update_camera_vectors = true;
 }
 
-void Camera::zoom(float zoom_amount, float dt) {
+void BaseCamera::zoom(float zoom_amount, float dt) {
   m_fov = std::clamp(m_fov * zoom_amount, 1.0f, 45.0f);
   m_update_projection = true;
 }
 
-void Camera::update_camera_vectors() {
+void BaseCamera::update_camera_vectors() {
   glm::vec3 front;
   front.x = glm::cos(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
   front.y = glm::sin(glm::radians(m_pitch));
@@ -110,5 +86,25 @@ void Camera::update_camera_vectors() {
   m_front = glm::normalize(front);
   m_right = glm::normalize(glm::cross(m_front, m_world_up));
   m_up = glm::normalize(glm::cross(m_right, m_front));
+}
+
+void BaseCamera::copy_camera_data(BaseCamera& other) {
+  m_velocity = other.m_velocity;
+  m_rotation_sensitivity = other.m_rotation_sensitivity;
+  m_zoom_sensitivity = other.m_zoom_sensitivity;
+  m_aspect_ratio = other.m_aspect_ratio;
+  m_near_plane = other.m_near_plane;
+  m_far_plane = other.m_far_plane;
+  m_pos = other.m_pos;
+  m_front = other.m_front;
+  m_up = other.m_up;
+  m_right = other.m_right;
+  m_world_up = other.m_world_up;
+  m_yaw = other.m_yaw;
+  m_pitch = other.m_pitch;
+  m_fov = other.m_fov;
+  m_update_view = true;
+  m_update_projection = true;
+  m_update_camera_vectors = true;
 }
 }  // namespace mge

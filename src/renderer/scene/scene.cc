@@ -3,14 +3,14 @@
 #include "entity.hh"
 
 namespace mge {
-Scene::Scene(std::unique_ptr<Camera> camera)
+Scene::Scene(std::unique_ptr<BaseCamera> camera)
     : m_registry(std::make_unique<entt::registry>()),
-      m_cameras([](std::unique_ptr<Camera> cam) {
-        std::vector<std::unique_ptr<Camera>> v;
+      m_cameras([](std::unique_ptr<BaseCamera> cam) {
+        std::vector<std::unique_ptr<BaseCamera>> v;
         v.emplace_back(std::move(cam));
         return v;
       }(std::move(camera))),
-      m_current_camera(*m_cameras[0]) {}
+      m_current_camera_idx(0) {}
 
 Entity& Scene::create_entity() {
   auto entity = std::unique_ptr<Entity>(new Entity(*m_registry));

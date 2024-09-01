@@ -4,11 +4,11 @@
 #include "mgepch.hh"
 
 #include "events/event.hh"
-#include "events/events.hh"
 #include "events/event_manager.hh"
+#include "events/events.hh"
 #include "layers/layer_stack.hh"
 #include "render_context.hh"
-#include "renderer/camera.hh"
+#include "renderer/camera/camera.hh"
 #include "renderer/scene/scene.hh"
 #include "shader_system.hh"
 #include "timer.hh"
