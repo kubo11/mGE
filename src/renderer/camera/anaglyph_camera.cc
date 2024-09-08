@@ -71,10 +71,10 @@ glm::mat4 AnaglyphCamera::create_view_matrix() {
   float virtual_eye_distance = m_projective_plane_distance / m_screen_distance * m_eye_distance;
   glm::vec3 eye_pos;
   if (m_eye == Eye::Left) {
-    eye_pos = m_pos - m_right * virtual_eye_distance / 2.0f;
+    eye_pos = m_pos + m_right * virtual_eye_distance / 2.0f;
 
   } else {
-    eye_pos = m_pos + m_right * virtual_eye_distance / 2.0f;
+    eye_pos = m_pos - m_right * virtual_eye_distance / 2.0f;
   }
   return glm::inverse(glm::mat4{m_right.x, m_right.y, m_right.z, 0.0f, m_up.x, m_up.y, m_up.z, 0.0f, -m_front.x,
                                 -m_front.y, -m_front.z, 0, eye_pos.x, eye_pos.y, eye_pos.z, 1.0f});

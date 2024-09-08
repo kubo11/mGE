@@ -12,7 +12,7 @@ using EntityId = entt::entity;
 using EntityVector = std::vector<std::reference_wrapper<mge::Entity>>;
 using OptionalEntity = std::optional<std::reference_wrapper<Entity>>;
 using Handler = std::function<void(mge::Entity&)>;
-using HandlerMap = std::unordered_map<TypeInfoRef, std::vector<Handler>, Hasher, EqualTo>;
+using HandlerMap = std::unordered_map<TypeInfoRef, std::list<Handler>, Hasher, EqualTo>;
 
 class Entity {
  public:
@@ -24,7 +24,7 @@ class Entity {
   PREVENT_COPY(Entity);
 
   void destroy() {
-    m_registry.destroy(m_id);
+    if (is_valid()) m_registry.destroy(m_id);
     for (auto& parent : m_parents) {
       vector_remove(parent.get().m_children, *this);
     }
@@ -42,6 +42,8 @@ class Entity {
       child.get().destroy_recursively();
     }
   }
+
+  bool is_valid() const { return m_registry.valid(m_id); }
 
   template <class T, class... Args>
   inline decltype(auto) add_component(Args&&... args) {
@@ -212,7 +214,7 @@ class Entity {
   HandlerMap m_on_update_handlers;
   HandlerMap m_on_destroy_handlers;
   unsigned int m_next_handler_id = 0u;
-  std::unordered_map<unsigned int, typename std::vector<Handler>::iterator> m_handler_handles;
+  std::unordered_map<unsigned int, typename std::list<Handler>::iterator> m_handler_handles;
 
   friend class Scene;
 };

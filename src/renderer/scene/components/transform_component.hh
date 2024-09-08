@@ -63,6 +63,7 @@ struct TransformComponent {
 
   inline glm::vec3 get_position() const { return m_position; }
   inline glm::quat get_rotation() const { return m_rotation; }
+  inline glm::vec3 get_rotation_euler() const { return glm::eulerAngles(m_rotation); }
   inline glm::vec3 get_scale() const { return m_scale; }
 
   inline glm::mat4 get_model_mat() const { return m_model_mat; }
