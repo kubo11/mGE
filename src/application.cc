@@ -15,8 +15,8 @@ Application::Application(const ApplicationParams& config) : m_running(true), m_n
 
   m_layer_stack = std::make_unique<LayerStack>();
   m_scene = std::make_unique<mge::Scene>(std::move(std::make_unique<mge::Camera>(
-      glm::vec3{2.0f, 2.0f, 2.0f}, -135, -35, 20,
-      static_cast<float>(config.window_width) / static_cast<float>(config.window_height), 0.1f, 100.0f)));
+      glm::vec3{3.0f, 3.0f, 0.0f}, 180, -45, 45,
+      static_cast<float>(config.window_width) / static_cast<float>(config.window_height), 0.01f, 100.0f)));
 
   AddEventListener(WindowEvents::WindowClosed, Application::on_window_closed, this);
 

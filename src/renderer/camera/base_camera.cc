@@ -15,8 +15,8 @@ BaseCamera::BaseCamera(glm::vec3 position, float yaw, float pitch, float fov, fl
       m_update_projection(false),
       m_update_camera_vectors(false),
       m_rotation_sensitivity(100000.0f),
-      m_zoom_sensitivity(1.0f),
-      m_velocity(1.0f) {
+      m_zoom_sensitivity(400.0f),
+      m_velocity(20.0f) {
   update_camera_vectors();
 }
 
@@ -74,8 +74,12 @@ void BaseCamera::rotate(float yaw, float pitch, float dt) {
 }
 
 void BaseCamera::zoom(float zoom_amount, float dt) {
-  m_fov = std::clamp(m_fov * zoom_amount, 1.0f, 45.0f);
-  m_update_projection = true;
+  if (zoom_amount < 1.0f) {
+    m_pos += m_front * m_zoom_sensitivity * dt;
+  } else {
+    m_pos -= m_front * m_zoom_sensitivity * dt;
+  }
+  m_update_view = true;
 }
 
 void BaseCamera::update_camera_vectors() {
