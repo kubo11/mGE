@@ -27,6 +27,9 @@ If you want to speed up the buliding process add `-jN` flag to the last command,
 ## Libraries
 
 This project has been created with use of some other open-source dependencies:
-- [glad](https://github.com/Dav1dde/glad) - 2.0.5
-- [glfw](https://github.com/glfw/glfw) - 3.3.10
-- [spdlog](https://github.com/gabime/spdlog) - 1.13.0
+- [glad](https://github.com/Dav1dde/glad)
+- [glfw](https://github.com/glfw/glfw)
+- [spdlog](https://github.com/gabime/spdlog)
+- [glm](https://github.com/g-truc/glm)
+- [imgui](https://github.com/ocornut/imgui)
+- [entt](https://github.com/skypjack/entt.git)
