@@ -3,10 +3,10 @@
 namespace mge {
 std::shared_ptr<Logger> Logger::s_instance = nullptr;
 
-Logger::Logger() {
+Logger::Logger(const std::string& name) {
   spdlog::set_pattern("%^[%T][%n][%l]%$: %v");
 
-  m_mge_logger = spdlog::stdout_color_mt("Espert");
+  m_mge_logger = spdlog::stdout_color_mt(name);
   m_mge_logger->set_level(spdlog::level::trace);
 }
 
@@ -14,12 +14,12 @@ Logger::~Logger() {
   if (Logger::s_instance) terminate();
 }
 
-std::shared_ptr<Logger> Logger::create() {
+std::shared_ptr<Logger> Logger::create(const std::string& name) {
   if (Logger::s_instance != nullptr) {
     throw std::runtime_error("The logger instance already exists!");
   }
 
-  Logger::s_instance = std::shared_ptr<Logger>(new Logger());
+  Logger::s_instance = std::shared_ptr<Logger>(new Logger(name));
   MGE_INFO("Logger created");
 
   return s_instance;

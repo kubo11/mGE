@@ -9,7 +9,7 @@ class Logger {
 
  public:
   ~Logger();
-  static std::shared_ptr<Logger> create();
+  static std::shared_ptr<Logger> create(const std::string& name);
   inline static Logger& get_instance() { return *s_instance; }
   inline static std::shared_ptr<spdlog::logger> get_mge_logger() { return s_instance->m_mge_logger; }
 
@@ -21,7 +21,7 @@ class Logger {
   static std::shared_ptr<Logger> s_instance;
   std::shared_ptr<spdlog::logger> m_mge_logger;
 
-  Logger();
+  Logger(const std::string& name);
 };
 }  // namespace mge
 

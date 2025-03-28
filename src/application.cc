@@ -2,7 +2,7 @@
 
 namespace mge {
 Application::Application(const ApplicationParams& config) : m_running(true), m_name(config.name) {
-  m_logger = Logger::create();
+  m_logger = Logger::create("mGE");
   m_timer = std::make_unique<Timer>();
   m_event_manager = EventManager::create(*m_timer);
   m_window_manager = WindowManager::create();
