@@ -27,6 +27,7 @@ void UIManager::start_frame() {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
+  // ImGuizmo::BeginFrame();
 }
 
 void UIManager::end_frame() { ImGui::EndFrame(); }

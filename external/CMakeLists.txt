@@ -39,5 +39,13 @@ target_include_directories(
     ${IMGUI_DIR}/backends
 )
 
+#imguizmo
+set(IMGUIZMO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imguizmo)
+set(IMGUIZMO_SOURCES ${IMGUIZMO_DIR}/ImGuizmo.cpp ${IMGUIZMO_DIR}/ImGuizmo.h)
+add_library(imguizmo ${IMGUIZMO_SOURCES})
+target_link_libraries(imguizmo PUBLIC imgui)
+target_include_directories(imguizmo PUBLIC ${IMGUIZMO_DIR})
+target_compile_definitions(imguizmo PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
+
 # spdlog
 add_subdirectory(spdlog)
