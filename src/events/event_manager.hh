@@ -53,6 +53,12 @@ class _EventManager {
 
   const Timer& get_timer() const { return m_timer; }
 
+  template <class E>
+  void send_event(E& event) {
+    event.set_dt(get_timer().get_dt());
+    get_dispatcher(event.get_type()).send_event(event);
+  }
+
  private:
   inline static std::shared_ptr<_EventManager> s_instance = nullptr;
   DispatcherMap<T...> m_event_dispatchers;
@@ -77,14 +83,8 @@ class _EventManager {
 #define RemoveEventListener(event_type, handle) \
   EventManager::get_instance().get_dispatcher(event_type).remove_listener(handle)
 
-#define SendEvent(_event)                                           \
-  _event.set_dt(EventManager::get_instance().get_timer().get_dt()); \
-  EventManager::get_instance().get_dispatcher(_event.get_type()).send_event(_event)
-
-#define SendEngineEvent(_event)                                          \
-  _event.set_dt(mge::EventManager::get_instance().get_timer().get_dt()); \
-  mge::EventManager::get_instance().get_dispatcher(_event.get_type()).send_event(_event)
-
+#define SendEvent(_event) \
+  EventManager::get_instance().send_event(_event)
 }  // namespace mge
 
 #endif  // MGE_EVENTS_EVENT_MANAGER
