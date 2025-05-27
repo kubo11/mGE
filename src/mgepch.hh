@@ -19,6 +19,7 @@
 #include <vector>
 
 namespace fs = std::filesystem;
+namespace views = std::views;
 
 // entt
 #include <entt/entt.hpp>
