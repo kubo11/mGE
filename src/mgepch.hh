@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <variant>
 #include <vector>
+#include <queue>
 
 namespace fs = std::filesystem;
 namespace views = std::views;
