@@ -47,6 +47,7 @@ void ShaderProgram::load_uniforms() {
   for (const auto& [name, type] : uniforms) {
     if (name.starts_with("gl_")) continue;
     auto location = RenderContext::get_instance().get_uniform_location(m_id, name);
+    if (type == 35678) continue;
     m_uniforms.emplace(name, create_uniform(name, location, type, m_id));
   }
 }
