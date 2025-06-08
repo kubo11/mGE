@@ -62,7 +62,6 @@ void Canvas::line(glm::ivec2 start, glm::ivec2 end) {
 }
 
 void Canvas::line(glm::vec2 start, glm::vec2 end) {
-  // line(wrap_pos(normalize_pos(start)), wrap_pos(normalize_pos(end)));
   line(glm::ivec2{m_size.x * start.x, m_size.y * start.y}, glm::ivec2{m_size.x * end.x, m_size.y * end.y});
 }
 

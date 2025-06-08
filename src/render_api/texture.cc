@@ -18,6 +18,8 @@ Texture::Texture(glm::uvec2 size) : m_size(size) {
   glCheckError();
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_size.x, m_size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
   glCheckError();
+  glGenerateMipmap(GL_TEXTURE_2D);
+  glCheckError();
 }
 
 Texture::~Texture() {
